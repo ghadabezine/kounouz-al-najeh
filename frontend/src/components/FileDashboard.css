@@ -1,0 +1,108 @@
+/* Style for FileDashboard container */
+.file-dashboard {
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  max-width: 900px;
+  /* Wider display */
+  padding: 20px;
+  background-color: #e7fafc;
+  /* Light blue similar to the background */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header with site name */
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  /* Similar playful font */
+  font-size: 48px;
+  color: #003366;
+  /* Dark blue, like the title in the image */
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  /* To match the uppercase look */
+  margin-bottom: 10px;
+}
+
+/* Heading for file upload section */
+h2 {
+  color: #00796b;
+  /* Greenish color */
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* File input and button container */
+input[type="file"] {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #daf4f7;
+  /* Light blue border similar to the background */
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #ff4081;
+  /* Pink color */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #f50057;
+  /* Slightly darker pink */
+}
+
+/* List of uploaded files */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #fff;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+li a {
+  text-decoration: none;
+  color: #00796b;
+  /* Greenish color for links */
+  font-size: 16px;
+}
+
+li a:hover {
+  text-decoration: underline;
+}
+
+/* Delete button */
+button {
+  background-color: #f44336;
+  /* Red for delete button */
+  padding: 8px 15px;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #e53935;
+  /* Slightly darker red */
+}

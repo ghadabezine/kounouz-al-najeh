@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import './FileDashboard.css';  // Import the CSS file
 
 const FileDashboard = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Fetch files
+  // Fetch files when component mounts
   useEffect(() => {
     fetchFiles();
   }, []);
@@ -24,7 +25,7 @@ const FileDashboard = () => {
     setSelectedFile(event.target.files[0]);
   };
 
-  // Upload File
+  // Handle file upload
   const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file first.");
@@ -47,7 +48,7 @@ const FileDashboard = () => {
     }
   };
 
-  // Delete File
+  // Handle file deletion
   const handleDelete = async (filename) => {
     try {
       await axios.delete(`http://localhost:5000/api/files/${filename}`);
@@ -59,7 +60,10 @@ const FileDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="file-dashboard">
+      <header>
+        <h1>Kunouz Al Najeh</h1>
+      </header>
       <h2>Upload File</h2>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleUpload}>Upload</button>
