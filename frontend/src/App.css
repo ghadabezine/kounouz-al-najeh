@@ -29,7 +29,7 @@ button {
 }
 
 .edit-btn {
-  background: blue;
+  background:#3498db;
   color: white;
 }
 
@@ -38,7 +38,7 @@ button {
 }
 
 .delete-btn {
-  background: red;
+  background: #e74c3c;
   color: white;
 }
 
