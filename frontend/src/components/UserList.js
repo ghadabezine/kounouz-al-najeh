@@ -1,6 +1,5 @@
 import React from "react";
 import "../App.css";
-
 const UserList = ({ users, handleDelete, handleEdit }) => {
   return (
     <table className="user-table">
@@ -33,5 +32,6 @@ const UserList = ({ users, handleDelete, handleEdit }) => {
     </table>
   );
 };
+
 
 export default UserList;
