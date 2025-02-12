@@ -5,6 +5,7 @@ const {
   getFiles,
   getFile,
   deleteFile,
+  updateFilename
 } = require("../controllers/FileController");
 
 const router = express.Router();
@@ -13,10 +14,11 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// ✅ Routes
+// ✅ Define Routes
 router.post("/files/upload", upload.single("file"), uploadFile);
 router.get("/files", getFiles);
 router.get("/files/:filename", getFile);
 router.delete("/files/:filename", deleteFile);
+router.patch("/files/:filename", updateFilename);
 
 module.exports = router;

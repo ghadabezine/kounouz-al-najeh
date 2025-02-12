@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import UserForm from './components/UserForm';
 import UserList from './components/UserList';
 import './styles/App.css';
+import FileDashboard from './components/FileDashboard'; // Import FileDashboard
+
 
 const App = () => {
   const [users, setUsers] = useState([]);
@@ -34,14 +36,17 @@ const App = () => {
 
   return (
     <div className="container">
+
       <Header setActivePage={setActivePage} />
+
       <main>
         {activePage === 'home' && (
           <div>
-            <h2>Welcome to Koumouz</h2>
-            <p>Explore our platform and discover amazing features.</p>
+            <h2>Welcome to Kounouz Ennajeh</h2>
+            <h3>Explore our platform and discover amazing features.</h3>
           </div>
         )}
+        {activePage === 'files' && <FileDashboard />}
 
         {activePage === 'users' && (
           <div>
@@ -58,6 +63,7 @@ const App = () => {
             />
           </div>
         )}
+
       </main>
       <Footer />
 

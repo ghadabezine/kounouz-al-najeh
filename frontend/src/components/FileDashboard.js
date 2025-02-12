@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './FileDashboard.css';  // Import the CSS file
+import './FileDashboard.css';  
 
 const FileDashboard = () => {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [editingFile, setEditingFile] = useState(null); 
+  const [newFilename, setNewFilename] = useState(""); 
 
-  // Fetch files when component mounts
   useEffect(() => {
     fetchFiles();
   }, []);
@@ -20,12 +21,10 @@ const FileDashboard = () => {
     }
   };
 
-  // Handle file selection
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
 
-  // Handle file upload
   const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file first.");
@@ -36,9 +35,7 @@ const FileDashboard = () => {
     formData.append("file", selectedFile);
 
     try {
-      await axios.post("http://localhost:5000/api/files/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.post("http://localhost:5000/api/files/upload", formData);
       alert("File uploaded successfully!");
       setSelectedFile(null);
       fetchFiles();
@@ -48,7 +45,6 @@ const FileDashboard = () => {
     }
   };
 
-  // Handle file deletion
   const handleDelete = async (filename) => {
     try {
       await axios.delete(`http://localhost:5000/api/files/${filename}`);
@@ -59,11 +55,30 @@ const FileDashboard = () => {
     }
   };
 
+  const handleEdit = (file) => {
+    setEditingFile(file.filename);
+    setNewFilename(file.filename);
+  };
+
+  const handleUpdateFilename = async () => {
+    if (!newFilename.trim()) {
+      alert("Filename cannot be empty.");
+      return;
+    }
+
+    try {
+      await axios.patch(`http://localhost:5000/api/files/${editingFile}`, { newFilename });
+      alert("Filename updated!");
+      setEditingFile(null);
+      fetchFiles();
+    } catch (err) {
+      console.error("Error updating filename:", err);
+      alert("Failed to update filename");
+    }
+  };
+
   return (
-    <div className="file-dashboard">
-      <header>
-        <h1>Kunouz Al Najeh</h1>
-      </header>
+    <div >
       <h2>Upload File</h2>
       <input type="file" onChange={handleFileChange} />
       <button onClick={handleUpload}>Upload</button>
@@ -71,11 +86,22 @@ const FileDashboard = () => {
       <h2>Uploaded Files</h2>
       <ul>
         {files.map((file) => (
-          <li key={file._id}>
-            <a href={`http://localhost:5000/api/files/${file.filename}`} target="_blank" rel="noopener noreferrer">
-              {file.filename}
-            </a>
-            <button onClick={() => handleDelete(file.filename)}>Delete</button>
+          <li key={file._id} className="file-item">
+            {editingFile === file.filename ? (
+              <>
+                <input type="text" value={newFilename} onChange={(e) => setNewFilename(e.target.value)} />
+                <button onClick={handleUpdateFilename}>Save</button>
+                <button onClick={() => setEditingFile(null)}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <a href={`http://localhost:5000/api/files/${file.filename}`} target="_blank">{file.filename}</a>
+                <div className="button-container">
+                <button class="edit-btn" onClick={() => handleEdit(file)}>Edit</button>
+                <button onClick={() => handleDelete(file.filename)}>Delete</button>
+                </div>
+              </>
+            )}
           </li>
         ))}
       </ul>

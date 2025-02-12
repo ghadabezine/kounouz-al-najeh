@@ -4,23 +4,23 @@ const connectDB = require("../config/db");
 
 let db, gridFSBucket;
 
+// ✅ Initialize Database Connection
 const initDB = async () => {
   const dbConnection = await connectDB();
   db = dbConnection.db;
   gridFSBucket = dbConnection.gridFSBucket;
 };
 
-// Initialize DB
-initDB().catch((err) => console.error("Failed to initialize DB:", err));
+// Run initDB when module is loaded
+initDB().catch((err) => console.error("❌ Failed to initialize DB:", err));
 
 // ✅ File Upload
-exports.uploadFile = async (req, res) => {
+const uploadFile = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Convert buffer to readable stream
     const readableStream = new Readable();
     readableStream.push(req.file.buffer);
     readableStream.push(null);
@@ -32,22 +32,19 @@ exports.uploadFile = async (req, res) => {
     readableStream.pipe(uploadStream);
 
     uploadStream.on("finish", () => {
-      console.log(`✅ File uploaded: ${req.file.originalname}`);
       res.json({ file: { filename: req.file.originalname, _id: uploadStream.id } });
     });
 
     uploadStream.on("error", (err) => {
-      console.error("❌ Upload Error:", err);
       res.status(500).json({ error: "Upload failed" });
     });
   } catch (error) {
-    console.error("❌ Unexpected Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 // ✅ Get All Files
-exports.getFiles = async (req, res) => {
+const getFiles = async (req, res) => {
   try {
     const files = await db.collection("quizes.files").find().toArray();
     if (!files || files.length === 0) {
@@ -55,13 +52,12 @@ exports.getFiles = async (req, res) => {
     }
     res.json(files);
   } catch (error) {
-    console.error("❌ Fetching Files Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 // ✅ File Download
-exports.getFile = async (req, res) => {
+const getFile = async (req, res) => {
   try {
     const file = await db.collection("quizes.files").findOne({ filename: req.params.filename });
 
@@ -72,13 +68,12 @@ exports.getFile = async (req, res) => {
     res.set("Content-Type", file.contentType);
     gridFSBucket.openDownloadStreamByName(req.params.filename).pipe(res);
   } catch (error) {
-    console.error("❌ File Retrieval Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
 // ✅ File Deletion
-exports.deleteFile = async (req, res) => {
+const deleteFile = async (req, res) => {
   try {
     const file = await db.collection("quizes.files").findOne({ filename: req.params.filename });
 
@@ -89,7 +84,43 @@ exports.deleteFile = async (req, res) => {
     await gridFSBucket.delete(file._id);
     res.json({ message: "File deleted successfully" });
   } catch (error) {
-    console.error("❌ File Deletion Error:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+};
+
+// ✅ File Rename (Fixing 404 Issue)
+const updateFilename = async (req, res) => {
+  try {
+    const { newFilename } = req.body;
+    const { filename } = req.params;
+
+    if (!newFilename.trim()) {
+      return res.status(400).json({ error: "New filename cannot be empty" });
+    }
+
+    const file = await db.collection("quizes.files").findOne({ filename });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    // Rename file in GridFS
+    await db.collection("quizes.files").updateOne(
+      { filename },
+      { $set: { filename: newFilename } }
+    );
+
+    res.json({ message: "Filename updated successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// ✅ Export all functions
+module.exports = {
+  uploadFile,
+  getFiles,
+  getFile,
+  deleteFile,
+  updateFilename,
 };

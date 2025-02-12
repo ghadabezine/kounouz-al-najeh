@@ -1,6 +1,5 @@
-// backend/routes/userRoutes.js
 const express = require("express");
-const User = require("../modelss/User");
+const User = require("../models/User");
 const router = express.Router();
 
 // Create User
