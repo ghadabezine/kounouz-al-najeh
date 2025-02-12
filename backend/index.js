@@ -15,9 +15,11 @@ app.use(express.json());
 // ✅ Connect to MongoDB
 connectDB();
 
+
 // ✅ Routes
 app.use("/api", fileRoutes);
 app.use("/api/users", userRoutes);
 // Start Server
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
