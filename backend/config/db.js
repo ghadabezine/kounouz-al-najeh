@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 const mongoose = require("mongoose");
 const { GridFSBucket } = require("mongodb");
@@ -17,8 +18,11 @@ const connectDB = async () => {
     return { conn, db, gridFSBucket };
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
+
     process.exit(1);
   }
 };
 
+
 module.exports = connectDB;
+
