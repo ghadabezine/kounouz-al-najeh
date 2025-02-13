@@ -1,37 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+
 import Header from './components/Header';
 import Footer from './components/Footer';
-import UserForm from './components/UserForm';
-import UserList from './components/UserList';
+import UserSection from './components/UserSection';
+import HomeSection from './components/HomeSection';
+import UserModal from './components/UserModal';
 import './styles/App.css';
 import FileDashboard from './components/FileDashboard'; // Import FileDashboard
 
 
 const App = () => {
-  const [users, setUsers] = useState([]);
-  const [editingUser, setEditingUser] = useState(null); // Track the user being edited
-  const [activePage, setActivePage] = useState('home'); // Track the active page
+  const [activePage, setActivePage] = useState('home');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
-  useEffect(() => {
-    if (activePage === 'users') {
-      fetchUsers();
-    }
-  }, [activePage]);
-
-  const fetchUsers = async () => {
-    const response = await axios.get("http://localhost:5000/api/users");
-    setUsers(response.data);
-  };
-
-  const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/users/${id}`);
-    fetchUsers();
-  };
-
-  const handleEdit = (user) => {
-    setEditingUser(user); // Set the user to be edited in the form
+  const openModal = (user = null) => {
+    setEditingUser(user);
+    setIsModalOpen(true);
   };
 
   return (
@@ -40,6 +27,12 @@ const App = () => {
       <Header setActivePage={setActivePage} />
 
       <main>
+
+        {activePage === 'home' ? <HomeSection /> : <UserSection openModal={openModal} />}
+      </main>
+      <Footer />
+      {isModalOpen && <UserModal editingUser={editingUser} closeModal={() => setIsModalOpen(false)} />}
+
         {activePage === 'home' && (
           <div>
             <h2>Welcome to Kounouz Ennajeh</h2>
@@ -66,6 +59,7 @@ const App = () => {
 
       </main>
       <Footer />
+
 
     </div>
   );
