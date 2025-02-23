@@ -1,44 +1,30 @@
 import React, { useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Animated,
-} from "react-native";
+import axios from "axios";
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from "react-native";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    console.log("Logging in with:", email, password);
-  };
+  const handleLogin = async () => {
+    if (!email || !password) {
+      return Alert.alert("Error", "Please enter both email and password");
+    }
 
-  // Animated circle motion
-  const translateY = new Animated.Value(0);
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(translateY, {
-        toValue: 20,
-        duration: 4000,
-        useNativeDriver: true, // Ensure you use the native driver
-      }),
-      Animated.timing(translateY, {
-        toValue: -20,
-        duration: 4000,
-        useNativeDriver: true,
-      }),
-    ])
-  ).start();
+    try {
+      const { data } = await axios.post("http://192.168.100.97:5000/api/auth/login", { email, password });
+      Alert.alert("Success", data.message || "Logged in successfully");
+      console.log("Received Token:", data.token);
+      // Navigate to dashboard or home if needed
+    } catch (error) {
+      console.error("Login Error:", error.response?.data || error.message);
+      Alert.alert("Error", error.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.circle, { transform: [{ translateY }] }]} />
-
-      <Text style={styles.header}>Kounouz Al Najah</Text>
-      <Text style={styles.subHeader}>Welcome Back!</Text>
+      <Text style={styles.header}>Login</Text>
 
       <TextInput
         style={styles.input}
@@ -46,8 +32,8 @@ const Login = ({ navigation }) => {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        autoCapitalize="none"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -60,12 +46,9 @@ const Login = ({ navigation }) => {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      <Text style={styles.registerText}>
-        Don't have an account?{" "}
-        <Text
-          style={styles.link}
-          onPress={() => navigation.navigate("Register")}
-        >
+      <Text style={styles.footerText}>
+        Don’t have an account?{" "}
+        <Text style={styles.link} onPress={() => navigation.navigate("Register")}>
           Register
         </Text>
       </Text>
@@ -74,64 +57,13 @@ const Login = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#E3F2FD", // Replaced gradient with solid background
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#1A237E",
-    marginBottom: 5,
-  },
-  subHeader: {
-    fontSize: 16,
-    color: "#1A237E",
-    marginBottom: 20,
-  },
-  input: {
-    width: "90%",
-    height: 50,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    color: "#fff",
-    marginBottom: 15,
-  },
-  button: {
-    width: "90%",
-    backgroundColor: "#01579B",
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 10,
-    elevation: 5,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  registerText: {
-    color: "#fff",
-    marginTop: 10,
-  },
-  link: {
-    color: "#D50000",
-    fontWeight: "bold",
-  },
-  circle: {
-    width: 150,
-    height: 150,
-    backgroundColor: "#fff",
-    borderRadius: 75,
-    position: "absolute",
-    top: 80,
-    opacity: 0.1,
-  },
+  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "#E3F2FD" },
+  header: { fontSize: 26, fontWeight: "bold", marginBottom: 20, color: "#1A237E" },
+  input: { width: "90%", height: 50, backgroundColor: "#fff", borderRadius: 10, paddingHorizontal: 15, marginBottom: 12 },
+  button: { width: "90%", backgroundColor: "#01579B", paddingVertical: 12, borderRadius: 10, alignItems: "center", marginTop: 10 },
+  buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  footerText: { marginTop: 15, color: "#1A237E" },
+  link: { color: "#D50000", fontWeight: "bold" },
 });
 
 export default Login;
