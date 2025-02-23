@@ -1,25 +1,25 @@
-// backend/index.js (update this file)
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const userRoutes = require("./routes/userRoutes");
-
-const fileRoutes = require("./routes/fileRoutes");
 const connectDB = require("./config/db");
+
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const fileRoutes = require("./routes/fileRoutes");
 
 const app = express();
 app.use(cors());
-app.use(express.json());
 
+app.use(express.json()); // Parses JSON requests
+app.use(express.urlencoded({ extended: true })); // Parses URL-encoded requests
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 connectDB();
 
+// Routes
+app.use("/api/auth", authRoutes);     // Auth endpoints
+app.use("/api/users", userRoutes);    // User endpoints
+app.use("/api/files", fileRoutes);    // File endpoints
 
-// ✅ Routes
-app.use("/api", fileRoutes);
-app.use("/api/users", userRoutes);
-// Start Server
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
