@@ -12,10 +12,14 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const { data } = await axios.post("http://192.168.100.97:5000/api/auth/login", { email, password });
+      const { data } = await axios.post(
+        "http://192.168.100.97:5000/api/auth/login", // ✅ Correct POST endpoint
+        { email, password }, // ✅ Send credentials in POST body
+        { headers: { "Content-Type": "application/json" } }
+      );
+
       Alert.alert("Success", data.message || "Logged in successfully");
       console.log("Received Token:", data.token);
-      // Navigate to dashboard or home if needed
     } catch (error) {
       console.error("Login Error:", error.response?.data || error.message);
       Alert.alert("Error", error.response?.data?.message || "Login failed");
