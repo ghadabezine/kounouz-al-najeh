@@ -14,7 +14,8 @@ const FileDashboard = () => {
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/files");
+      const res = await axios.get("http://localhost:5000/api/files"); // ✅ Matches backend route
+
       setFiles(res.data);
     } catch (err) {
       console.error("Error fetching files:", err);
