@@ -13,7 +13,7 @@ const Login = ({ navigation }) => {
 
     try {
       const { data } = await axios.post(
-        "http://192.168.100.97:5000/api/auth/login", // ✅ Correct POST endpoint
+        "http://192.168.100.97:5001/api/auth/login", // ✅ Correct POST endpoint
         { email, password }, // ✅ Send credentials in POST body
         { headers: { "Content-Type": "application/json" } }
       );
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   button: { width: "90%", backgroundColor: "#01579B", paddingVertical: 12, borderRadius: 10, alignItems: "center", marginTop: 10 },
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   footerText: { marginTop: 15, color: "#1A237E" },
-  link: { color: "#D50000", fontWeight: "bold" },
+  link: { color: "#D50010", fontWeight: "bold" },
 });
 
 export default Login;

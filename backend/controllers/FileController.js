@@ -1,25 +1,30 @@
 const { Readable } = require("stream");
-const mongoose = require("mongoose");
 const connectDB = require("../config/db");
-
+const Subject = require("../models/Subject");  // ✅ Add this line
+const File = require("../models/fileModel");
 let db, gridFSBucket;
 
-// ✅ Initialize Database Connection
+// ✅ Initialize the database and GridFS bucket
 const initDB = async () => {
-  const dbConnection = await connectDB();
-  db = dbConnection.db;
-  gridFSBucket = dbConnection.gridFSBucket;
+  const { db: database, gridFSBucket: bucket } = await connectDB();
+  db = database;
+  gridFSBucket = bucket;
 };
 
-// Run initDB when module is loaded
-initDB().catch((err) => console.error("❌ Failed to initialize DB:", err));
+initDB().catch((err) => console.error("❌ DB initialization failed:", err));
 
-// ✅ File Upload
+// ✅ Define uploadFile function (this was missing)
 const uploadFile = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
+    const { subjectId } = req.body;
+
+    // ✅ Validate subject
+    const subject = await Subject.findById(subjectId);
+    if (!subject) {
+      return res.status(404).json({ error: "Subject not found." });
     }
+
+    if (!req.file) return res.status(400).json({ error: "No file uploaded." });
 
     const readableStream = new Readable();
     readableStream.push(req.file.buffer);
@@ -27,100 +32,95 @@ const uploadFile = async (req, res) => {
 
     const uploadStream = gridFSBucket.openUploadStream(req.file.originalname, {
       contentType: req.file.mimetype,
+      metadata: { permission: "View Only", subject: subjectId },
     });
 
+    // ✅ Upload file to GridFS
     readableStream.pipe(uploadStream);
 
-    uploadStream.on("finish", () => {
-      res.json({ file: { filename: req.file.originalname, _id: uploadStream.id } });
+    uploadStream.on("finish", async () => {
+      // ✅ Save file metadata to File collection
+      const fileDoc = new File({
+        filename: req.file.originalname,
+        length: uploadStream.length,
+        uploadDate: new Date(),
+        metadata: { permission: "View Only" },
+        subject: subjectId,
+      });
+
+      await fileDoc.save();
+
+      // ✅ Update subject to reference this file
+      subject.resources.push(fileDoc._id);
+      await subject.save();
+
+      res.status(201).json({
+        message: "✅ File uploaded and referenced successfully!",
+        file: { filename: req.file.originalname, _id: fileDoc._id },
+      });
     });
 
     uploadStream.on("error", (err) => {
-      res.status(500).json({ error: "Upload failed" });
+      console.error("❌ Upload error:", err);
+      res.status(500).json({ error: "Upload failed." });
     });
+
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("❌ Internal error:", error);
+    res.status(500).json({ error: "Internal Server Error." });
   }
 };
-
-// ✅ Get All Files
+// ✅ Define other functions (examples)
 const getFiles = async (req, res) => {
   try {
-    const files = await db.collection("quizes.files").find().toArray();
-    if (!files || files.length === 0) {
-      return res.status(404).json({ message: "No files found" });
-    }
+    const files = await gridFSBucket.find().toArray();
     res.json(files);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("❌ Error fetching files:", error);
+    res.status(500).json({ error: "Failed to fetch files" });
+  }
+};
+const getFilesBySubject = async (req, res) => {
+  try {
+    const { subjectId } = req.params;
+
+    if (!subjectId) return res.status(400).json({ error: "Subject ID is required." });
+
+    const files = await File.find({ subject: subjectId });
+    res.json(files);
+  } catch (error) {
+    console.error("❌ Error fetching files:", error);
+    res.status(500).json({ error: "Failed to fetch files." });
   }
 };
 
-// ✅ File Download
 const getFile = async (req, res) => {
   try {
-    const file = await db.collection("quizes.files").findOne({ filename: req.params.filename });
-
-    if (!file) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    res.set("Content-Type", file.contentType);
-    gridFSBucket.openDownloadStreamByName(req.params.filename).pipe(res);
+    const file = await gridFSBucket.find({ filename: req.params.filename }).toArray();
+    if (!file.length) return res.status(404).json({ error: "File not found" });
+    res.json(file[0]);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("❌ Error fetching file:", error);
+    res.status(500).json({ error: "Failed to fetch file" });
   }
 };
 
-// ✅ File Deletion
 const deleteFile = async (req, res) => {
   try {
-    const file = await db.collection("quizes.files").findOne({ filename: req.params.filename });
+    const file = await gridFSBucket.find({ filename: req.params.filename }).toArray();
+    if (!file.length) return res.status(404).json({ error: "File not found" });
 
-    if (!file) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    await gridFSBucket.delete(file._id);
+    await gridFSBucket.delete(file[0]._id);
     res.json({ message: "File deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("❌ Error deleting file:", error);
+    res.status(500).json({ error: "Failed to delete file" });
   }
 };
 
-// ✅ File Rename (Fixing 404 Issue)
 const updateFilename = async (req, res) => {
-  try {
-    const { newFilename } = req.body;
-    const { filename } = req.params;
-
-    if (!newFilename.trim()) {
-      return res.status(400).json({ error: "New filename cannot be empty" });
-    }
-
-    const file = await db.collection("quizes.files").findOne({ filename });
-
-    if (!file) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    // Rename file in GridFS
-    await db.collection("quizes.files").updateOne(
-      { filename },
-      { $set: { filename: newFilename } }
-    );
-
-    res.json({ message: "Filename updated successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+  return res.status(501).json({ error: "Update filename not implemented" });
 };
 
-// ✅ Export all functions
-module.exports = {
-  uploadFile,
-  getFiles,
-  getFile,
-  deleteFile,
-  updateFilename,
-};
+// ✅ Export all defined functions
+module.exports = { uploadFile, getFiles, getFile, deleteFile, updateFilename, getFilesBySubject };

@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const mongoose = require("mongoose");
 const { GridFSBucket } = require("mongodb");
@@ -10,19 +9,19 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
 
-    console.log("✅ MongoDB Connected");
+    console.log(`✅ Connected to MongoDB: ${conn.connection.host}`);
+    console.log(`✅ Using Database: ${conn.connection.name}`);
 
-    const db = conn.connection.db;
-    const gridFSBucket = new GridFSBucket(db, { bucketName: "quizes" });
+    const db = mongoose.connection.db;
+    const gridFSBucket = new mongoose.mongo.GridFSBucket(db, {
+      bucketName: "resources",
+    });
 
-    return { conn, db, gridFSBucket };
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-
+    return { db, gridFSBucket };
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   }
 };
 
-
 module.exports = connectDB;
-

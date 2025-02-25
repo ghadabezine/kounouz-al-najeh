@@ -18,11 +18,11 @@ const UserForm = ({ fetchUsers, editingUser, setEditingUser }) => {
     e.preventDefault();
     if (editingUser) {
       // Update user
-      await axios.put(`http://localhost:5000/api/users/${editingUser._id}`, form);
+      await axios.put(`http://localhost:5001/api/users/${editingUser._id}`, form);
       setEditingUser(null); // Reset editing mode
     } else {
       // Add new user
-      await axios.post("http://localhost:5000/api/users", form);
+      await axios.post("http://localhost:5001/api/users", form);
     }
     setForm({ firstName: "", lastName: "", email: "", password: "" });
     fetchUsers();

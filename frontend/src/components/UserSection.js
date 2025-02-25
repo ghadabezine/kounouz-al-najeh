@@ -10,12 +10,12 @@ const UserSection = ({ openModal }) => {
   }, []);
 
   const fetchUsers = async () => {
-    const { data } = await axios.get("http://localhost:5000/api/users");
+    const { data } = await axios.get("http://localhost:5001/api/users");
     setUsers(data);
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/users/${id}`);
+    await axios.delete(`http://localhost:5001/api/users/${id}`);
     fetchUsers();
   };
 

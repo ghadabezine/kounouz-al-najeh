@@ -13,12 +13,12 @@ const App = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const response = await axios.get("http://localhost:5000/api/users");
+    const response = await axios.get("http://localhost:5001/api/users");
     setUsers(response.data);
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/users/${id}`);
+    await axios.delete(`http://localhost:5001/api/users/${id}`);
     fetchUsers();
   };
 

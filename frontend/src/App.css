@@ -29,7 +29,7 @@ button {
 
 .edit-btn {
 
-  background:#3498db;
+  background: #3498db;
 
   color: white;
 }
@@ -86,4 +86,84 @@ header h1 {
   text-transform: uppercase;
   /* To match the uppercase look */
   margin-bottom: 10px;
+}
+
+/* styles.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background-color: #e6f7ff;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #b3d9ff;
+  transition: background-color 0.2s ease;
+}
+
+.card:hover {
+  background-color: #d0ebff;
+}
+
+.button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.button-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  margin-left: 10px;
+}
+
+.upload-container {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-file {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.message {
+  margin-top: 16px;
+  font-weight: bold;
 }

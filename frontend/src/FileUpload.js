@@ -18,7 +18,7 @@ function FileUpload() {
     formData.append("file", file);
 
     try {
-      await axios.post("http://localhost:5000/upload", formData, {
+      await axios.post("http://localhost:5001/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("File uploaded successfully!");
@@ -32,7 +32,7 @@ function FileUpload() {
   // Fetch Files
   const fetchFiles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/files");
+      const res = await axios.get("http://localhost:5001/files");
       setFiles(res.data);
     } catch (err) {
       console.error(err);
@@ -42,7 +42,7 @@ function FileUpload() {
   // Delete File
   const deleteFile = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/file/${id}`);
+      await axios.delete(`http://localhost:5001/file/${id}`);
       alert("File deleted!");
       fetchFiles();
     } catch (err) {
@@ -64,7 +64,7 @@ function FileUpload() {
       <ul>
         {files.map((file) => (
           <li key={file._id}>
-            <a href={`http://localhost:5000/file/${file.filename}`} target="_blank" rel="noopener noreferrer">
+            <a href={`http://localhost:5001/file/${file.filename}`} target="_blank" rel="noopener noreferrer">
               {file.filename}
             </a>
             <button onClick={() => deleteFile(file._id)}>Delete</button>

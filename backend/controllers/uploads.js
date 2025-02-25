@@ -11,7 +11,7 @@ const storage = new GridFsStorage({
       const filename = file.originalname;
       const fileInfo = {
         filename: filename,
-        bucketName: "quizes", // The name of your GridFS collection
+        bucketName: "resources", // The name of your GridFS collection
       };
       resolve(fileInfo);
     });

@@ -1,18 +1,30 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import UserForm from './components/UserForm';
 import UserList from './components/UserList';
+import FileDashboard from './components/FileDashboard';
+import QuizForm from './components/QuizForm';
+import TakeQuiz from './components/TakeQuiz';
+import Dashboard from "./components/SubjectsDashboard";
+import FileUpload from "./components/FileDashboard";
 import './styles/App.css';
-import FileDashboard from './components/FileDashboard'; // Import FileDashboard
-
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null); // Track the user being edited
-  const [activePage, setActivePage] = useState('home'); // Track the active page
+  const [activePage, setActivePage] = useState('home'); // ✅ Start with 'home' as the initial page
+  const [quizId, setQuizId] = useState(''); // Track the quiz ID for taking quizzes
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:5001/api/subjects")
+      .then((res) => res.json())
+      .then((data) => setSubjects(data))
+      .catch((err) => console.error("❌ Error fetching subjects:", err));
+  }, []);
 
   useEffect(() => {
     if (activePage === 'users') {
@@ -21,13 +33,21 @@ const App = () => {
   }, [activePage]);
 
   const fetchUsers = async () => {
-    const response = await axios.get("http://localhost:5000/api/users");
-    setUsers(response.data);
+    try {
+      const response = await axios.get('http://localhost:5001/api/users');
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/api/users/${id}`);
-    fetchUsers();
+    try {
+      await axios.delete(`http://localhost:5001/api/users/${id}`);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   };
 
   const handleEdit = (user) => {
@@ -36,16 +56,17 @@ const App = () => {
 
   return (
     <div className="container">
+      <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
 
-      <Header setActivePage={setActivePage} />
 
       <main>
         {activePage === 'home' && (
-          <div>
+          <div className="home">
             <h2>Welcome to Kounouz Ennajeh</h2>
             <h3>Explore our platform and discover amazing features.</h3>
           </div>
         )}
+
         {activePage === 'files' && <FileDashboard />}
 
         {activePage === 'users' && (
@@ -64,9 +85,51 @@ const App = () => {
           </div>
         )}
 
+        {activePage === 'subjects' && (
+          !selectedSubject ? (
+            <Dashboard
+              subjects={subjects}
+              onFileUpload={(subject) => {
+                setSelectedSubject(subject);
+                setActivePage('fileUpload');
+              }}
+              onCreateQuiz={(subject) => {
+                setSelectedSubject(subject);
+                setActivePage('createQuiz');
+              }}
+            />
+          ) : (
+            <FileUpload subject={selectedSubject} goBack={() => setSelectedSubject(null)} />
+          )
+        )}
+        {activePage === 'createQuiz' && selectedSubject && (
+          <QuizForm subject={selectedSubject} goBack={() => setActivePage('subjects')} />
+        )}
+        {activePage === 'fileUpload' && selectedSubject && (
+          <FileUpload
+            subject={selectedSubject}
+            goBack={() => {
+              setSelectedSubject(null);
+              setActivePage('subjects');
+            }}
+          />
+        )}
+        {activePage === 'takeQuiz' && (
+          <div>
+            <h1>Take a Quiz</h1>
+            <input
+              type="text"
+              value={quizId}
+              onChange={(e) => setQuizId(e.target.value)}
+              placeholder="Enter Quiz ID"
+              className="quiz-id-input"
+            />
+            {quizId && <TakeQuiz quizId={quizId} />}
+          </div>
+        )}
       </main>
-      <Footer />
 
+      <Footer />
     </div>
   );
 };
