@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const mongoose = require("mongoose");
 const { GridFSBucket } = require("mongodb");
@@ -23,6 +22,4 @@ const connectDB = async () => {
   }
 };
 
-
 module.exports = connectDB;
-

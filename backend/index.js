@@ -17,9 +17,9 @@ app.use(express.urlencoded({ extended: true })); // Parses URL-encoded requests
 connectDB();
 
 // Routes
-app.use("/api/auth", authRoutes);     // Auth endpoints
-app.use("/api/users", userRoutes);    // User endpoints
-app.use("/api/files", fileRoutes);    // File endpoints
+app.use("/api/auth", authRoutes); // Auth endpoints
+app.use("/api/users", userRoutes); // User endpoints
+app.use("/api/files", fileRoutes); // File endpoints
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

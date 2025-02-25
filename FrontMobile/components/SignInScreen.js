@@ -20,6 +20,7 @@ const Login = ({ navigation }) => {
 
       Alert.alert("Success", data.message || "Logged in successfully");
       console.log("Received Token:", data.token);
+      navigation.navigate('HomeScreen');
     } catch (error) {
       console.error("Login Error:", error.response?.data || error.message);
       Alert.alert("Error", error.response?.data?.message || "Login failed");
