@@ -1,3 +1,4 @@
+// App.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/Header';
@@ -9,13 +10,14 @@ import QuizForm from './components/QuizForm';
 import TakeQuiz from './components/TakeQuiz';
 import Dashboard from "./components/SubjectsDashboard";
 import FileUpload from "./components/FileDashboard";
+import ViewQuizzes from "./components/ViewQuizzes"; // Import the new component
 import './styles/App.css';
 
 const App = () => {
   const [users, setUsers] = useState([]);
-  const [editingUser, setEditingUser] = useState(null); // Track the user being edited
-  const [activePage, setActivePage] = useState('home'); // ✅ Start with 'home' as the initial page
-  const [quizId, setQuizId] = useState(''); // Track the quiz ID for taking quizzes
+  const [editingUser, setEditingUser] = useState(null);
+  const [activePage, setActivePage] = useState('home');
+  const [quizId, setQuizId] = useState('');
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
 
@@ -51,13 +53,12 @@ const App = () => {
   };
 
   const handleEdit = (user) => {
-    setEditingUser(user); // Set the user to be edited in the form
+    setEditingUser(user);
   };
 
   return (
     <div className="container">
       <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
-
 
       <main>
         {activePage === 'home' && (
@@ -97,6 +98,10 @@ const App = () => {
                 setSelectedSubject(subject);
                 setActivePage('createQuiz');
               }}
+              onViewQuizzes={(subject) => {
+                setSelectedSubject(subject);
+                setActivePage('viewQuizzes');
+              }}
             />
           ) : (
             <FileUpload subject={selectedSubject} goBack={() => setSelectedSubject(null)} />
@@ -126,6 +131,9 @@ const App = () => {
             />
             {quizId && <TakeQuiz quizId={quizId} />}
           </div>
+        )}
+        {activePage === 'viewQuizzes' && selectedSubject && (
+          <ViewQuizzes subject={selectedSubject} goBack={() => setActivePage('subjects')} />
         )}
       </main>
 
