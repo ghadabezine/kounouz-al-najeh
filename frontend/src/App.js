@@ -9,30 +9,39 @@ import QuizForm from './components/QuizForm';
 import TakeQuiz from './components/TakeQuiz';
 import Dashboard from "./components/SubjectsDashboard";
 import FileUpload from "./components/FileDashboard";
+import ViewQuizzes from "./components/ViewQuizzes";
 import Login from "./components/Login";
 import './styles/App.css';
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
-  const [activePage, setActivePage] = useState('login'); // ✅ Start with the login page
+  const [activePage, setActivePage] = useState('login'); // Start with login page
   const [quizId, setQuizId] = useState('');
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/subjects")
-      .then((res) => res.json())
-      .then((data) => setSubjects(data))
-      .catch((err) => console.error("❌ Error fetching subjects:", err));
-  }, []);
+    if (isAuthenticated) {
+      fetchSubjects(); // Fetch subjects only after login
+    }
+  }, [isAuthenticated]);
+
+  const fetchSubjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:5001/api/subjects");
+      setSubjects(response.data);
+    } catch (err) {
+      console.error("❌ Error fetching subjects:", err);
+    }
+  };
 
   useEffect(() => {
-    if (activePage === 'users') {
+    if (activePage === 'users' && isAuthenticated) {
       fetchUsers();
     }
-  }, [activePage]);
+  }, [activePage, isAuthenticated]);
 
   const fetchUsers = async () => {
     try {
@@ -58,18 +67,20 @@ const App = () => {
 
   return (
     <div className="container">
-      {isAuthenticated && <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />}
+      {/* ✅ Show Login Page if not authenticated */}
+      {!isAuthenticated ? (
+        <Login
+          setIsAuthenticated={(status) => {
+            setIsAuthenticated(status);
+            if (status) setActivePage('home'); // Navigate to home on successful login
+          }}
+        />
+      ) : (
+        <>
+          {/* ✅ Show header only after authentication */}
+          <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
 
-      <main>
-        {!isAuthenticated ? (
-          <Login
-            setIsAuthenticated={(status) => {
-              setIsAuthenticated(status);
-              if (status) setActivePage('home'); // ✅ Navigate to home after login
-            }}
-          />
-        ) : (
-          <>
+          <main>
             {activePage === 'home' && (
               <div className="home">
                 <h2>Welcome to Kounouz Ennajeh</h2>
@@ -82,8 +93,16 @@ const App = () => {
             {activePage === 'users' && (
               <div>
                 <h1 className="user-management">User Management</h1>
-                <UserForm fetchUsers={fetchUsers} editingUser={editingUser} setEditingUser={setEditingUser} />
-                <UserList users={users} handleDelete={handleDelete} handleEdit={handleEdit} />
+                <UserForm
+                  fetchUsers={fetchUsers}
+                  editingUser={editingUser}
+                  setEditingUser={setEditingUser}
+                />
+                <UserList
+                  users={users}
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                />
               </div>
             )}
 
@@ -98,6 +117,10 @@ const App = () => {
                   onCreateQuiz={(subject) => {
                     setSelectedSubject(subject);
                     setActivePage('createQuiz');
+                  }}
+                  onViewQuizzes={(subject) => {
+                    setSelectedSubject(subject);
+                    setActivePage('viewQuizzes');
                   }}
                 />
               ) : (
@@ -132,11 +155,15 @@ const App = () => {
                 {quizId && <TakeQuiz quizId={quizId} />}
               </div>
             )}
-          </>
-        )}
-      </main>
 
-      {isAuthenticated && <Footer />}
+            {activePage === 'viewQuizzes' && selectedSubject && (
+              <ViewQuizzes subject={selectedSubject} goBack={() => setActivePage('subjects')} />
+            )}
+          </main>
+
+          <Footer />
+        </>
+      )}
     </div>
   );
 };

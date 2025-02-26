@@ -1,4 +1,3 @@
-// components/SubjectsDashboard.js
 import React from "react";
 
 const SubjectsDashboard = ({ subjects, onFileUpload, onCreateQuiz, onViewQuizzes }) => {
