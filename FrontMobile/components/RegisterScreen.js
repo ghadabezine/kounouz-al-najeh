@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#1A237E",
+    color: "#6C5B7B", // Soft Purple
     textAlign: "center",
   },
   input: {
@@ -135,18 +135,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 12,
+    color: "#333", // Dark text for inputs
   },
   button: {
     width: "90%",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F9A826", // Golden Yellow
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  footerText: { marginTop: 15, color: "#1A237E", textAlign: "center" },
-  link: { color: "#EF6C00", fontWeight: "bold" },
+  footerText: { marginTop: 15, color: "#6C5B7B", textAlign: "center" },
+  link: { color: "#01579B", fontWeight: "bold" },
 });
 
 export default Register;

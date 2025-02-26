@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -62,9 +63,12 @@ export default function CourseListScreen() {
             onPress={() => handlePress(item)}
           >
             <Text style={styles.courseName}>{item.name}</Text>
+            <Text style={styles.courseDetails}>
+              {item.professor} - {item.gradeLevel}
+            </Text>
           </TouchableOpacity>
         )}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={styles.flatListContent}
       />
 
       {/* Modal for Course Details */}
@@ -118,27 +122,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   header: {
-    fontSize: 26,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "700",
     marginVertical: 20,
-    color: "#007bff",
+    color: "#6C5B7B", // Soft purple
     textAlign: "center",
   },
   courseItem: {
-    padding: 15,
-    marginBottom: 10,
+    padding: 18,
+    marginBottom: 12,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 12,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   courseName: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
     color: "#333",
+  },
+  courseDetails: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 4,
+  },
+  flatListContent: {
+    paddingBottom: 20,
   },
   modalBackground: {
     flex: 1,
@@ -150,24 +162,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 15,
-    width: "85%",
+    width: "90%",
+    maxWidth: 400,
     alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 5,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
   modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#007bff",
-    marginBottom: 10,
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#6C5B7B", // Soft purple
+    marginBottom: 12,
   },
   detailText: {
     fontSize: 16,
     color: "#555",
-    marginBottom: 8,
+    marginBottom: 10,
     textAlign: "center",
   },
   bold: {
@@ -175,21 +188,22 @@ const styles = StyleSheet.create({
     color: "#222",
   },
   addButton: {
-    padding: 12,
-    backgroundColor: "#4CAF50",
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    backgroundColor: "#F9A826", // Golden yellow
     borderRadius: 8,
-    marginTop: 15,
+    marginTop: 18,
     width: "100%",
     alignItems: "center",
   },
   addButtonText: {
     fontSize: 16,
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   closeButton: {
-    padding: 12,
-    marginTop: 10,
+    paddingVertical: 14,
+    marginTop: 12,
     backgroundColor: "#ccc",
     borderRadius: 8,
     width: "100%",
@@ -197,7 +211,7 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: "#333",
   },
 });

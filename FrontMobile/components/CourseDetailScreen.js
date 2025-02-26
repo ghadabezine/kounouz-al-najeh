@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import { WebView } from "react-native-webview"; // Correct import for WebView
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import Icon from "react-native-vector-icons/MaterialIcons"; // or another icon set like FontAwesome
 
 // Sample data
 const quizzes = [
@@ -51,6 +51,7 @@ export default function CourseDetailScreen({ navigation }) {
   const [question, setQuestion] = useState("");
   const [qna, setQna] = useState([]);
   const [rating, setRating] = useState(0);
+  const [showVideo, setShowVideo] = useState(false); // State to control video display
 
   const handleAskQuestion = () => {
     if (question) {
@@ -95,26 +96,13 @@ export default function CourseDetailScreen({ navigation }) {
                 <Text style={styles.cardText}>{item.title}</Text>
                 <Text style={styles.cardDescription}>{item.description}</Text>
                 <TouchableOpacity
-                  onPress={
-                    () => navigation.navigate("WebView", { link: item.pdfLink }) // Use the correct screen for WebView
-                  }
+                  onPress={() => setShowVideo(true)} // Set showVideo to true when clicked
                   style={styles.askButton}
                 >
                   <Text style={styles.askButtonText}>View Course PDF</Text>
                 </TouchableOpacity>
               </View>
             )}
-          />
-        </View>
-
-        {/* YouTube Video */}
-        <View style={styles.videoContainer}>
-          <Text style={styles.sectionTitle}>Course Video Guide</Text>
-          <WebView
-            source={{
-              uri: "https://www.youtube.com/watch?v=Qfr3mVwKyN0&list=RDye6-SUS5N9o&index=15",
-            }} // Example YouTube video link
-            style={styles.video}
           />
         </View>
 
@@ -237,20 +225,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     paddingBottom: 20,
   },
-  courseTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 15,
-  },
-  videoContainer: {
-    marginBottom: 20,
-  },
-  video: {
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
   section: {
     marginBottom: 20,
     paddingHorizontal: 20,
@@ -258,6 +232,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#6C5B7B", // Soft purple
     marginBottom: 10,
   },
   card: {
@@ -270,6 +245,7 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#6C5B7B", // Soft purple
   },
   cardDescription: {
     fontSize: 14,
@@ -285,7 +261,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   askButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F9A826", // Golden Yellow
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -304,6 +280,7 @@ const styles = StyleSheet.create({
   qnaQuestion: {
     fontWeight: "bold",
     fontSize: 16,
+    color: "#6C5B7B", // Soft purple
   },
   qnaAnswer: {
     fontSize: 14,

@@ -49,7 +49,7 @@ export default function ExamScreen() {
           <Text style={styles.buttonText}>Generate Exam</Text>
         </TouchableOpacity>
 
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
+        {loading && <ActivityIndicator size="large" color="#F9A826" />}
 
         {examQuestions.length > 0 && !loading && (
           <View style={styles.examContainer}>
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
+    color: "#6C5B7B", // Soft purple
   },
   input: {
     borderWidth: 1,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F9A826", // Golden yellow
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
@@ -109,6 +110,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#6C5B7B", // Soft purple
   },
   questionContainer: {
     backgroundColor: "#f9f9f9",
@@ -120,6 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#333",
   },
   optionButton: {
     backgroundColor: "#f1f1f1",

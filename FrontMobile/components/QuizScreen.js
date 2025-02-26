@@ -34,7 +34,7 @@ export default function QuizScreen() {
       <Text style={styles.title}>AI-Generated Quiz</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#4CAF50" style={styles.loader} />
+        <ActivityIndicator size="large" color="#F9A826" style={styles.loader} />
       ) : quiz ? (
         quiz.map((q, index) => (
           <View key={index} style={styles.quizCard}>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#333",
+    color: "#6C5B7B", // Soft purple
   },
   loader: {
     marginVertical: 20,
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   generateButton: {
-    backgroundColor: "#6200EE",
+    backgroundColor: "#F9A826", // Golden yellow
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
