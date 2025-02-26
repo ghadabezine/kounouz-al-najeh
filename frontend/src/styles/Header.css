@@ -41,4 +41,15 @@ header {
   nav ul li a:hover {
     color: #ffffff;
   }
-  
+  .header-logo {
+    width: 50px; /* Adjust the size as needed */
+    height: auto;
+    border-radius: 50%; /* Optional: Makes the logo circular */
+}  
+.header-title {
+  display: flex;
+  flex-direction: row; /* Align logo and title horizontally */
+  align-items: center; /* Vertically center the logo and title */
+  justify-content: center; /* Horizontally center the logo and title */
+  gap: 10px; /* Space between logo and title */
+}
