@@ -5,7 +5,20 @@
   padding: 20px;
   min-height: 100vh;
 }
-
+.home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 65vh;
+  background-color: white;
+  background-image: url('../assets/logoo.png');
+  background-size: cover; /* ✅ Maintain image proportions */
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 15px;
+  text-align: center;
+}
 .user-management {
   color: black;
   font-size: 2rem;
