@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './FileDashboard.css';
+import '../styles/FileDashboard.css';
 
 const FileDashboard = ({ subject, goBack }) => {
   const [file, setFile] = useState(null);
