@@ -67,11 +67,12 @@ const deleteQuestion = async (req, res) => {
             return res.status(404).json({ error: "Quiz not found." });
         }
 
-        // Remove the question at the specified index
+        // Validate question index
         if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
             return res.status(400).json({ error: "Invalid question index." });
         }
 
+        // Remove the question at the specified index
         quiz.questions.splice(questionIndex, 1);
         await quiz.save();
 
@@ -109,4 +110,27 @@ const editQuestion = async (req, res) => {
     }
 };
 
-module.exports = { createQuiz, getQuizzesBySubject, deleteQuiz, deleteQuestion, editQuestion };
+// Update a quiz (add or modify questions)
+const updateQuiz = async (req, res) => {
+    try {
+        const { quizId } = req.params;
+        const { title, questions } = req.body;
+
+        const quiz = await Quiz.findById(quizId);
+        if (!quiz) {
+            return res.status(404).json({ error: "Quiz not found." });
+        }
+
+        // Update the quiz title and questions
+        quiz.title = title || quiz.title;
+        quiz.questions = questions || quiz.questions;
+        await quiz.save();
+
+        res.status(200).json({ message: "Quiz updated successfully.", quiz });
+    } catch (err) {
+        console.error("❌ Error updating quiz:", err);
+        res.status(500).json({ error: "Failed to update quiz." });
+    }
+};
+
+module.exports = { createQuiz, getQuizzesBySubject, deleteQuiz, deleteQuestion, editQuestion, updateQuiz };
