@@ -1,8 +1,21 @@
 const express = require("express");
-const { createQuiz } = require("../controllers/QuizController");
+const { createQuiz, getQuizzesBySubject, deleteQuiz, deleteQuestion, editQuestion } = require("../controllers/QuizController");
 
 const router = express.Router();
 
-router.post("/", createQuiz); // ✅ Create quiz with subject association
+// Create a new quiz
+router.post("/", createQuiz);
+
+// Get quizzes by subject
+router.get("/", getQuizzesBySubject);
+
+// Delete a quiz
+router.delete("/:quizId", deleteQuiz);
+
+// Delete a question from a quiz
+router.delete("/:quizId/questions/:questionIndex", deleteQuestion);
+
+// Edit a question in a quiz
+router.put("/:quizId/questions/:questionIndex", editQuestion);
 
 module.exports = router;
