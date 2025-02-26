@@ -7,6 +7,7 @@ const ViewQuizzes = ({ subject, goBack }) => {
     const [quizzes, setQuizzes] = useState([]);
     const [expandedQuiz, setExpandedQuiz] = useState(null);
     const [editingQuestion, setEditingQuestion] = useState(null);
+    const [editingQuiz, setEditingQuiz] = useState(null);
 
     // Fetch quizzes for the selected subject
     useEffect(() => {
@@ -91,6 +92,28 @@ const ViewQuizzes = ({ subject, goBack }) => {
         }
     };
 
+    // Open the edit quiz popup
+    const handleEditQuiz = (quiz) => {
+        setEditingQuiz(quiz);
+    };
+
+    // Save the edited quiz
+    const handleSaveQuiz = async (updatedQuiz) => {
+        try {
+            await axios.put(`http://localhost:5001/api/quizzes/${updatedQuiz._id}`, updatedQuiz);
+
+            // Update the quizzes state to reflect the changes
+            const updatedQuizzes = quizzes.map((quiz) =>
+                quiz._id === updatedQuiz._id ? updatedQuiz : quiz
+            );
+
+            setQuizzes(updatedQuizzes);
+            setEditingQuiz(null); // Close the edit popup
+        } catch (error) {
+            console.error("Error updating quiz:", error);
+        }
+    };
+
     return (
         <div className="view-quizzes-container">
             {/* Header with logo and back button */}
@@ -112,7 +135,7 @@ const ViewQuizzes = ({ subject, goBack }) => {
                 {quizzes.length > 0 ? (
                     quizzes.map((quiz) => (
                         <div key={quiz._id} className="quiz-card">
-                            {/* Quiz header with toggle arrow and delete button */}
+                            {/* Quiz header with toggle arrow, delete button, and edit button */}
                             <div className="quiz-header" onClick={() => toggleQuiz(quiz._id)}>
                                 <h2 className="quiz-title">{quiz.title}</h2>
                                 <div>
@@ -120,6 +143,9 @@ const ViewQuizzes = ({ subject, goBack }) => {
                                         <svg xmlns="http://www.w3.org/2000/svg" className="delete-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
+                                    </button>
+                                    <button onClick={(e) => { e.stopPropagation(); handleEditQuiz(quiz); }} className="edit-button">
+                                        Edit Quiz
                                     </button>
                                     <svg xmlns="http://www.w3.org/2000/svg" className={`toggle-icon ${expandedQuiz === quiz._id ? 'rotate' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -171,6 +197,15 @@ const ViewQuizzes = ({ subject, goBack }) => {
                     onClose={() => setEditingQuestion(null)}
                 />
             )}
+
+            {/* Edit Quiz Popup */}
+            {editingQuiz && (
+                <EditQuizPopup
+                    quiz={editingQuiz}
+                    onSave={handleSaveQuiz}
+                    onClose={() => setEditingQuiz(null)}
+                />
+            )}
         </div>
     );
 };
@@ -214,7 +249,109 @@ const EditQuestionPopup = ({ question, onSave, onClose }) => {
                         />
                     ))}
                 </div>
+                <select
+                    value={editedQuestion.correctAnswer}
+                    onChange={(e) => {
+                        setEditedQuestion({ ...editedQuestion, correctAnswer: e.target.value });
+                    }}
+                >
+                    {editedQuestion.options.map((option, index) => (
+                        <option key={index} value={option}>
+                            {option}
+                        </option>
+                    ))}
+                </select>
                 <button onClick={() => onSave(editedQuestion)}>Save</button>
+                <button onClick={onClose}>Cancel</button>
+            </div>
+        </div>
+    );
+};
+
+// Edit Quiz Popup Component
+const EditQuizPopup = ({ quiz, onSave, onClose }) => {
+    const [editedQuiz, setEditedQuiz] = useState(quiz);
+
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setEditedQuiz({ ...editedQuiz, [name]: value });
+    };
+
+    // Handle adding a new question
+    const handleAddQuestion = () => {
+        setEditedQuiz({
+            ...editedQuiz,
+            questions: [
+                ...editedQuiz.questions,
+                { questionText: "", options: ["", "", "", ""], correctAnswer: "" },
+            ],
+        });
+    };
+
+    // Handle saving the edited quiz
+    const handleSave = () => {
+        onSave(editedQuiz);
+    };
+
+    return (
+        <div className="popup-overlay">
+            <div className="popup-content">
+                <h2>Edit Quiz</h2>
+                <input
+                    type="text"
+                    name="title"
+                    value={editedQuiz.title}
+                    onChange={handleChange}
+                    placeholder="Quiz Title"
+                />
+                <div>
+                    {editedQuiz.questions.map((question, qIndex) => (
+                        <div key={qIndex} className="question-card">
+                            <input
+                                type="text"
+                                value={question.questionText}
+                                onChange={(e) => {
+                                    const newQuestions = [...editedQuiz.questions];
+                                    newQuestions[qIndex].questionText = e.target.value;
+                                    setEditedQuiz({ ...editedQuiz, questions: newQuestions });
+                                }}
+                                placeholder="Question Text"
+                            />
+                            <div>
+                                {question.options.map((option, optIndex) => (
+                                    <input
+                                        key={optIndex}
+                                        type="text"
+                                        value={option}
+                                        onChange={(e) => {
+                                            const newQuestions = [...editedQuiz.questions];
+                                            newQuestions[qIndex].options[optIndex] = e.target.value;
+                                            setEditedQuiz({ ...editedQuiz, questions: newQuestions });
+                                        }}
+                                        placeholder={`Option ${optIndex + 1}`}
+                                    />
+                                ))}
+                            </div>
+                            <select
+                                value={question.correctAnswer}
+                                onChange={(e) => {
+                                    const newQuestions = [...editedQuiz.questions];
+                                    newQuestions[qIndex].correctAnswer = e.target.value;
+                                    setEditedQuiz({ ...editedQuiz, questions: newQuestions });
+                                }}
+                            >
+                                {question.options.map((option, optIndex) => (
+                                    <option key={optIndex} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    ))}
+                </div>
+                <button onClick={handleAddQuestion}>Add Question</button>
+                <button onClick={handleSave}>Save</button>
                 <button onClick={onClose}>Cancel</button>
             </div>
         </div>
