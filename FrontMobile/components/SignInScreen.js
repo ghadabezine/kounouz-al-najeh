@@ -11,27 +11,25 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const handleLogin = async () => {
-    try {
-        const response = await fetch("http://your-backend-url/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-        });
+  try {
+    const response = await fetch("http://your-backend-url/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-        const data = await response.json();
-        if (response.ok) {
-            await AsyncStorage.setItem("token", data.token);
-            navigation.replace("ProfileScreen"); // Redirect to Profile after login
-        } else {
-            alert(data.message);
-        }
-    } catch (error) {
-        console.error("❌ Login error:", error);
+    const data = await response.json();
+    if (response.ok) {
+      await AsyncStorage.setItem("token", data.token);
+      navigation.replace("ProfileScreen"); // Redirect to Profile after login
+    } else {
+      alert(data.message);
     }
+  } catch (error) {
+    console.error("❌ Login error:", error);
+  }
 };
-
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
