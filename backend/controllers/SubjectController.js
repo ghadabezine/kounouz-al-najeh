@@ -1,47 +1,58 @@
 const Subject = require("../models/Subject");
-const Course = require("../models/fileModel");
-const Quiz = require("../models/quizModel");
 
 // ✅ Create a new subject
-const createSubject = async (req, res) => {
+exports.createSubject = async (req, res) => {
     try {
-        const { name, resources, quizzes } = req.body;
-
-        // Check if course exists
-        const courseExists = await Course.findById(resources);
-        if (!courseExists) {
-            return res.status(404).json({ error: "Course not found" });
-        }
-
-        // Validate quizzes
-        const quizExists = await Quiz.find({ _id: { $in: quizzes } });
-        if (quizExists.length !== quizzes.length) {
-            return res.status(404).json({ error: "One or more quizzes not found" });
-        }
-
-        // Create subject
-        const subject = new Subject({ name, resources, quizzes });
-        await subject.save();
-
-        res.status(201).json(subject);
+        const { name } = req.body;
+        const newSubject = new Subject({ name });
+        await newSubject.save();
+        res.status(201).json(newSubject);
     } catch (error) {
-        console.error("❌ Error creating subject:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Error creating subject" });
     }
 };
 
-// ✅ Get all subjects with populated course and quizzes
-const getSubjects = async (req, res) => {
+// ✅ Get all subjects
+exports.getSubjects = async (req, res) => {
     try {
-        const subjects = await Subject.find()
-            .populate("resources", "name") // Populates resources with course name
-            .populate("quizzes", "title"); // Populates quizzes with quiz title
-
-        res.json(subjects);
+        const subjects = await Subject.find();
+        res.status(200).json(subjects);
     } catch (error) {
-        console.error("❌ Error fetching subjects:", error);
-        res.status(500).json({ error: "Failed to fetch subjects" });
+        res.status(500).json({ error: "Error fetching subjects" });
     }
 };
 
-module.exports = { createSubject, getSubjects };
+// ✅ Delete a subject by ID
+exports.deleteSubject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedSubject = await Subject.findByIdAndDelete(id);
+        if (!deletedSubject) {
+            return res.status(404).json({ error: "Subject not found" });
+        }
+        res.status(200).json({ message: "Subject deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Error deleting subject" });
+    }
+};
+// ✅ Update a subject by ID
+exports.updateSubject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+
+        const updatedSubject = await Subject.findByIdAndUpdate(
+            id,
+            { name },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedSubject) {
+            return res.status(404).json({ error: "Subject not found" });
+        }
+
+        res.status(200).json(updatedSubject);
+    } catch (error) {
+        res.status(500).json({ error: "Error updating subject" });
+    }
+};

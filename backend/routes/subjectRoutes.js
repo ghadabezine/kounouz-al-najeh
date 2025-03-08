@@ -1,5 +1,5 @@
 const express = require("express");
-const { createSubject, getSubjects } = require("../controllers/SubjectController");
+const { createSubject, getSubjects, deleteSubject, updateSubject } = require("../controllers/SubjectController");
 
 const router = express.Router();
 
@@ -8,5 +8,11 @@ router.post("/", createSubject);
 
 // ✅ Get all subjects
 router.get("/", getSubjects);
+
+// ✅ Delete a subject by ID
+router.delete("/:id", deleteSubject);
+
+// ✅ Update a subject by ID
+router.put("/:id", updateSubject);
 
 module.exports = router;

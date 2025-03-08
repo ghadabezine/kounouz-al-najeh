@@ -22,12 +22,23 @@ const App = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication
 
+  // Fetch subjects when authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      fetchSubjects(); // Fetch subjects only after login
+      fetchSubjects();
     }
   }, [isAuthenticated]);
+  const handleEditSubject = async (id, name) => {
+    try {
+        const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
+        fetchSubjects(); // Refetch subjects to update the UI
+        return response.data;
+    } catch (err) {
+        console.error("❌ Error updating subject:", err);
+    }
+};
 
+  // Fetch subjects from the backend
   const fetchSubjects = async () => {
     try {
       const response = await axios.get("http://localhost:5001/api/subjects");
@@ -37,12 +48,14 @@ const App = () => {
     }
   };
 
+  // Fetch users when the active page is 'users' and authenticated
   useEffect(() => {
     if (activePage === 'users' && isAuthenticated) {
       fetchUsers();
     }
   }, [activePage, isAuthenticated]);
 
+  // Fetch users from the backend
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/users');
@@ -52,6 +65,7 @@ const App = () => {
     }
   };
 
+  // Handle deleting a user
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5001/api/users/${id}`);
@@ -61,13 +75,35 @@ const App = () => {
     }
   };
 
+  // Handle editing a user
   const handleEdit = (user) => {
     setEditingUser(user);
   };
 
+  // Handle adding a new subject
+  const handleAddSubject = async (name) => {
+    try {
+      const response = await axios.post("http://localhost:5001/api/subjects", { name });
+      fetchSubjects(); // Refetch subjects to update the UI
+      return response.data;
+    } catch (err) {
+      console.error("❌ Error adding subject:", err);
+    }
+  };
+
+  // Handle deleting a subject
+  const handleDeleteSubject = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/subjects/${id}`);
+      fetchSubjects(); // Refetch subjects to update the UI
+    } catch (err) {
+      console.error("❌ Error deleting subject:", err);
+    }
+  };
+
   return (
     <div className="container">
-      {/* ✅ Show Login Page if not authenticated */}
+      {/* Show Login Page if not authenticated */}
       {!isAuthenticated ? (
         <Login
           setIsAuthenticated={(status) => {
@@ -77,7 +113,7 @@ const App = () => {
         />
       ) : (
         <>
-          {/* ✅ Show header only after authentication */}
+          {/* Show header only after authentication */}
           <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
 
           <main>
@@ -122,6 +158,9 @@ const App = () => {
                     setSelectedSubject(subject);
                     setActivePage('viewQuizzes');
                   }}
+                  onDeleteSubject={handleDeleteSubject} // Pass delete function
+                  onAddSubject={handleAddSubject} // Pass add function
+                  onEditSubject={handleEditSubject} 
                 />
               ) : (
                 <FileUpload subject={selectedSubject} goBack={() => setSelectedSubject(null)} />
