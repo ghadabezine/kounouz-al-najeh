@@ -168,7 +168,10 @@ const App = () => {
             )}
 
             {activePage === 'createQuiz' && selectedSubject && (
-              <QuizForm subject={selectedSubject} goBack={() => setActivePage('subjects')} />
+              <QuizForm subject={selectedSubject} goBack={() => {
+                setSelectedSubject(null); // Clear the selected subject
+                setActivePage('subjects'); // Navigate back to the Subjects Dashboard
+            }} />
             )}
 
             {activePage === 'fileUpload' && selectedSubject && (
@@ -196,7 +199,10 @@ const App = () => {
             )}
 
             {activePage === 'viewQuizzes' && selectedSubject && (
-              <ViewQuizzes subject={selectedSubject} goBack={() => setActivePage('subjects')} />
+              <ViewQuizzes subject={selectedSubject}   goBack={() => {
+                setSelectedSubject(null); // Clear the selected subject
+                setActivePage('subjects'); // Navigate back to the Subjects Dashboard
+            }} />
             )}
           </main>
 
