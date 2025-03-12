@@ -1,8 +1,12 @@
 const express = require("express");
-const User = require("../models/User"); // Ensure path is correct
-const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { protect } = require("../middleware/authMiddleware");
+
+const router = express.Router();
+
+// ✅ Register User
 router.post("/register", async (req, res) => {
     console.log("🚀 Incoming request body:", req.body);
 
@@ -32,6 +36,7 @@ router.post("/register", async (req, res) => {
     }
 });
 
+// ✅ Login User
 router.post("/login", async (req, res) => {
     console.log("🔑 Login request body:", req.body);
 
@@ -49,7 +54,7 @@ router.post("/login", async (req, res) => {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid credentialsf cgvhbj" });
+            return res.status(400).json({ message: "Invalid credentials" });
         }
 
         const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET || "defaultsecret", {
@@ -67,4 +72,43 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.get("/profile", protect, async (req, res) => {
+    try {
+        console.log("📢 Fetching profile for user:", req.user);
+
+        if (!req.user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({
+            id: req.user._id,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            email: req.user.email,
+        });
+    } catch (error) {
+        console.error("❌ Profile Fetch Error:", error);
+        res.status(500).json({ message: "❌ Server error" });
+    }
+});
+/** ✅ Update Profile (Protected) */
+router.patch("/updateProfile", protect, async (req, res) => {
+    try {
+        const { firstName, lastName, email } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // ✅ Update user fields
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+        user.email = email || user.email;
+
+        await user.save();
+        res.json({ message: "✅ Profile updated successfully!", user });
+    } catch (error) {
+        console.error("❌ Update Profile Error:", error);
+        res.status(500).json({ message: "❌ Server error" });
+    }
+});
 module.exports = router;

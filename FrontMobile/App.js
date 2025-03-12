@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,22 +14,22 @@ import QuizScreen from "./components/QuizScreen";
 import ExamScreen from "./components/ExamScreen";
 import CourseListScreen from "./components/CourseListScreen"; // Explore Courses
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
+import EditProfileScreen from "./components/EditProfileScreen";
+
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+/** ✅ Bottom Tabs Navigation */
 function BottomTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;
-          if (route.name === "Home") {
-            iconName = "home";
-          } else if (route.name === "Courses") {
-            iconName = "book";
-          } else if (route.name === "Profile") {
-            iconName = "person";
-          }
+          if (route.name === "Home") iconName = "home";
+          else if (route.name === "Courses") iconName = "book";
+          else if (route.name === "Profile") iconName = "person";
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#007bff",
@@ -44,20 +44,43 @@ function BottomTabs() {
   );
 }
 
+/** ✅ Main App with Authentication Handling */
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    /** ✅ Check for authentication token */
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem("token");
+      setIsAuthenticated(!!token); // ✅ Set true if token exists
+    };
+    checkLoginStatus();
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/*<Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />*/}
-        <Stack.Screen name="Main" component={BottomTabs} />
-        <Stack.Screen name="CourseList" component={CourseListScreen} />
-        <Stack.Screen
-          name="CourseDetailScreen"
-          component={CourseDetailScreen}
-        />
-        <Stack.Screen name="QuizScreen" component={QuizScreen} />
-        <Stack.Screen name="ExamScreen" component={ExamScreen} />
+        {/* ✅ Show Login/Register if NOT authenticated */}
+        {!isAuthenticated ? (
+          <>
+            <Stack.Screen name="Login">
+              {(props) => <Login {...props} setIsAuthenticated={setIsAuthenticated} />}
+            </Stack.Screen>
+            <Stack.Screen name="Register" component={Register} />
+          </>
+        ) : (
+          <>
+            {/* ✅ Show Bottom Tabs if Authenticated */}
+            <Stack.Screen name="Main" component={BottomTabs} />
+            <Stack.Screen name="CourseList" component={CourseListScreen} />
+            <Stack.Screen name="CourseDetailScreen" component={CourseDetailScreen} />
+            <Stack.Screen name="QuizScreen" component={QuizScreen} />
+            <Stack.Screen name="ExamScreen" component={ExamScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} /> 
+
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
