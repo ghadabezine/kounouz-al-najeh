@@ -23,7 +23,7 @@ const Login = ({ navigation, setIsAuthenticated }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://192.168.100.7:5001/api/auth/login", {
+      const response = await axios.post("http://172.20.10.2:5001/api/auth/login", {
         email,
         password,
       });
@@ -33,7 +33,7 @@ const Login = ({ navigation, setIsAuthenticated }) => {
         console.log("✅ Token stored successfully in AsyncStorage");
         setIsAuthenticated(true);
 
-        
+
       } else {
         Alert.alert("Login Failed", "Invalid credentials.");
       }
