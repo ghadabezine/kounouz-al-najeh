@@ -119,8 +119,6 @@ const App = () => {
           <main>
             {activePage === 'home' && (
               <div className="home">
-                <h2>Welcome to Kounouz Ennajeh</h2>
-                <h3>Explore our platform and discover amazing features.</h3>
               </div>
             )}
 

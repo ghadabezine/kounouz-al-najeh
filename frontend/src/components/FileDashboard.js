@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import '../styles/FileDashboard.css';
+import "../styles/FileDashboard.css";
 
 const FileDashboard = ({ subject, goBack }) => {
   const [file, setFile] = useState(null);
@@ -22,9 +22,7 @@ const FileDashboard = ({ subject, goBack }) => {
     }
   };
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+  const handleFileChange = (event) => setFile(event.target.files[0]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -39,7 +37,7 @@ const FileDashboard = ({ subject, goBack }) => {
       if (res.status === 201) {
         setMessage("✅ File uploaded successfully!");
         setFile(null);
-        fetchFiles(); // Refresh files after upload
+        fetchFiles();
       } else {
         setMessage("❌ Upload failed.");
       }
@@ -83,7 +81,7 @@ const FileDashboard = ({ subject, goBack }) => {
 
   return (
     <div className="upload-container">
-      <h2 className="title">{subject.name}</h2>
+      <h2>{subject.name}</h2>
 
       <form onSubmit={handleUpload} className="form">
         <input type="file" onChange={handleFileChange} className="input-file" />
@@ -114,11 +112,7 @@ const FileDashboard = ({ subject, goBack }) => {
                 </>
               ) : (
                 <>
-                  <a
-                    href={`http://localhost:5001/api/files/${file._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={`http://localhost:5001/api/files/${file._id}`} target="_blank" rel="noopener noreferrer">
                     {file.filename}
                   </a>
                   <div className="button-container">
