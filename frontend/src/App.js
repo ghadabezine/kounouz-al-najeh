@@ -11,16 +11,18 @@ import Dashboard from "./components/SubjectsDashboard";
 import FileUpload from "./components/FileDashboard";
 import ViewQuizzes from "./components/ViewQuizzes";
 import Login from "./components/Login";
+import UserModal from './components/UserModal';
 import './styles/App.css';
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
-  const [activePage, setActivePage] = useState('login'); // Start with login page
+  const [activePage, setActivePage] = useState('login');
   const [quizId, setQuizId] = useState('');
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Track authentication
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch subjects when authenticated
   useEffect(() => {
@@ -28,25 +30,6 @@ const App = () => {
       fetchSubjects();
     }
   }, [isAuthenticated]);
-  const handleEditSubject = async (id, name) => {
-    try {
-        const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
-        fetchSubjects(); // Refetch subjects to update the UI
-        return response.data;
-    } catch (err) {
-        console.error("❌ Error updating subject:", err);
-    }
-};
-
-  // Fetch subjects from the backend
-  const fetchSubjects = async () => {
-    try {
-      const response = await axios.get("http://localhost:5001/api/subjects");
-      setSubjects(response.data);
-    } catch (err) {
-      console.error("❌ Error fetching subjects:", err);
-    }
-  };
 
   // Fetch users when the active page is 'users' and authenticated
   useEffect(() => {
@@ -78,6 +61,29 @@ const App = () => {
   // Handle editing a user
   const handleEdit = (user) => {
     setEditingUser(user);
+    setIsModalOpen(true);
+  };
+
+  // Open modal for adding a new user
+  const openModal = () => {
+    setEditingUser(null);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingUser(null);
+  };
+
+  // Fetch subjects from the backend
+  const fetchSubjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:5001/api/subjects");
+      setSubjects(response.data);
+    } catch (err) {
+      console.error("❌ Error fetching subjects:", err);
+    }
   };
 
   // Handle adding a new subject
@@ -101,6 +107,17 @@ const App = () => {
     }
   };
 
+  // Handle editing a subject
+  const handleEditSubject = async (id, name) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
+      fetchSubjects(); // Refetch subjects to update the UI
+      return response.data;
+    } catch (err) {
+      console.error("❌ Error updating subject:", err);
+    }
+  };
+
   return (
     <div className="container">
       {/* Show Login Page if not authenticated */}
@@ -117,26 +134,15 @@ const App = () => {
           <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
 
           <main>
-            {activePage === 'home' && (
-              <div className="home">
-              </div>
-            )}
+            {activePage === 'home' && <div className="home"></div>}
 
             {activePage === 'files' && <FileDashboard />}
 
             {activePage === 'users' && (
               <div>
                 <h1 className="user-management">User Management</h1>
-                <UserForm
-                  fetchUsers={fetchUsers}
-                  editingUser={editingUser}
-                  setEditingUser={setEditingUser}
-                />
-                <UserList
-                  users={users}
-                  handleDelete={handleDelete}
-                  handleEdit={handleEdit}
-                />
+                <button onClick={openModal}>Add User</button>
+                <UserList users={users} handleDelete={handleDelete} handleEdit={handleEdit} />
               </div>
             )}
 
@@ -156,9 +162,9 @@ const App = () => {
                     setSelectedSubject(subject);
                     setActivePage('viewQuizzes');
                   }}
-                  onDeleteSubject={handleDeleteSubject} // Pass delete function
-                  onAddSubject={handleAddSubject} // Pass add function
-                  onEditSubject={handleEditSubject} 
+                  onDeleteSubject={handleDeleteSubject}
+                  onAddSubject={handleAddSubject}
+                  onEditSubject={handleEditSubject}
                 />
               ) : (
                 <FileUpload subject={selectedSubject} goBack={() => setSelectedSubject(null)} />
@@ -167,9 +173,9 @@ const App = () => {
 
             {activePage === 'createQuiz' && selectedSubject && (
               <QuizForm subject={selectedSubject} goBack={() => {
-                setSelectedSubject(null); // Clear the selected subject
-                setActivePage('subjects'); // Navigate back to the Subjects Dashboard
-            }} />
+                setSelectedSubject(null);
+                setActivePage('subjects');
+              }} />
             )}
 
             {activePage === 'fileUpload' && selectedSubject && (
@@ -197,12 +203,18 @@ const App = () => {
             )}
 
             {activePage === 'viewQuizzes' && selectedSubject && (
-              <ViewQuizzes subject={selectedSubject}   goBack={() => {
-                setSelectedSubject(null); // Clear the selected subject
-                setActivePage('subjects'); // Navigate back to the Subjects Dashboard
-            }} />
+              <ViewQuizzes subject={selectedSubject} goBack={() => {
+                setSelectedSubject(null);
+                setActivePage('subjects');
+              }} />
             )}
           </main>
+
+          {isModalOpen && (
+            <UserModal closeModal={closeModal}>
+              <UserForm fetchUsers={fetchUsers} editingUser={editingUser} setEditingUser={setEditingUser} closeModal={closeModal} />
+            </UserModal>
+          )}
 
           <Footer />
         </>
