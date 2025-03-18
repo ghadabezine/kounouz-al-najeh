@@ -11,7 +11,7 @@ const EditProfileScreen = ({ navigation, route }) => {
   const handleSave = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await fetch("http://192.168.100.7:5001/api/auth/updateProfile", {
+      const res = await fetch("http://172.20.10.2:5001/api/auth/updateProfile", {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,

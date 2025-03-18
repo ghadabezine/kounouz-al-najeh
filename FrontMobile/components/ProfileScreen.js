@@ -27,7 +27,7 @@ export default function ProfileScreen({ navigation }) {
 
       console.log("📢 Token retrieved:", token); // ✅ Debug: Ensure token is retrieved
 
-      const response = await fetch("http://192.168.100.7:5001/api/auth/profile", {
+      const response = await fetch("http://172.20.10.2:5001/api/auth/profile", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ export default function ProfileScreen({ navigation }) {
       Alert.alert("Error", "User data is not available.");
     }
   };
-  
+
 
   return (
     <ScrollView style={styles.container}>

@@ -28,6 +28,7 @@ function BottomTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === "Home") iconName = "home";
+
           else if (route.name === "Courses") iconName = "book";
           else if (route.name === "Profile") iconName = "person";
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -77,7 +78,9 @@ export default function App() {
             <Stack.Screen name="QuizScreen" component={QuizScreen} />
             <Stack.Screen name="ExamScreen" component={ExamScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} /> 
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="MyCoursesScreen" component={MyCoursesScreen} />
+
 
           </>
         )}
