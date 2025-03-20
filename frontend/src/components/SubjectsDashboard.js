@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/SubjectsDashboard.css";
-
+import { FaPen } from "react-icons/fa";
 const SubjectsDashboard = ({
     subjects,
     onFileUpload,
@@ -33,7 +33,7 @@ const SubjectsDashboard = ({
 
     return (
         <div className="dashboard">
-            <h1 className="title">Courses Dashboard</h1>
+
 
             <button className="add-button" onClick={() => setShowAddPopup(true)}>
                 + Add Course
@@ -53,7 +53,8 @@ const SubjectsDashboard = ({
                                 setShowEditPopup(true);
                             }}
                         >
-                            Edit
+                            <FaPen style={{ marginRight: "5px" }} /> 
+                           
                         </button>
 
                         <h2>{subject.name}</h2>
