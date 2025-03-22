@@ -1,24 +1,16 @@
-require("dotenv").config();
+// db.js
 const mongoose = require("mongoose");
-const { GridFSBucket } = require("mongodb");
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect("mongodb://localhost:27017/quizdb", {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-
     console.log("✅ MongoDB Connected");
-
-    const db = conn.connection.db;
-    const gridFSBucket = new GridFSBucket(db, { bucketName: "quizes" });
-
-    return { conn, db, gridFSBucket };
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-
-    process.exit(1);
+  } catch (err) {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1); // Exit the process if MongoDB connection fails
   }
 };
 

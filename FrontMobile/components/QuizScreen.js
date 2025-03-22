@@ -1,51 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  Alert,
 } from "react-native";
+import axios from "axios";
+import { useNavigation } from "@react-navigation/native"; // To navigate to quiz details
 
 export default function QuizScreen() {
-  const [loading, setLoading] = useState(false);
-  const [quiz, setQuiz] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [quizzes, setQuizzes] = useState([]);
+  const navigation = useNavigation(); // React Navigation Hook
 
-  const generateQuiz = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setQuiz([
-        {
-          question: "What is React Native?",
-          answer: "A framework for building mobile apps using React.",
-        },
-        {
-          question: "What is State in React?",
-          answer:
-            "State is a built-in object that holds data about a component.",
-        },
-      ]);
-      setLoading(false);
-    }, 2000); // Simulating AI quiz generation
+  useEffect(() => {
+    // Fetch quizzes from the backend
+    axios
+      .get("http://localhost:5001/api/quizzes")
+      .then((response) => {
+        setQuizzes(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching quizzes:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleQuizSelect = (quizId) => {
+    navigation.navigate("QuizDetails", { quizId }); // Navigate to the QuizDetails screen
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AI-Generated Quiz</Text>
+      <Text style={styles.title}>Available Quizzes</Text>
 
       {loading ? (
         <ActivityIndicator size="large" color="#F9A826" style={styles.loader} />
-      ) : quiz ? (
-        quiz.map((q, index) => (
-          <View key={index} style={styles.quizCard}>
-            <Text style={styles.question}>{q.question}</Text>
-            <Text style={styles.answer}>{q.answer}</Text>
-          </View>
+      ) : quizzes.length > 0 ? (
+        quizzes.map((quiz) => (
+          <TouchableOpacity
+            key={quiz._id}
+            onPress={() => handleQuizSelect(quiz._id)}
+            style={styles.quizCard}
+          >
+            <Text style={styles.quizTitle}>{quiz.title}</Text>
+          </TouchableOpacity>
         ))
       ) : (
-        <TouchableOpacity onPress={generateQuiz} style={styles.generateButton}>
-          <Text style={styles.generateButtonText}>Generate Quiz</Text>
-        </TouchableOpacity>
+        <Text>No quizzes available</Text>
       )}
     </View>
   );
@@ -78,26 +83,9 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  question: {
-    fontSize: 16,
+  quizTitle: {
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 5,
-  },
-  answer: {
-    fontSize: 14,
-    color: "#555",
-  },
-  generateButton: {
-    backgroundColor: "#F9A826", // Golden yellow
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  generateButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });

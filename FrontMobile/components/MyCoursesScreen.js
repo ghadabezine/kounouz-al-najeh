@@ -7,9 +7,8 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
+import { FontAwesome } from "@expo/vector-icons"; // For icons
 
 // Sample course data with progress (percentage)
 const courses = [
@@ -22,23 +21,20 @@ export default function MyCoursesScreen({ navigation }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Handle long press event to show options
-  const handleLongPress = (course) => {
+  // Open Modal with Course Options
+  const openModal = (course) => {
     setSelectedCourse(course);
     setIsModalVisible(true);
   };
 
-  // Close the modal
+  // Close the Modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
-  // Render course item with progress bar
+  // Render course item
   const renderCourse = ({ item }) => (
-    <TouchableOpacity
-      onLongPress={() => handleLongPress(item)}
-      style={styles.courseCard}
-    >
+    <View style={styles.courseCard}>
       <Text style={styles.courseName}>{item.name}</Text>
 
       {/* Progress Bar */}
@@ -46,7 +42,16 @@ export default function MyCoursesScreen({ navigation }) {
         <View style={[styles.progressBar, { width: `${item.progress}%` }]} />
       </View>
       <Text style={styles.progressText}>{item.progress}% Completed</Text>
-    </TouchableOpacity>
+
+      {/* Open Modal Button */}
+      <TouchableOpacity
+        style={styles.optionsButton}
+        onPress={() => openModal(item)}
+      >
+        <Text style={styles.optionsButtonText}>Options</Text>
+        <FontAwesome name="ellipsis-h" size={18} color="#fff" />
+      </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -57,71 +62,83 @@ export default function MyCoursesScreen({ navigation }) {
         renderItem={renderCourse}
       />
 
-      {/* Modal for options */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={closeModal}
-      >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View style={styles.modalBackground} />
-        </TouchableWithoutFeedback>
+      {/* Modal for Options */}
+      {selectedCourse && (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
 
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Choose an Option</Text>
-          <TouchableOpacity
-            style={styles.modalButton}
-            onPress={() => {
-              navigation.navigate("CourseDetailScreen", {
-                courseId: selectedCourse.id,
-              });
-              closeModal();
-            }}
-          >
-            <Text style={styles.modalButtonText}>View Course</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalButton}
-            onPress={() => {
-              navigation.navigate("QuizScreen", {
-                courseId: selectedCourse.id,
-              });
-              closeModal();
-            }}
-          >
-            <Text style={styles.modalButtonText}>Generate Quiz</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalButton}
-            onPress={() => {
-              navigation.navigate("ExamScreen", {
-                courseId: selectedCourse.id,
-              });
-              closeModal();
-            }}
-          >
-            <Text style={styles.modalButtonText}>Generate Exam</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  navigation.navigate("CourseDetailScreen", {
+                    courseId: selectedCourse.id,
+                  });
+                  closeModal();
+                }}
+              >
+                <FontAwesome name="book" size={18} color="#fff" />
+                <Text style={styles.modalButtonText}>View Course</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  navigation.navigate("QuizScreen", {
+                    courseId: selectedCourse.id,
+                  });
+                  closeModal();
+                }}
+              >
+                <FontAwesome name="question-circle" size={18} color="#fff" />
+                <Text style={styles.modalButtonText}>Generate Quiz</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  navigation.navigate("ExamScreen", {
+                    courseId: selectedCourse.id,
+                  });
+                  closeModal();
+                }}
+              >
+                <FontAwesome name="pencil" size={18} color="#fff" />
+                <Text style={styles.modalButtonText}>Generate Exam</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={closeModal}
+              >
+                <FontAwesome name="times" size={18} color="#fff" />
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#F0F0F0", // Light gray background for the screen
+    backgroundColor: "#F0F0F0", // Light gray background
   },
   courseCard: {
     padding: 20,
     marginVertical: 12,
-    backgroundColor: "#6C5B7B", // Soft purple for course card background
+    backgroundColor: "#6C5B7B", // Soft purple background
     borderRadius: 12,
     elevation: 6,
     shadowColor: "#000",
@@ -131,71 +148,92 @@ const styles = StyleSheet.create({
   courseName: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#FFFFFF", // White text for course name
+    color: "#FFFFFF",
+    marginBottom: 8,
   },
   progressContainer: {
     height: 8,
-    backgroundColor: "#ddd", // Light gray for progress background
+    backgroundColor: "#ddd",
     borderRadius: 5,
     marginVertical: 10,
     overflow: "hidden",
   },
   progressBar: {
     height: "100%",
-    backgroundColor: "#6C5B7B", // Soft purple for progress fill
+    backgroundColor: "#F9A826", // Golden yellow
   },
   progressText: {
     fontSize: 14,
-    color: "#333",
+    color: "#fff",
+  },
+  optionsButton: {
+    marginTop: 12,
+    backgroundColor: "#F9A826",
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+  },
+  optionsButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "500",
   },
 
   // Modal Styles
   modalBackground: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    position: "absolute",
-    top: "30%",
-    left: "10%",
-    right: "10%",
-    backgroundColor: "#FFFFFF", // White background for modal
+    backgroundColor: "#FFFFFF",
     padding: 20,
     borderRadius: 10,
     elevation: 8,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
+    width: "80%",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#6C5B7B", // Title color matching card background
+    color: "#6C5B7B",
     textAlign: "center",
   },
   modalButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
     paddingVertical: 12,
     marginBottom: 10,
-    backgroundColor: "#6C5B7B", // Soft purple for buttons
+    backgroundColor: "#6C5B7B",
     borderRadius: 8,
+    width: "100%",
+    justifyContent: "center",
   },
   modalButtonText: {
     fontSize: 16,
     fontWeight: "500",
     color: "#fff",
-    textAlign: "center",
   },
   cancelButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
     paddingVertical: 12,
     marginTop: 10,
-    backgroundColor: "#F9A826", // Soft yellow for cancel button
+    backgroundColor: "#F9A826",
     borderRadius: 8,
+    width: "100%",
+    justifyContent: "center",
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: "500",
     color: "#fff",
-    textAlign: "center",
   },
 });

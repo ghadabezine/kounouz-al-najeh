@@ -3,47 +3,35 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   FlatList,
+  TextInput,
   StyleSheet,
   SafeAreaView,
-  TextInput,
-  ScrollView,
+  Alert,
 } from "react-native";
-import { WebView } from "react-native-webview"; // Correct import for WebView
-import Icon from "react-native-vector-icons/MaterialIcons"; // or another icon set like FontAwesome
+import Icon from "react-native-vector-icons/MaterialIcons";
 
-// Sample data
+// Sample Data
 const quizzes = [
-  { id: "1", title: "React Native Quiz #1", link: "https://example.com/quiz1" },
-  { id: "2", title: "React Native Quiz #2", link: "https://example.com/quiz2" },
+  { id: "1", title: "React Native Quiz #1" },
+  { id: "2", title: "React Native Quiz #2" },
 ];
+
 const exams = [
-  {
-    id: "1",
-    title: "React Native Final Exam",
-    link: "https://example.com/exam1",
-  },
-  {
-    id: "2",
-    title: "React Native Midterm Exam",
-    link: "https://example.com/exam2",
-  },
+  { id: "1", title: "React Native Final Exam" },
+  { id: "2", title: "React Native Midterm Exam" },
 ];
+
 const courses = [
   {
     id: "1",
     title: "React Native for Beginners",
-    description:
-      "Learn the fundamentals of React Native and start building mobile apps.",
-    pdfLink: "https://example.com/course1.pdf",
+    description: "Learn the basics",
   },
   {
     id: "2",
     title: "Advanced React Native",
-    description:
-      "Dive deep into React Native and master complex mobile development techniques.",
-    pdfLink: "https://example.com/course2.pdf",
+    description: "Master advanced concepts",
   },
 ];
 
@@ -51,167 +39,128 @@ export default function CourseDetailScreen({ navigation }) {
   const [question, setQuestion] = useState("");
   const [qna, setQna] = useState([]);
   const [rating, setRating] = useState(0);
-  const [showVideo, setShowVideo] = useState(false); // State to control video display
 
   const handleAskQuestion = () => {
-    if (question) {
-      setQna([...qna, { id: qna.length + 1, question, answers: [], likes: 0 }]);
+    if (question.trim()) {
+      setQna([...qna, { id: Date.now().toString(), question, likes: 0 }]);
       setQuestion("");
     } else {
       Alert.alert("Please enter a question.");
     }
   };
 
-  const handleRating = (rate) => setRating(rate);
-
-  const handleDeleteQuestion = (id) => {
-    setQna(qna.filter((item) => item.id !== id));
-  };
-
-  const handleReplyToQuestion = (id, reply) => {
-    const updatedQna = qna.map((item) =>
-      item.id === id ? { ...item, answers: [...item.answers, reply] } : item
-    );
-    setQna(updatedQna);
-  };
-
-  const handleLikeQuestion = (id) => {
-    const updatedQna = qna.map((item) =>
-      item.id === id ? { ...item, likes: item.likes + 1 } : item
-    );
-    setQna(updatedQna);
-  };
+  const renderItem = ({ item, section }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate("WebView", { link: item.link })}
+    >
+      <Text style={styles.cardText}>{item.title}</Text>
+      {item.description && (
+        <Text style={styles.cardDescription}>{item.description}</Text>
+      )}
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Courses Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Available Courses</Text>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Course Details</Text>
+      </View>
+
+      {/* Courses Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Courses</Text>
+        <FlatList
+          data={courses}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+      </View>
+
+      {/* Quizzes Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Quizzes</Text>
+        <FlatList
+          data={quizzes}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+      </View>
+
+      {/* Exams Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Exams</Text>
+        <FlatList
+          data={exams}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+        />
+      </View>
+
+      {/* Ask a Question Section */}
+      <View style={styles.askSection}>
+        <Text style={styles.sectionTitle}>Ask a Question</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ask your question here..."
+          value={question}
+          onChangeText={setQuestion}
+        />
+        <TouchableOpacity onPress={handleAskQuestion} style={styles.askButton}>
+          <Text style={styles.askButtonText}>Ask Question</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Display Q&A Section */}
+      <View style={styles.qnaSection}>
+        <Text style={styles.sectionTitle}>Student Questions</Text>
+        {qna.length > 0 ? (
           <FlatList
-            data={courses}
+            data={qna}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <View style={styles.card}>
-                <Text style={styles.cardText}>{item.title}</Text>
-                <Text style={styles.cardDescription}>{item.description}</Text>
+              <View style={styles.qnaCard}>
+                <Text style={styles.qnaQuestion}>{item.question}</Text>
                 <TouchableOpacity
-                  onPress={() => setShowVideo(true)} // Set showVideo to true when clicked
-                  style={styles.askButton}
+                  style={styles.likeButton}
+                  onPress={() => {
+                    const updatedQna = qna.map((q) =>
+                      q.id === item.id ? { ...q, likes: q.likes + 1 } : q
+                    );
+                    setQna(updatedQna);
+                  }}
                 >
-                  <Text style={styles.askButtonText}>View Course PDF</Text>
+                  <Icon name="thumb-up" size={20} color="#4CAF50" />
                 </TouchableOpacity>
               </View>
             )}
           />
-        </View>
+        ) : (
+          <Text style={styles.emptyText}>No questions asked yet.</Text>
+        )}
+      </View>
 
-        {/* Old Quizzes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Old Quizzes</Text>
-          <FlatList
-            data={quizzes}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
-                <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
-            )}
-          />
+      {/* Rating Section */}
+      <View style={styles.ratingSection}>
+        <Text style={styles.sectionTitle}>Rate this Course</Text>
+        <View style={styles.rating}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity key={star} onPress={() => setRating(star)}>
+              <Icon
+                name={star <= rating ? "star" : "star-outline"}
+                size={30}
+                color="#FFD700"
+              />
+            </TouchableOpacity>
+          ))}
         </View>
-
-        {/* Past Exams */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Past Exams</Text>
-          <FlatList
-            data={exams}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
-                <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-
-        {/* Q&A Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ask a Question</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ask your question here..."
-            value={question}
-            onChangeText={setQuestion}
-          />
-          <TouchableOpacity
-            onPress={handleAskQuestion}
-            style={styles.askButton}
-          >
-            <Text style={styles.askButtonText}>Ask Question</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Display Q&A */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Student Questions</Text>
-          <FlatList
-            data={qna}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.qnaCard}>
-                <Text style={styles.qnaQuestion}>{item.question}</Text>
-                <FlatList
-                  data={item.answers}
-                  keyExtractor={(answer, index) => index.toString()}
-                  renderItem={({ item }) => (
-                    <Text style={styles.qnaAnswer}>{item}</Text>
-                  )}
-                />
-                <View style={styles.qnaActions}>
-                  <TouchableOpacity
-                    onPress={() => handleLikeQuestion(item.id)}
-                    style={styles.qnaActionButton}
-                  >
-                    <Icon name="thumb-up" size={20} color="#4CAF50" />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDeleteQuestion(item.id)}
-                    style={styles.qnaActionButton}
-                  >
-                    <Icon name="delete" size={20} color="#F44336" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
-          />
-        </View>
-
-        {/* Course Rating */}
-        <View style={styles.ratingContainer}>
-          <Text style={styles.sectionTitle}>Rate this Course</Text>
-          <View style={styles.rating}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity key={star} onPress={() => handleRating(star)}>
-                <Icon
-                  name={star <= rating ? "star" : "star-outline"}
-                  size={30}
-                  color="#FFD700"
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -219,21 +168,35 @@ export default function CourseDetailScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
     backgroundColor: "#f9f9f9",
   },
-  scrollContainer: {
-    paddingBottom: 20,
+  header: {
+    padding: 20,
+    backgroundColor: "#6C5B7B", // Soft purple header
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButton: {
+    marginRight: 15,
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    flex: 1,
+    textAlign: "center",
   },
   section: {
-    marginBottom: 20,
+    marginVertical: 10,
     paddingHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#6C5B7B", // Soft purple
-    marginBottom: 10,
+    marginVertical: 10,
   },
   card: {
     backgroundColor: "#fff",
@@ -243,14 +206,18 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#6C5B7B", // Soft purple
   },
   cardDescription: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 5,
+    marginTop: 5,
+  },
+  askSection: {
+    marginTop: 20,
+    marginHorizontal: 20,
   },
   input: {
     height: 50,
@@ -261,14 +228,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   askButton: {
-    backgroundColor: "#F9A826", // Golden Yellow
+    backgroundColor: "#F9A826",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
   },
   askButtonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  qnaSection: {
+    marginTop: 20,
+    marginHorizontal: 20,
   },
   qnaCard: {
     backgroundColor: "#fff",
@@ -280,28 +252,25 @@ const styles = StyleSheet.create({
   qnaQuestion: {
     fontWeight: "bold",
     fontSize: 16,
-    color: "#6C5B7B", // Soft purple
+    color: "#6C5B7B",
   },
-  qnaAnswer: {
-    fontSize: 14,
-    color: "#555",
-    marginLeft: 10,
-    marginTop: 5,
-  },
-  qnaActions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  likeButton: {
     marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "center",
   },
-  qnaActionButton: {
-    padding: 5,
+  emptyText: {
+    textAlign: "center",
+    color: "#888",
+    marginVertical: 10,
   },
-  ratingContainer: {
-    alignItems: "center",
+  ratingSection: {
     marginTop: 20,
+    marginHorizontal: 20,
   },
   rating: {
     flexDirection: "row",
     justifyContent: "center",
+    marginVertical: 10,
   },
 });

@@ -7,12 +7,16 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  Dimensions,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 
+// Get screen dimensions
+const { width } = Dimensions.get("window");
+
 const progressData = {
   course: "React Native Basics",
-  progress: 65, // Percentage progress
+  progress: 65,
 };
 
 const motivationalQuotes = [
@@ -32,33 +36,33 @@ export default function HomeScreen({ navigation }) {
     setQuote(randomQuote);
   }, []);
 
-  const markedDates = {
-    "2025-02-20": {
-      selected: true,
-      marked: true,
-      selectedColor: "#6C5B7B", // Soft purple color for first date
-    },
-    "2025-02-25": {
-      selected: true,
-      marked: true,
-      selectedColor: "#F9A826", // Golden yellow color for second date
-    },
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning! ☀️";
+    if (hour < 18) return "Good Afternoon! 🌤️";
+    return "Good Evening! 🌙";
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        {/* Profile & Greeting */}
         <View style={styles.headerContainer}>
-          <Text style={styles.appName}>Kounouz Al Najah</Text>
+          <Image
+            source={require("../assets/profile.jpg")}
+            style={styles.profileImage}
+          />
+          <View>
+            <Text style={styles.greetingText}>{getGreeting()}</Text>
+            <Text style={styles.appName}>Welcome to Kounouz Al Najah</Text>
+          </View>
         </View>
+
         <Text style={styles.descriptionText}>
           Explore courses and generate quizzes!
         </Text>
 
-        <Text style={styles.greetingText}>
-          Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}!
-        </Text>
-
+        {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <Text style={styles.progressTitle}>
             Progress in {progressData.course}
@@ -76,55 +80,55 @@ export default function HomeScreen({ navigation }) {
           </Text>
         </View>
 
+        {/* Quote of the Day */}
         <Text style={styles.quoteText}>"{quote}"</Text>
 
-        {/* New Feature: Random Achievement */}
-        <View style={styles.achievementContainer}>
-          <Text style={styles.achievementText}>🎉 Achievement Unlocked!</Text>
-          <Text style={styles.achievementDetail}>
-            Completed 50% of your first React Native course.
-          </Text>
-        </View>
-
+        {/* Navigation Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
+            activeOpacity={0.8}
             onPress={() => navigation.navigate("CourseList")}
           >
-            <Text style={styles.buttonText}>Explore Courses</Text>
+            <Text style={styles.buttonText}>📚 Explore Courses</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.button}
+            activeOpacity={0.8}
             onPress={() => navigation.navigate("Profile")}
           >
-            <Text style={styles.buttonText}>My Profile</Text>
+            <Text style={styles.buttonText}>👤 My Profile</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
+            activeOpacity={0.8}
             onPress={() => navigation.navigate("UpcomingEvents")}
           >
-            <Text style={styles.buttonText}>Upcoming Events</Text>
+            <Text style={styles.buttonText}>📅 Upcoming Events</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
+            activeOpacity={0.8}
             onPress={() => navigation.navigate("Notifications")}
           >
-            <Text style={styles.buttonText}>Notifications</Text>
+            <Text style={styles.buttonText}>🔔 Notifications</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Calendar */}
         <View style={styles.calendarContainer}>
-          <Text style={styles.sectionTitle}>Upcoming Vacations and Exams</Text>
+          <Text style={styles.sectionTitle}>📆 Upcoming Vacations & Exams</Text>
           <Calendar
             current={"2025-02-01"}
-            markedDates={markedDates}
             theme={{
-              todayTextColor: "#6C5B7B", // Soft purple for today text
-              arrowColor: "#F9A826", // Golden yellow for arrows
+              todayTextColor: "#6C5B7B",
+              arrowColor: "#F9A826",
               monthTextColor: "#333",
               textMonthFontWeight: "bold",
-              selectedDayBackgroundColor: "#F9A826", // Golden yellow for selected day background
+              selectedDayBackgroundColor: "#F9A826",
               selectedDayTextColor: "#fff",
             }}
           />
@@ -137,7 +141,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E8E8E8",
+    backgroundColor: "#F7F7F7",
   },
   scrollViewContent: {
     alignItems: "center",
@@ -147,44 +151,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
-    justifyContent: "center",
+    width: "100%",
   },
-  logo: {
-    width: 70,
-    height: 70,
+  profileImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     marginRight: 15,
-    borderRadius: 10,
   },
   appName: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "600",
-    color: "#6C5B7B", // Soft purple for the app name
-    textShadowColor: "#f5f5f5",
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 10,
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
-  },
-  descriptionText: {
-    color: "#777",
-    marginBottom: 20,
-    textAlign: "center",
+    color: "#6C5B7B",
   },
   greetingText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#F9A826", // Golden yellow greeting color
-    marginBottom: 20,
-    letterSpacing: 2,
+    color: "#F9A826",
+  },
+  descriptionText: {
+    fontSize: 16,
+    color: "#555",
     textAlign: "center",
+    marginBottom: 20,
   },
   progressContainer: {
-    width: "100%",
-    marginVertical: 20,
+    width: "90%",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    elevation: 3,
+    marginBottom: 20,
     alignItems: "center",
   },
   progressTitle: {
@@ -197,12 +194,11 @@ const styles = StyleSheet.create({
     height: 10,
     backgroundColor: "#e0e0e0",
     borderRadius: 5,
-    marginBottom: 5,
+    overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#6C5B7B", // Soft purple for progress fill
-    borderRadius: 5,
+    backgroundColor: "#6C5B7B",
   },
   progressText: {
     marginTop: 5,
@@ -216,45 +212,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  achievementContainer: {
-    marginVertical: 30,
-    padding: 20,
-    backgroundColor: "#F9A826", // Golden yellow background for achievement box
-    borderRadius: 15,
-    borderWidth: 2,
-    borderColor: "#6C5B7B", // Soft purple border
-    width: "90%",
-    alignItems: "center",
-  },
-  achievementText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  achievementDetail: {
-    fontSize: 14,
-    color: "#fff",
-    marginTop: 10,
-    fontStyle: "italic",
-  },
   buttonContainer: {
     width: "100%",
     alignItems: "center",
   },
   button: {
-    backgroundColor: "#6C5B7B", // Soft purple for buttons
-    paddingVertical: 12,
+    backgroundColor: "#6C5B7B",
+    paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 10,
-    marginVertical: 12,
-    width: "80%",
-    elevation: 6, // Shadow for depth
+    marginVertical: 10,
+    width: width * 0.85,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    elevation: 5,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-    textTransform: "uppercase",
   },
   sectionTitle: {
     fontSize: 20,
@@ -263,8 +241,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   calendarContainer: {
-    marginTop: 30,
     width: "100%",
     alignItems: "center",
+    marginTop: 20,
   },
 });

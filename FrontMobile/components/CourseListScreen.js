@@ -8,12 +8,18 @@ import {
   SafeAreaView,
   FlatList,
   Dimensions,
+  Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import Icon from "react-native-vector-icons/MaterialIcons";
+
+const { width } = Dimensions.get("window");
 
 export default function CourseListScreen() {
   const [isMenuVisible, setMenuVisible] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const slideAnim = new Animated.Value(300);
   const navigation = useNavigation();
 
   const courses = [
@@ -31,17 +37,27 @@ export default function CourseListScreen() {
       courseMaterial: "JavaScript: The Good Parts, MDN Docs",
       gradeLevel: "Advanced",
     },
-    // Add more courses here
   ];
 
   const handlePress = (course) => {
     setSelectedCourse(course);
     setMenuVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
   };
 
   const closeMenu = () => {
-    setMenuVisible(false);
-    setSelectedCourse(null);
+    Animated.timing(slideAnim, {
+      toValue: 300,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setMenuVisible(false);
+      setSelectedCourse(null);
+    });
   };
 
   const handleAddToMyCourses = () => {
@@ -52,8 +68,15 @@ export default function CourseListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Explore Courses</Text>
+      {/* Return Button */}
 
+      <Text style={styles.header}>Explore Courses</Text>
+      <TouchableOpacity
+        style={styles.returnButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={28} color="#fff" />
+      </TouchableOpacity>
       <FlatList
         data={courses}
         keyExtractor={(item) => item.id.toString()}
@@ -71,16 +94,20 @@ export default function CourseListScreen() {
         contentContainerStyle={styles.flatListContent}
       />
 
-      {/* Modal for Course Details */}
+      {/* Pop-up Modal */}
       {isMenuVisible && selectedCourse && (
-        <Modal
-          transparent={true}
-          animationType="fade"
-          visible={isMenuVisible}
-          onRequestClose={closeMenu}
-        >
+        <Modal transparent={true} visible={isMenuVisible} animationType="fade">
           <View style={styles.modalBackground}>
-            <View style={styles.menuContainer}>
+            <Animated.View
+              style={[
+                styles.menuContainer,
+                { transform: [{ translateY: slideAnim }] },
+              ]}
+            >
+              <TouchableOpacity style={styles.closeIcon} onPress={closeMenu}>
+                <Ionicons name="close-circle" size={28} color="#F9A826" />
+              </TouchableOpacity>
+
               <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
               <Text style={styles.detailText}>
                 <Text style={styles.bold}>Professor:</Text>{" "}
@@ -102,12 +129,7 @@ export default function CourseListScreen() {
               >
                 <Text style={styles.addButtonText}>Add to My Courses</Text>
               </TouchableOpacity>
-
-              {/* Close Menu Button */}
-              <TouchableOpacity onPress={closeMenu} style={styles.closeButton}>
-                <Text style={styles.menuText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+            </Animated.View>
           </View>
         </Modal>
       )}
@@ -121,23 +143,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#f5f5f5",
   },
+  returnButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    backgroundColor: "#6C5B7B",
+    padding: 8,
+    borderRadius: 8,
+    zIndex: 10,
+  },
   header: {
     fontSize: 28,
     fontWeight: "700",
-    marginVertical: 20,
+    marginVertical: 40,
     color: "#6C5B7B", // Soft purple
     textAlign: "center",
   },
   courseItem: {
-    padding: 18,
-    marginBottom: 12,
+    padding: 20,
+    marginBottom: 14,
     backgroundColor: "#fff",
-    borderRadius: 12,
+    borderRadius: 15,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
+    borderLeftWidth: 6,
+    borderLeftColor: "#F9A826", // Golden Yellow Accent
   },
   courseName: {
     fontSize: 20,
@@ -156,20 +189,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   menuContainer: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 25,
     borderRadius: 15,
     width: "90%",
     maxWidth: 400,
     alignItems: "center",
+    elevation: 10,
     shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+  },
+  closeIcon: {
+    position: "absolute",
+    top: 12,
+    right: 12,
   },
   modalTitle: {
     fontSize: 24,
@@ -200,18 +238,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     fontWeight: "600",
-  },
-  closeButton: {
-    paddingVertical: 14,
-    marginTop: 12,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
-    width: "100%",
-    alignItems: "center",
-  },
-  menuText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
   },
 });
