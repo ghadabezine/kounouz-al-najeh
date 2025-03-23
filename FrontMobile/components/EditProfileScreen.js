@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EditProfileScreen = ({ navigation, route }) => {
@@ -11,14 +18,17 @@ const EditProfileScreen = ({ navigation, route }) => {
   const handleSave = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await fetch("http://172.20.10.2:5001/api/auth/updateProfile", {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ firstName, lastName, email }),
-      });
+      const res = await fetch(
+        "http://192.168.8.44:5002/api/auth/updateProfile",
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ firstName, lastName, email }),
+        }
+      );
 
       if (!res.ok) throw new Error("Failed to update profile");
 
@@ -42,9 +52,25 @@ const EditProfileScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Edit Profile</Text>
 
-      <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} placeholder="First Name" />
-      <TextInput style={styles.input} value={lastName} onChangeText={setLastName} placeholder="Last Name" />
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
+      <TextInput
+        style={styles.input}
+        value={firstName}
+        onChangeText={setFirstName}
+        placeholder="First Name"
+      />
+      <TextInput
+        style={styles.input}
+        value={lastName}
+        onChangeText={setLastName}
+        placeholder="Last Name"
+      />
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+        keyboardType="email-address"
+      />
 
       <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
         <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -55,7 +81,12 @@ const EditProfileScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
   input: {
     width: "100%",
     padding: 12,

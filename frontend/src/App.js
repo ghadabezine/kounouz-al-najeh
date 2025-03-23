@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import UserForm from './components/UserForm';
-import UserList from './components/UserList';
-import FileDashboard from './components/FileDashboard';
-import QuizForm from './components/QuizForm';
-import TakeQuiz from './components/TakeQuiz';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import UserForm from "./components/UserForm";
+import UserList from "./components/UserList";
+import FileDashboard from "./components/FileDashboard";
+import QuizForm from "./components/QuizForm";
+import TakeQuiz from "./components/TakeQuiz";
 import Dashboard from "./components/SubjectsDashboard";
 import FileUpload from "./components/FileDashboard";
 import ViewQuizzes from "./components/ViewQuizzes";
 import Login from "./components/Login";
-import UserModal from './components/UserModal';
-import './styles/App.css';
+import UserModal from "./components/UserModal";
+import "./styles/App.css";
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
-  const [activePage, setActivePage] = useState('login');
-  const [quizId, setQuizId] = useState('');
+  const [activePage, setActivePage] = useState("login");
+  const [quizId, setQuizId] = useState("");
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,7 +33,7 @@ const App = () => {
 
   // Fetch users when the active page is 'users' and authenticated
   useEffect(() => {
-    if (activePage === 'users' && isAuthenticated) {
+    if (activePage === "users" && isAuthenticated) {
       fetchUsers();
     }
   }, [activePage, isAuthenticated]);
@@ -41,20 +41,20 @@ const App = () => {
   // Fetch users from the backend
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/users');
+      const response = await axios.get("http://localhost:5002/api/users");
       setUsers(response.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
 
   // Handle deleting a user
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/users/${id}`);
+      await axios.delete(`http://localhost:5002/api/users/${id}`);
       fetchUsers();
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error("Error deleting user:", error);
     }
   };
 
@@ -79,7 +79,7 @@ const App = () => {
   // Fetch subjects from the backend
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get("http://localhost:5001/api/subjects");
+      const response = await axios.get("http://localhost:5002/api/subjects");
       setSubjects(response.data);
     } catch (err) {
       console.error("❌ Error fetching subjects:", err);
@@ -89,7 +89,9 @@ const App = () => {
   // Handle adding a new subject
   const handleAddSubject = async (name) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/subjects", { name });
+      const response = await axios.post("http://localhost:5002/api/subjects", {
+        name,
+      });
       fetchSubjects(); // Refetch subjects to update the UI
       return response.data;
     } catch (err) {
@@ -100,7 +102,7 @@ const App = () => {
   // Handle deleting a subject
   const handleDeleteSubject = async (id) => {
     try {
-      await axios.delete(`http://localhost:5001/api/subjects/${id}`);
+      await axios.delete(`http://localhost:5002/api/subjects/${id}`);
       fetchSubjects(); // Refetch subjects to update the UI
     } catch (err) {
       console.error("❌ Error deleting subject:", err);
@@ -110,7 +112,10 @@ const App = () => {
   // Handle editing a subject
   const handleEditSubject = async (id, name) => {
     try {
-      const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
+      const response = await axios.put(
+        `http://localhost:5002/api/subjects/${id}`,
+        { name }
+      );
       fetchSubjects(); // Refetch subjects to update the UI
       return response.data;
     } catch (err) {
@@ -125,70 +130,82 @@ const App = () => {
         <Login
           setIsAuthenticated={(status) => {
             setIsAuthenticated(status);
-            if (status) setActivePage('home'); // Navigate to home on successful login
+            if (status) setActivePage("home"); // Navigate to home on successful login
           }}
         />
       ) : (
         <>
           {/* Show header only after authentication */}
-          <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
+          <Header
+            setActivePage={setActivePage}
+            setSelectedSubject={setSelectedSubject}
+          />
 
           <main>
-            {activePage === 'home' && <div className="home"></div>}
+            {activePage === "home" && <div className="home"></div>}
 
-            {activePage === 'files' && <FileDashboard />}
+            {activePage === "files" && <FileDashboard />}
 
-            {activePage === 'users' && (
+            {activePage === "users" && (
               <div>
                 <h1 className="user-management">User Management</h1>
                 <button onClick={openModal}>Add User</button>
-                <UserList users={users} handleDelete={handleDelete} handleEdit={handleEdit} />
+                <UserList
+                  users={users}
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                />
               </div>
             )}
 
-            {activePage === 'subjects' && (
-              !selectedSubject ? (
+            {activePage === "subjects" &&
+              (!selectedSubject ? (
                 <Dashboard
                   subjects={subjects}
                   onFileUpload={(subject) => {
                     setSelectedSubject(subject);
-                    setActivePage('fileUpload');
+                    setActivePage("fileUpload");
                   }}
                   onCreateQuiz={(subject) => {
                     setSelectedSubject(subject);
-                    setActivePage('createQuiz');
+                    setActivePage("createQuiz");
                   }}
                   onViewQuizzes={(subject) => {
                     setSelectedSubject(subject);
-                    setActivePage('viewQuizzes');
+                    setActivePage("viewQuizzes");
                   }}
                   onDeleteSubject={handleDeleteSubject}
                   onAddSubject={handleAddSubject}
                   onEditSubject={handleEditSubject}
                 />
               ) : (
-                <FileUpload subject={selectedSubject} goBack={() => setSelectedSubject(null)} />
-              )
-            )}
+                <FileUpload
+                  subject={selectedSubject}
+                  goBack={() => setSelectedSubject(null)}
+                />
+              ))}
 
-            {activePage === 'createQuiz' && selectedSubject && (
-              <QuizForm subject={selectedSubject} goBack={() => {
-                setSelectedSubject(null);
-                setActivePage('subjects');
-              }} />
-            )}
-
-            {activePage === 'fileUpload' && selectedSubject && (
-              <FileUpload
+            {activePage === "createQuiz" && selectedSubject && (
+              <QuizForm
                 subject={selectedSubject}
                 goBack={() => {
                   setSelectedSubject(null);
-                  setActivePage('subjects');
+                  setActivePage("subjects");
                 }}
               />
             )}
 
-            {activePage === 'takeQuiz' && (
+            {activePage === "fileUpload" && selectedSubject && (
+              <FileUpload
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage("subjects");
+                }}
+              />
+            )}
+
+            {activePage === "takeQuiz" && (
               <div>
                 <h1>Take a Quiz</h1>
                 <input
@@ -202,17 +219,25 @@ const App = () => {
               </div>
             )}
 
-            {activePage === 'viewQuizzes' && selectedSubject && (
-              <ViewQuizzes subject={selectedSubject} goBack={() => {
-                setSelectedSubject(null);
-                setActivePage('subjects');
-              }} />
+            {activePage === "viewQuizzes" && selectedSubject && (
+              <ViewQuizzes
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage("subjects");
+                }}
+              />
             )}
           </main>
 
           {isModalOpen && (
             <UserModal closeModal={closeModal}>
-              <UserForm fetchUsers={fetchUsers} editingUser={editingUser} setEditingUser={setEditingUser} closeModal={closeModal} />
+              <UserForm
+                fetchUsers={fetchUsers}
+                editingUser={editingUser}
+                setEditingUser={setEditingUser}
+                closeModal={closeModal}
+              />
             </UserModal>
           )}
 

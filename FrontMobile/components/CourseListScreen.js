@@ -23,7 +23,7 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://172.20.10.2:5001/api/subjects"); // Replace with your actual API
+      const response = await fetch("http://192.168.8.44:5002/api/subjects"); // Replace with your actual API
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
@@ -74,10 +74,13 @@ export default function CourseListScreen() {
           data={courses}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.courseItem} onPress={() => {
-              setSelectedCourse(item);
-              setMenuVisible(true);
-            }}>
+            <TouchableOpacity
+              style={styles.courseItem}
+              onPress={() => {
+                setSelectedCourse(item);
+                setMenuVisible(true);
+              }}
+            >
               <Text style={styles.courseName}>{item.name}</Text>
             </TouchableOpacity>
           )}
@@ -86,16 +89,27 @@ export default function CourseListScreen() {
 
       {/* ✅ Modal for Course Details */}
       {isMenuVisible && selectedCourse && (
-        <Modal transparent={true} animationType="fade" visible={isMenuVisible} onRequestClose={() => setMenuVisible(false)}>
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={isMenuVisible}
+          onRequestClose={() => setMenuVisible(false)}
+        >
           <View style={styles.modalBackground}>
             <View style={styles.menuContainer}>
               <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
-              
-              <TouchableOpacity onPress={handleAddToMyCourses} style={styles.addButton}>
+
+              <TouchableOpacity
+                onPress={handleAddToMyCourses}
+                style={styles.addButton}
+              >
                 <Text style={styles.addButtonText}>Add to My Courses</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => setMenuVisible(false)} style={styles.closeButton}>
+              <TouchableOpacity
+                onPress={() => setMenuVisible(false)}
+                style={styles.closeButton}
+              >
                 <Text style={styles.menuText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -108,7 +122,13 @@ export default function CourseListScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
-  header: { fontSize: 28, fontWeight: "700", marginVertical: 20, color: "#6C5B7B", textAlign: "center" },
+  header: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginVertical: 20,
+    color: "#6C5B7B",
+    textAlign: "center",
+  },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
   courseItem: {
     padding: 18,
@@ -121,7 +141,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   courseName: { fontSize: 20, fontWeight: "600", color: "#333" },
-  modalBackground: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   menuContainer: {
     backgroundColor: "#fff",
     padding: 20,
@@ -130,7 +155,12 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     alignItems: "center",
   },
-  modalTitle: { fontSize: 24, fontWeight: "700", color: "#6C5B7B", marginBottom: 12 },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#6C5B7B",
+    marginBottom: 12,
+  },
   addButton: {
     paddingVertical: 14,
     backgroundColor: "#F9A826",
@@ -139,6 +169,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
-  closeButton: { paddingVertical: 14, marginTop: 12, backgroundColor: "#ccc", borderRadius: 8, width: "100%", alignItems: "center" },
+  closeButton: {
+    paddingVertical: 14,
+    marginTop: 12,
+    backgroundColor: "#ccc",
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+  },
   menuText: { fontSize: 16, fontWeight: "600", color: "#333" },
 });

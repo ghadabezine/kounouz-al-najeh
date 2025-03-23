@@ -15,7 +15,9 @@ const FileDashboard = ({ subject, goBack }) => {
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/api/files/subject/${subject._id}`);
+      const res = await axios.get(
+        `http://localhost:5002/api/files/subject/${subject._id}`
+      );
       setFiles(res.data);
     } catch (err) {
       console.error("❌ Error fetching files:", err);
@@ -33,7 +35,10 @@ const FileDashboard = ({ subject, goBack }) => {
     formData.append("subjectId", subject._id);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/files/upload", formData);
+      const res = await axios.post(
+        "http://localhost:5002/api/files/upload",
+        formData
+      );
       if (res.status === 201) {
         setMessage("✅ File uploaded successfully!");
         setFile(null);
@@ -49,7 +54,7 @@ const FileDashboard = ({ subject, goBack }) => {
 
   const handleDelete = async (filename) => {
     try {
-      await axios.delete(`http://localhost:5001/api/files/${filename}`);
+      await axios.delete(`http://localhost:5002/api/files/${filename}`);
       alert("✅ File deleted!");
       fetchFiles();
     } catch (err) {
@@ -69,7 +74,9 @@ const FileDashboard = ({ subject, goBack }) => {
     }
 
     try {
-      await axios.patch(`http://localhost:5001/api/files/${editingFile}`, { newFilename });
+      await axios.patch(`http://localhost:5002/api/files/${editingFile}`, {
+        newFilename,
+      });
       alert("✅ Filename updated!");
       setEditingFile(null);
       fetchFiles();
@@ -86,8 +93,12 @@ const FileDashboard = ({ subject, goBack }) => {
       <form onSubmit={handleUpload} className="form">
         <input type="file" onChange={handleFileChange} className="input-file" />
         <div className="button-group">
-          <button type="submit" className="button">Upload</button>
-          <button type="button" onClick={goBack} className="button-secondary">Back</button>
+          <button type="submit" className="button">
+            Upload
+          </button>
+          <button type="button" onClick={goBack} className="button-secondary">
+            Back
+          </button>
         </div>
       </form>
 
@@ -106,18 +117,39 @@ const FileDashboard = ({ subject, goBack }) => {
                     onChange={(e) => setNewFilename(e.target.value)}
                   />
                   <div className="button-container">
-                    <button className="save-btn" onClick={handleUpdateFilename}>Save</button>
-                    <button className="cancel-btn" onClick={() => setEditingFile(null)}>Cancel</button>
+                    <button className="save-btn" onClick={handleUpdateFilename}>
+                      Save
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => setEditingFile(null)}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </>
               ) : (
                 <>
-                  <a href={`http://localhost:5001/api/files/${file._id}`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={`http://localhost:5002/api/files/${file._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {file.filename}
                   </a>
                   <div className="button-container">
-                    <button className="edit-btn" onClick={() => handleEdit(file)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(file.filename)}>Delete</button>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(file)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(file.filename)}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </>
               )}

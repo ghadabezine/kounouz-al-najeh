@@ -30,7 +30,7 @@ const Register = ({ navigation }) => {
 
     try {
       const response = await axios.post(
-        "http://172.20.10.2:5001/api/auth/register",
+        "http://192.168.8.44:5002/api/auth/register",
         { firstName, lastName, email, password },
         { headers: { "Content-Type": "application/json" } }
       );

@@ -13,12 +13,12 @@ const App = () => {
   }, []);
 
   const fetchUsers = async () => {
-    const response = await axios.get("http://localhost:5001/api/users");
+    const response = await axios.get("http://localhost:5002/api/users");
     setUsers(response.data);
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5001/api/users/${id}`);
+    await axios.delete(`http://localhost:5002/api/users/${id}`);
     fetchUsers();
   };
 
@@ -29,8 +29,16 @@ const App = () => {
   return (
     <div className="container">
       <h1>User Management</h1>
-      <UserForm fetchUsers={fetchUsers} editingUser={editingUser} setEditingUser={setEditingUser} />
-      <UserList users={users} handleDelete={handleDelete} handleEdit={handleEdit} />
+      <UserForm
+        fetchUsers={fetchUsers}
+        editingUser={editingUser}
+        setEditingUser={setEditingUser}
+      />
+      <UserList
+        users={users}
+        handleDelete={handleDelete}
+        handleEdit={handleEdit}
+      />
     </div>
   );
 };

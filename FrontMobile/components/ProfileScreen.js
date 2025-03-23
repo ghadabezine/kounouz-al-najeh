@@ -14,7 +14,6 @@ import Icon from "react-native-vector-icons/FontAwesome";
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
 
-
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -27,13 +26,16 @@ export default function ProfileScreen({ navigation }) {
 
       console.log("📢 Token retrieved:", token); // ✅ Debug: Ensure token is retrieved
 
-      const response = await fetch("http://172.20.10.2:5001/api/auth/profile", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "http://192.168.8.44:5002/api/auth/profile",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -74,12 +76,13 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={{ uri: user?.profileImage || "https://placekitten.com/200/200" }}
+          source={{
+            uri: user?.profileImage || "https://placekitten.com/200/200",
+          }}
           style={styles.profileImage}
         />
         <Text style={styles.username}>
