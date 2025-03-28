@@ -49,8 +49,18 @@ export default function MyCoursesScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
-  header: { fontSize: 28, fontWeight: "700", marginVertical: 20, textAlign: "center" },
-  noCourses: { textAlign: "center", marginTop: 20, fontSize: 16, color: "#777" },
+  header: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginVertical: 20,
+    textAlign: "center",
+  },
+  noCourses: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#777",
+  },
   courseItem: {
     padding: 18,
     marginBottom: 12,

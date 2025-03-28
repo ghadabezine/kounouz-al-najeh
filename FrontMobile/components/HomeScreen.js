@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   ScrollView,
-  Image,
+  Animated,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 
@@ -25,49 +25,51 @@ const motivationalQuotes = [
 
 export default function HomeScreen({ navigation }) {
   const [quote, setQuote] = useState("");
+  const progressAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     const randomQuote =
       motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
     setQuote(randomQuote);
-  }, []);
 
-  const markedDates = {
-    "2025-02-20": {
-      selected: true,
-      marked: true,
-      selectedColor: "#6C5B7B", // Soft purple color for first date
-    },
-    "2025-02-25": {
-      selected: true,
-      marked: true,
-      selectedColor: "#F9A826", // Golden yellow color for second date
-    },
-  };
+    Animated.timing(progressAnim, {
+      toValue: progressData.progress,
+      duration: 800,
+      useNativeDriver: false,
+    }).start();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.appName}>Kounouz Al Najah</Text>
-        </View>
+        {/* App Name */}
+        <Text style={styles.appName}>Kounouz Al Najah</Text>
+
+        {/* Description */}
         <Text style={styles.descriptionText}>
           Explore courses and generate quizzes!
         </Text>
 
+        {/* Greeting */}
         <Text style={styles.greetingText}>
           Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}!
         </Text>
 
+        {/* Progress Bar */}
         <View style={styles.progressContainer}>
           <Text style={styles.progressTitle}>
             Progress in {progressData.course}
           </Text>
           <View style={styles.progressBar}>
-            <View
+            <Animated.View
               style={[
                 styles.progressFill,
-                { width: `${progressData.progress}%` },
+                {
+                  width: progressAnim.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ["0%", "100%"],
+                  }),
+                },
               ]}
             />
           </View>
@@ -76,16 +78,10 @@ export default function HomeScreen({ navigation }) {
           </Text>
         </View>
 
+        {/* Motivational Quote */}
         <Text style={styles.quoteText}>"{quote}"</Text>
 
-        {/* New Feature: Random Achievement */}
-        <View style={styles.achievementContainer}>
-          <Text style={styles.achievementText}>🎉 Achievement Unlocked!</Text>
-          <Text style={styles.achievementDetail}>
-            Completed 50% of your first React Native course.
-          </Text>
-        </View>
-
+        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.button}
@@ -100,12 +96,14 @@ export default function HomeScreen({ navigation }) {
           >
             <Text style={styles.buttonText}>My Profile</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("UpcomingEvents")}
           >
             <Text style={styles.buttonText}>Upcoming Events</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("Notifications")}
@@ -114,17 +112,17 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Calendar */}
         <View style={styles.calendarContainer}>
           <Text style={styles.sectionTitle}>Upcoming Vacations and Exams</Text>
           <Calendar
             current={"2025-02-01"}
-            markedDates={markedDates}
             theme={{
-              todayTextColor: "#6C5B7B", // Soft purple for today text
-              arrowColor: "#F9A826", // Golden yellow for arrows
+              todayTextColor: "#6C5B7B",
+              arrowColor: "#F9A826",
               monthTextColor: "#333",
               textMonthFontWeight: "bold",
-              selectedDayBackgroundColor: "#F9A826", // Golden yellow for selected day background
+              selectedDayBackgroundColor: "#F9A826",
               selectedDayTextColor: "#fff",
             }}
           />
@@ -143,52 +141,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-    justifyContent: "center",
+  backButton: {
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    marginBottom: 10,
+    backgroundColor: "#ddd",
+    padding: 8,
+    borderRadius: 5,
   },
-  logo: {
-    width: 70,
-    height: 70,
-    marginRight: 15,
-    borderRadius: 10,
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#6C5B7B",
   },
   appName: {
-    fontSize: 30,
-    fontWeight: "600",
-    color: "#6C5B7B", // Soft purple for the app name
-    textShadowColor: "#f5f5f5",
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 10,
-  },
-  welcomeText: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
+    color: "#6C5B7B",
+    textAlign: "center",
+    marginBottom: 10,
   },
   descriptionText: {
+    fontSize: 16,
     color: "#777",
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 10,
   },
   greetingText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#F9A826", // Golden yellow greeting color
-    marginBottom: 20,
-    letterSpacing: 2,
+    color: "#F9A826",
     textAlign: "center",
+    marginBottom: 15,
   },
   progressContainer: {
-    width: "100%",
-    marginVertical: 20,
+    width: "90%",
     alignItems: "center",
+    marginVertical: 15,
   },
   progressTitle: {
     fontSize: 16,
+    fontWeight: "600",
     color: "#333",
     marginBottom: 5,
   },
@@ -197,11 +190,11 @@ const styles = StyleSheet.create({
     height: 10,
     backgroundColor: "#e0e0e0",
     borderRadius: 5,
-    marginBottom: 5,
+    overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#6C5B7B", // Soft purple for progress fill
+    backgroundColor: "#6C5B7B",
     borderRadius: 5,
   },
   progressText: {
@@ -216,43 +209,24 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  achievementContainer: {
-    marginVertical: 30,
-    padding: 20,
-    backgroundColor: "#F9A826", // Golden yellow background for achievement box
-    borderRadius: 15,
-    borderWidth: 2,
-    borderColor: "#6C5B7B", // Soft purple border
-    width: "90%",
-    alignItems: "center",
-  },
-  achievementText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  achievementDetail: {
-    fontSize: 14,
-    color: "#fff",
-    marginTop: 10,
-    fontStyle: "italic",
-  },
   buttonContainer: {
     width: "100%",
     alignItems: "center",
+    marginTop: 10,
   },
   button: {
-    backgroundColor: "#6C5B7B", // Soft purple for buttons
+    backgroundColor: "#6C5B7B",
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 10,
-    marginVertical: 12,
+    marginVertical: 8,
     width: "80%",
-    elevation: 6, // Shadow for depth
+    alignItems: "center",
+    elevation: 3,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     textTransform: "uppercase",
   },

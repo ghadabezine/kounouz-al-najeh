@@ -13,9 +13,12 @@ export default function ExamScreen() {
   const [loading, setLoading] = useState(false);
   const [examQuestions, setExamQuestions] = useState([]);
   const [numQuestions, setNumQuestions] = useState("");
+  const [selectedAnswers, setSelectedAnswers] = useState({}); // Track selected answers
+  const [score, setScore] = useState(null); // Track score
 
   const generateExam = () => {
     setLoading(true);
+    setScore(null); // Reset score when new exam is generated
     setTimeout(() => {
       const generatedQuestions = Array.from(
         { length: parseInt(numQuestions) || 5 },
@@ -30,6 +33,23 @@ export default function ExamScreen() {
       setExamQuestions(generatedQuestions);
       setLoading(false);
     }, 2000); // Simulating exam generation
+  };
+
+  const handleAnswerSelection = (questionIndex, selectedOption) => {
+    setSelectedAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionIndex]: selectedOption,
+    }));
+  };
+
+  const submitExam = () => {
+    let totalScore = 0;
+    examQuestions.forEach((question, index) => {
+      if (selectedAnswers[index] === question.correctAnswer) {
+        totalScore += 1;
+      }
+    });
+    setScore(totalScore);
   };
 
   return (
@@ -58,12 +78,31 @@ export default function ExamScreen() {
               <View key={index} style={styles.questionContainer}>
                 <Text style={styles.question}>{q.question}</Text>
                 {q.options.map((option, idx) => (
-                  <TouchableOpacity key={idx} style={styles.optionButton}>
+                  <TouchableOpacity
+                    key={idx}
+                    style={[
+                      styles.optionButton,
+                      selectedAnswers[index] === option &&
+                        styles.selectedOption,
+                    ]}
+                    onPress={() => handleAnswerSelection(index, option)}
+                  >
                     <Text style={styles.optionText}>{option}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             ))}
+            <TouchableOpacity style={styles.button} onPress={submitExam}>
+              <Text style={styles.buttonText}>Submit Exam</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {score !== null && (
+          <View style={styles.resultContainer}>
+            <Text style={styles.resultText}>
+              You scored {score} out of {examQuestions.length}
+            </Text>
           </View>
         )}
       </View>
@@ -131,8 +170,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignItems: "center",
   },
+  selectedOption: {
+    backgroundColor: "#E1D6B1", // Light golden yellow to highlight selected option
+  },
   optionText: {
     fontSize: 16,
+    color: "#333",
+  },
+  resultContainer: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  resultText: {
+    fontSize: 18,
+    fontWeight: "bold",
     color: "#333",
   },
 });

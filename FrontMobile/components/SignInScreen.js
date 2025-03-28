@@ -14,31 +14,39 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation, setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State to manage loading
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      return Alert.alert("Error", "Please fill in both fields.");
+    }
+
+    setLoading(true); // Start loading when login request is triggered
+
     try {
       const response = await axios.post(
         "http://192.168.8.44:5002/api/auth/login",
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
       if (response.data.token) {
         await AsyncStorage.setItem("token", response.data.token);
         console.log("✅ Token stored successfully in AsyncStorage");
         setIsAuthenticated(true);
+        setLoading(false); // Stop loading when successful
       } else {
+        setLoading(false); // Stop loading if token is not received
         Alert.alert("Login Failed", "Invalid credentials.");
       }
     } catch (error) {
+      setLoading(false); // Stop loading in case of an error
       console.error("❌ Login Error:", error.response?.data || error.message);
       Alert.alert("Error", "Failed to log in.");
     }
@@ -77,9 +85,18 @@ const Login = ({ navigation, setIsAuthenticated }) => {
             secureTextEntry
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
+          {/* Show loading spinner if the request is processing */}
+          {loading ? (
+            <ActivityIndicator
+              size="large"
+              color="#F9A826"
+              style={styles.loader}
+            />
+          ) : (
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          )}
 
           <Text style={styles.footerText}>
             Don’t have an account?{" "}
@@ -143,6 +160,9 @@ const styles = StyleSheet.create({
     width: "100%", // Increase the width of the logo
     height: "170%", // Increase the height proportionally
     resizeMode: "contain", // Ensures the logo scales proportionally
+  },
+  loader: {
+    marginVertical: 20,
   },
 });
 

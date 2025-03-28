@@ -1,27 +1,40 @@
 const express = require("express");
-const {
-  createUser,
-  getUsers,
-  updateUser,
-  deleteUser,
-  getProfile,
-  updateProfile
-} = require("../controllers/UserController");
-const { protect } = require("../middleware/authMiddleware");
-
+const multer = require("multer");
+const User = require("../models/User"); // Import User model
 const router = express.Router();
 
-// ✅ Create a new user
-router.post("/", createUser);
+// Multer configuration (stores images in 'uploads/' folder)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // ✅ Ensure this folder exists
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
 
-// ✅ Get all users
-router.get("/", getUsers);
+const upload = multer({ storage });
 
-// ✅ Update a user
-router.put("/:id", updateUser);
+// ✅ Route to upload a profile image
+router.post(
+  "/upload-profile",
+  upload.single("profileImage"),
+  async (req, res) => {
+    try {
+      const userId = req.body.userId;
+      const imageUrl = `http://your-server.com/uploads/${req.file.filename}`; // ✅ Adjust with your server URL
 
-// ✅ Delete a user
-router.delete("/:id", deleteUser);
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { profileImage: imageUrl },
+        { new: true }
+      );
 
+      res.json({ message: "Profile image updated!", user });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  }
+);
 
 module.exports = router;

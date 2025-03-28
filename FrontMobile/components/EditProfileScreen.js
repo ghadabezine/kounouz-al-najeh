@@ -4,18 +4,26 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Image,
   StyleSheet,
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { launchImageLibrary } from "react-native-image-picker";
 
 const EditProfileScreen = ({ navigation, route }) => {
-  const { user, setUser } = route.params; // ✅ Get setUser from params
+  const { user, setUser } = route.params; // Get setUser from params
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
+  const [profileImage, setProfileImage] = useState(user.profileImage);
 
   const handleSave = async () => {
+    if (!firstName || !lastName || !email) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await fetch(
@@ -26,20 +34,18 @@ const EditProfileScreen = ({ navigation, route }) => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ firstName, lastName, email }),
+          body: JSON.stringify({ firstName, lastName, email, profileImage }),
         }
       );
 
       if (!res.ok) throw new Error("Failed to update profile");
 
-      const updatedUser = { firstName, lastName, email };
+      const updatedUser = { firstName, lastName, email, profileImage };
 
-      // ✅ Store updated user data in AsyncStorage
+      // Store updated user data in AsyncStorage
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
 
-      // ✅ Immediately update ProfileScreen
       setUser(updatedUser);
-
       Alert.alert("Success", "Profile updated successfully!");
       navigation.goBack();
     } catch (error) {
@@ -48,9 +54,35 @@ const EditProfileScreen = ({ navigation, route }) => {
     }
   };
 
+  const pickImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: "photo",
+        includeBase64: false,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log("User cancelled image picker");
+        } else if (response.errorCode) {
+          console.error("ImagePicker Error: ", response.errorMessage);
+        } else {
+          setProfileImage(response.uri);
+        }
+      }
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Edit Profile</Text>
+
+      <TouchableOpacity onPress={pickImage} style={styles.imageButton}>
+        {profileImage ? (
+          <Image source={{ uri: profileImage }} style={styles.profileImage} />
+        ) : (
+          <Text style={styles.imageText}>Add Profile Picture</Text>
+        )}
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -97,12 +129,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   saveButton: {
-    backgroundColor: "#F9A826",
+    backgroundColor: "#6C5B7B",
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
   },
   saveButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  imageButton: {
+    backgroundColor: "#F9A826",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  imageText: {
+    fontSize: 16,
+    color: "#fff",
+  },
 });
 
 export default EditProfileScreen;

@@ -9,6 +9,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator, // Importing ActivityIndicator for loading spinner
 } from "react-native";
 import axios from "axios";
 
@@ -18,6 +19,7 @@ const Register = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State to manage loading
 
   const handleRegister = async () => {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
@@ -27,6 +29,8 @@ const Register = ({ navigation }) => {
     if (password !== confirmPassword) {
       return Alert.alert("Error", "Passwords don't match");
     }
+
+    setLoading(true); // Start loading when the user submits the form
 
     try {
       const response = await axios.post(
@@ -48,6 +52,8 @@ const Register = ({ navigation }) => {
         "Error",
         error.response?.data?.message || "Registration failed"
       );
+    } finally {
+      setLoading(false); // Stop loading after the request finishes
     }
   };
 
@@ -101,9 +107,18 @@ const Register = ({ navigation }) => {
           secureTextEntry
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
+        {/* Show loading spinner if the request is processing */}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#F9A826"
+            style={styles.loader}
+          />
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+        )}
 
         <Text style={styles.footerText}>
           Already have an account?{" "}
@@ -148,6 +163,9 @@ const styles = StyleSheet.create({
   buttonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
   footerText: { marginTop: 15, color: "#6C5B7B", textAlign: "center" },
   link: { color: "#01579B", fontWeight: "bold" },
+  loader: {
+    marginVertical: 20,
+  },
 });
 
 export default Register;

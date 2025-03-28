@@ -10,24 +10,21 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import { WebView } from "react-native-webview"; // Correct import for WebView
 import Icon from "react-native-vector-icons/MaterialIcons"; // or another icon set like FontAwesome
 
 // Sample data
 const quizzes = [
-  { id: "1", title: "React Native Quiz #1", link: "https://example.com/quiz1" },
-  { id: "2", title: "React Native Quiz #2", link: "https://example.com/quiz2" },
+  { id: "1", title: "React Native Quiz #1" },
+  { id: "2", title: "React Native Quiz #2" },
 ];
 const exams = [
   {
     id: "1",
     title: "React Native Final Exam",
-    link: "https://example.com/exam1",
   },
   {
     id: "2",
     title: "React Native Midterm Exam",
-    link: "https://example.com/exam2",
   },
 ];
 const courses = [
@@ -47,11 +44,10 @@ const courses = [
   },
 ];
 
-export default function CourseDetailScreen({ navigation }) {
+export default function CourseDetailScreen() {
   const [question, setQuestion] = useState("");
   const [qna, setQna] = useState([]);
   const [rating, setRating] = useState(0);
-  const [showVideo, setShowVideo] = useState(false); // State to control video display
 
   const handleAskQuestion = () => {
     if (question) {
@@ -96,7 +92,7 @@ export default function CourseDetailScreen({ navigation }) {
                 <Text style={styles.cardText}>{item.title}</Text>
                 <Text style={styles.cardDescription}>{item.description}</Text>
                 <TouchableOpacity
-                  onPress={() => setShowVideo(true)} // Set showVideo to true when clicked
+                  onPress={() => alert("Course PDF link: " + item.pdfLink)} // Placeholder for PDF link
                   style={styles.askButton}
                 >
                   <Text style={styles.askButtonText}>View Course PDF</Text>
@@ -113,14 +109,9 @@ export default function CourseDetailScreen({ navigation }) {
             data={quizzes}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
+              <View style={styles.card}>
                 <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
+              </View>
             )}
           />
         </View>
@@ -132,14 +123,9 @@ export default function CourseDetailScreen({ navigation }) {
             data={exams}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
+              <View style={styles.card}>
                 <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
+              </View>
             )}
           />
         </View>
