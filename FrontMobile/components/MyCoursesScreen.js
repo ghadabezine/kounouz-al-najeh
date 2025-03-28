@@ -6,11 +6,14 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MyCoursesScreen({ navigation }) {
   const [myCourses, setMyCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   /** ✅ Load saved courses */
   const loadCourses = async () => {
@@ -26,6 +29,18 @@ export default function MyCoursesScreen({ navigation }) {
     loadCourses();
   }, []);
 
+  /** ✅ Open modal with selected course */
+  const openModal = (course) => {
+    setSelectedCourse(course);
+    setModalVisible(true);
+  };
+
+  /** ✅ Close modal */
+  const closeModal = () => {
+    setSelectedCourse(null);
+    setModalVisible(false);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>My Courses</Text>
@@ -37,11 +52,70 @@ export default function MyCoursesScreen({ navigation }) {
           data={myCourses}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.courseItem}>
+            <TouchableOpacity
+              style={styles.courseItem}
+              onPress={() => openModal(item)}
+            >
               <Text style={styles.courseName}>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
+      )}
+
+      {/* ✅ Modal for Course Options */}
+      {modalVisible && selectedCourse && (
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("CourseDetailScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Show Full Course</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("QuizScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Generate Quiz</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("ExamScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Generate Exam</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       )}
     </SafeAreaView>
   );
@@ -68,4 +142,42 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   courseName: { fontSize: 20, fontWeight: "600", color: "#fff" },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 15,
+    width: "90%",
+    maxWidth: 400,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#6C5B7B",
+    marginBottom: 12,
+  },
+  modalButton: {
+    paddingVertical: 14,
+    backgroundColor: "#F9A826",
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  modalButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
+  closeButton: {
+    paddingVertical: 14,
+    marginTop: 12,
+    backgroundColor: "#ccc",
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+  },
+  closeButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
 });

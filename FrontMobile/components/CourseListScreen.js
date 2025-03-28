@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from "@expo/vector-icons"; // Using Expo icons for a back arrow
 
 export default function CourseListScreen() {
   const [isMenuVisible, setMenuVisible] = useState(false);
@@ -23,7 +24,7 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://192.168.8.44:5002/api/subjects"); // Replace with your actual API
+      const response = await fetch("http://192.168.8.44:5002/api/subjects");
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
@@ -65,6 +66,14 @@ export default function CourseListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* ✅ Go Back Button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <AntDesign name="arrowleft" size={24} color="#6C5B7B" />
+      </TouchableOpacity>
+
       <Text style={styles.header}>Explore Courses</Text>
 
       {loading ? (
@@ -122,6 +131,13 @@ export default function CourseListScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+  },
   header: {
     fontSize: 28,
     fontWeight: "700",
