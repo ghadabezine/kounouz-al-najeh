@@ -23,7 +23,7 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://172.20.10.2:5001/api/subjects"); // Replace with your actual API
+      const response = await fetch("http://192.168.1.17:5001/api/subjects"); // Replace with your actual API
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
@@ -90,7 +90,7 @@ export default function CourseListScreen() {
           <View style={styles.modalBackground}>
             <View style={styles.menuContainer}>
               <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
-              
+
               <TouchableOpacity onPress={handleAddToMyCourses} style={styles.addButton}>
                 <Text style={styles.addButtonText}>Add to My Courses</Text>
               </TouchableOpacity>

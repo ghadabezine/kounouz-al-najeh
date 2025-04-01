@@ -23,7 +23,7 @@ const Login = ({ navigation, setIsAuthenticated }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://172.20.10.2:5001/api/auth/login", {
+      const response = await axios.post("http://192.168.1.17:5001/api/auth/login", {
         email,
         password,
       });

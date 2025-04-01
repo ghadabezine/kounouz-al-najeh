@@ -27,7 +27,7 @@ export default function ProfileScreen({ navigation }) {
 
       console.log("📢 Token retrieved:", token); // ✅ Debug: Ensure token is retrieved
 
-      const response = await fetch("http://172.20.10.2:5001/api/auth/profile", {
+      const response = await fetch("http://192.168.1.17:5001/api/auth/profile", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

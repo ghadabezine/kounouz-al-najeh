@@ -37,7 +37,10 @@ export default function MyCoursesScreen({ navigation }) {
           data={myCourses}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.courseItem}>
+            <TouchableOpacity
+              style={styles.courseItem}
+              onPress={() => navigation.navigate("GenerateQuizScreen", { subjectId: item._id })}
+            >
               <Text style={styles.courseName}>{item.name}</Text>
             </TouchableOpacity>
           )}

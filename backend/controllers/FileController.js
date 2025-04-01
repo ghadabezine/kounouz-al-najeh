@@ -2,6 +2,8 @@ const { Readable } = require("stream");
 const connectDB = require("../config/db");
 const Subject = require("../models/Subject");  // ✅ Add this line
 const File = require("../models/fileModel");
+const pdfParse = require("pdf-parse"); // ✅ Add this
+
 let db, gridFSBucket;
 
 // ✅ Initialize the database and GridFS bucket
@@ -14,18 +16,16 @@ const initDB = async () => {
 initDB().catch((err) => console.error("❌ DB initialization failed:", err));
 
 // ✅ Define uploadFile function (this was missing)
+
 const uploadFile = async (req, res) => {
   try {
     const { subjectId } = req.body;
-
-    // ✅ Validate subject
-    const subject = await Subject.findById(subjectId);
-    if (!subject) {
-      return res.status(404).json({ error: "Subject not found." });
-    }
-
     if (!req.file) return res.status(400).json({ error: "No file uploaded." });
 
+    const subject = await Subject.findById(subjectId);
+    if (!subject) return res.status(404).json({ error: "Subject not found." });
+
+    // ✅ Create readable stream from buffer
     const readableStream = new Readable();
     readableStream.push(req.file.buffer);
     readableStream.push(null);
@@ -35,29 +35,51 @@ const uploadFile = async (req, res) => {
       metadata: { permission: "View Only", subject: subjectId },
     });
 
-    // ✅ Upload file to GridFS
+    // ✅ Pipe to GridFS
     readableStream.pipe(uploadStream);
 
     uploadStream.on("finish", async () => {
-      // ✅ Save file metadata to File collection
-      const fileDoc = new File({
-        filename: req.file.originalname,
-        length: uploadStream.length,
-        uploadDate: new Date(),
-        metadata: { permission: "View Only" },
-        subject: subjectId,
-      });
+      try {
+        // ✅ Read uploaded file back from GridFS
+        const chunks = [];
+        const downloadStream = gridFSBucket.openDownloadStream(uploadStream.id);
 
-      await fileDoc.save();
+        downloadStream.on("data", (chunk) => chunks.push(chunk));
+        downloadStream.on("end", async () => {
+          const buffer = Buffer.concat(chunks);
+          const parsed = await pdfParse(buffer); // ✅ Extract text
+          const extractedText = parsed.text;
 
-      // ✅ Update subject to reference this file
-      subject.resources.push(fileDoc._id);
-      await subject.save();
+          // ✅ Save File doc
+          const fileDoc = new File({
+            filename: req.file.originalname,
+            length: uploadStream.length,
+            uploadDate: new Date(),
+            metadata: { permission: "View Only" },
+            subject: subjectId,
+            content: extractedText,
+          });
 
-      res.status(201).json({
-        message: "✅ File uploaded and referenced successfully!",
-        file: { filename: req.file.originalname, _id: fileDoc._id },
-      });
+          await fileDoc.save();
+
+          // ✅ Attach to subject
+          subject.resources.push(fileDoc._id);
+          await subject.save();
+
+          res.status(201).json({
+            message: "✅ File uploaded and parsed successfully!",
+            file: { id: fileDoc._id, filename: fileDoc.filename },
+          });
+        });
+
+        downloadStream.on("error", (err) => {
+          console.error("❌ GridFS read error:", err);
+          res.status(500).json({ error: "Failed to read uploaded file." });
+        });
+      } catch (err) {
+        console.error("❌ Parsing error:", err);
+        res.status(500).json({ error: "Failed to extract PDF text." });
+      }
     });
 
     uploadStream.on("error", (err) => {
@@ -65,9 +87,9 @@ const uploadFile = async (req, res) => {
       res.status(500).json({ error: "Upload failed." });
     });
 
-  } catch (error) {
-    console.error("❌ Internal error:", error);
-    res.status(500).json({ error: "Internal Server Error." });
+  } catch (err) {
+    console.error("❌ Internal error:", err);
+    res.status(500).json({ error: "Internal server error." });
   }
 };
 // ✅ Define other functions (examples)

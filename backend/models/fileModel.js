@@ -3,18 +3,19 @@ const mongoose = require("mongoose");
 const FileSchema = new mongoose.Schema(
   {
     filename: { type: String, required: true },
-    length: { type: Number }, // File size
+    length: { type: Number },
     uploadDate: { type: Date, default: Date.now },
     metadata: {
       permission: { type: String, default: "View Only" },
     },
     subject: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Subject", // ✅ Reference to the Subject model
+      ref: "Subject",
       required: true,
     },
+    content: { type: String }, // ✅ Extracted text content from the PDF
   },
-  { collection: "resources.files" } // GridFS collection
+  { collection: "resources.files" }
 );
 
 module.exports = mongoose.model("File", FileSchema);

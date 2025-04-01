@@ -14,6 +14,7 @@ import QuizScreen from "./components/QuizScreen";
 import ExamScreen from "./components/ExamScreen";
 import CourseListScreen from "./components/CourseListScreen"; // Explore Courses
 
+import GenerateQuizScreen from "./components/GenerateQuizScreen";
 
 import EditProfileScreen from "./components/EditProfileScreen";
 
@@ -80,6 +81,8 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
             <Stack.Screen name="MyCoursesScreen" component={MyCoursesScreen} />
+            <Stack.Screen name="GenerateQuizScreen" component={GenerateQuizScreen} />
+
 
 
           </>
