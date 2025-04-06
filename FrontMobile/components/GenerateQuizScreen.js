@@ -20,7 +20,7 @@ export default function GenerateQuizScreen({ route }) {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const response = await fetch("http://192.168.1.17:5001/api/quizzes/generate-quiz", {
+        const response = await fetch("http://192.168.1.56:5001/api/quizzes/generate-quiz", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ subjectId }),
