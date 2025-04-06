@@ -1,81 +1,154 @@
 /* styles/QuizForm.css */
 .quiz-form {
-    width: 100%;
-    max-width: 700px; /* ✅ Slightly narrower form */
-    margin: 40px auto;
-    padding: 25px;
-    border-radius: 12px;
-    background-color: #f9f9f9;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  .quiz-form h1 {
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #1a237e;
-  }
-  
-  .quiz-form input[type="text"],
-  .quiz-form select {
-    width: 90%; /* ✅ Shorter width */
-    max-width: 500px; /* ✅ Prevent overly long inputs */
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: #fff;
-  }
-  
-  .quiz-form input[type="text"]:focus,
-  .quiz-form select:focus {
-    outline: none;
-    border-color: #3f51b5;
-    box-shadow: 0 0 4px rgba(63, 81, 181, 0.3);
-  }
-  
-  .quiz-form .question-block {
-    background-color: #ffffff;
-    padding: 15px;
-    margin-bottom: 16px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-  }
-  
-  .quiz-form .question-block h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #303f9f;
-  }
-  
-  .quiz-form button {
-    padding: 10px 16px;
-    font-size: 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin: 6px 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .quiz-form button:hover {
-    opacity: 0.9;
-  }
-  
-  .quiz-form .add-btn {
-    background-color: #4caf50;
-    color: #fff;
-  }
-  
-  .quiz-form .save-btn {
-    background-color: #3f51b5;
-    color: #fff;
-  }
-  
-  .quiz-form .back-btn {
-    background-color: #f44336;
-    color: #fff;
-  }
-  
+  width: 100%;
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-form h1 {
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #1a237e;
+}
+
+.quiz-form input[type="text"],
+.quiz-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.quiz-form input[type="text"]:focus,
+.quiz-form select:focus {
+  outline: none;
+  border-color: #3f51b5;
+  box-shadow: 0 0 4px rgba(63, 81, 181, 0.3);
+}
+
+.quiz-form .question-block {
+  background-color: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #fffcfc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quiz-form .question-block h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  color: #303f9f;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding: 0.3rem;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.option-row input {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.option-checkbox {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.option-checkbox input[type="radio"] {
+  display: none;
+}
+
+.option-checkbox input[type="radio"] + .checkbox-label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  background-color: #fff;
+}
+
+.option-checkbox input[type="radio"]:checked + .checkbox-label {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.option-checkbox input[type="radio"]:checked + .checkbox-label::after {
+  content: "\2713";
+  font-size: 16px;
+  color: #fff;
+  text-align: center;
+  line-height: 18px;
+  display: block;
+}
+
+.quiz-form button {
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 6px 4px;
+  transition: background-color 0.3s ease;
+}
+
+.quiz-form button:hover {
+  opacity: 0.9;
+}
+
+.quiz-form .add-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.quiz-form .save-btn {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.quiz-form .back-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.add-option-btn,
+.delete-option-btn,
+.delete-question-btn {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #bdbfdc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.delete-option-btn {
+  background-color: #e53935;
+}
+
+.delete-question-btn {
+  background-color: #d32f2f;
+  margin-left: 10px;
+}
