@@ -34,7 +34,11 @@ const Register = ({ navigation }) => {
 
     try {
       const response = await axios.post(
+<<<<<<< HEAD
         "http://192.168.124.147:5002/api/auth/register",
+=======
+        "http://192.168.1.56:5001/api/auth/register",
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
         { firstName, lastName, email, password },
         { headers: { "Content-Type": "application/json" } }
       );

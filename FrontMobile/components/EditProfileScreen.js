@@ -26,6 +26,7 @@ const EditProfileScreen = ({ navigation, route }) => {
 
     try {
       const token = await AsyncStorage.getItem("token");
+<<<<<<< HEAD
       const res = await fetch(
         "http://192.168.124.147:5002/api/auth/updateProfile",
         {
@@ -37,6 +38,16 @@ const EditProfileScreen = ({ navigation, route }) => {
           body: JSON.stringify({ firstName, lastName, email, profileImage }),
         }
       );
+=======
+      const res = await fetch("http://192.168.1.56:5001/api/auth/updateProfile", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ firstName, lastName, email }),
+      });
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
 
       if (!res.ok) throw new Error("Failed to update profile");
 

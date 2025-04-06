@@ -54,7 +54,11 @@ export default function MyCoursesScreen({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.courseItem}
+<<<<<<< HEAD
               onPress={() => openModal(item)}
+=======
+              onPress={() => navigation.navigate("GenerateQuizScreen", { subjectId: item._id })}
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
             >
               <Text style={styles.courseName}>{item.name}</Text>
             </TouchableOpacity>

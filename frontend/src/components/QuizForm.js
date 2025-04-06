@@ -41,24 +41,40 @@ function QuizForm({ subject, goBack }) {
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+<<<<<<< HEAD
         placeholder="Quiz Title"
+=======
+        placeholder="Enter quiz title"
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
       />
 
       {questions.map((q, qIndex) => (
         <div key={qIndex} className="question-block">
           <h3>Question {qIndex + 1}</h3>
+<<<<<<< HEAD
+=======
+
+          <label>Question Text:</label>
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
           <input
             type="text"
             value={q.questionText}
             onChange={(e) => {
+<<<<<<< HEAD
               const updatedQuestions = [...questions];
               updatedQuestions[qIndex].questionText = e.target.value;
               setQuestions(updatedQuestions);
+=======
+              const updated = [...questions];
+              updated[qIndex].questionText = e.target.value;
+              setQuestions(updated);
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
             }}
             placeholder="Enter the question"
           />
 
           {q.options.map((opt, optIndex) => (
+<<<<<<< HEAD
             <input
               key={optIndex}
               type="text"
@@ -99,6 +115,54 @@ function QuizForm({ subject, goBack }) {
       <button className="back-btn" onClick={goBack}>
         Back
       </button>
+=======
+            <div className="option-row" key={optIndex}>
+              <label>Option {optIndex + 1}:</label>
+              <input
+                type="text"
+                value={opt}
+                onChange={(e) => {
+                  const updated = [...questions];
+                  updated[qIndex].options[optIndex] = e.target.value;
+                  setQuestions(updated);
+                }}
+              />
+              <div className="option-checkbox">
+                <input
+                  type="radio"
+                  name={`correct-${qIndex}`}
+                  id={`correct-${qIndex}-${optIndex}`}
+                  checked={q.correctAnswer === opt}
+                  onChange={() => {
+                    const updated = [...questions];
+                    updated[qIndex].correctAnswer = opt;
+                    setQuestions(updated);
+                  }}
+                  disabled={!!q.correctAnswer && q.correctAnswer !== opt}
+                />
+                <label className="checkbox-label" htmlFor={`correct-${qIndex}-${optIndex}`}></label>
+              </div>
+              <button
+                onClick={() => deleteOption(qIndex, optIndex)}
+                className="delete-option-btn"
+              >
+                🗑️
+              </button>
+            </div>
+          ))}
+
+          <button className="add-option-btn" onClick={() => addOption(qIndex)}>➕ Add Option</button>
+
+          <button className="delete-question-btn" onClick={() => deleteQuestion(qIndex)}>
+            ❌ Delete Question
+          </button>
+        </div>
+      ))}
+
+      <button className="add-btn" onClick={addQuestion}>➕ Add Question</button>
+      <button className="save-btn" onClick={handleSubmit}>💾 Save Quiz</button>
+      <button className="back-btn" onClick={goBack}>🔙 Back</button>
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
     </div>
   );
 }

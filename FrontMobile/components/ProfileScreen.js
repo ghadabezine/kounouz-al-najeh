@@ -46,6 +46,7 @@ export default function ProfileScreen({ navigation }) {
 
       console.log("📢 Token retrieved:", token);
 
+<<<<<<< HEAD
       const response = await fetch(
         "http://192.168.124.147:5002/api/auth/profile",
         {
@@ -56,6 +57,15 @@ export default function ProfileScreen({ navigation }) {
           },
         }
       );
+=======
+      const response = await fetch("http://192.168.1.56:5001/api/auth/profile", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+>>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
 
       if (!response.ok) {
         const errorText = await response.text();
