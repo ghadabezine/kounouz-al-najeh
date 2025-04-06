@@ -27,7 +27,7 @@ const EditProfileScreen = ({ navigation, route }) => {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await fetch(
-        "http://192.168.8.44:5002/api/auth/updateProfile",
+        "http://192.168.124.147:5002/api/auth/updateProfile",
         {
           method: "PATCH",
           headers: {

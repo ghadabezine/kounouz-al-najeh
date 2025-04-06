@@ -47,7 +47,7 @@ export default function ProfileScreen({ navigation }) {
       console.log("📢 Token retrieved:", token);
 
       const response = await fetch(
-        "http://192.168.8.44:5002/api/auth/profile",
+        "http://192.168.124.147:5002/api/auth/profile",
         {
           method: "GET",
           headers: {

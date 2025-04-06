@@ -32,7 +32,7 @@ const Login = ({ navigation, setIsAuthenticated }) => {
 
     try {
       const response = await axios.post(
-        "http://192.168.8.44:5002/api/auth/login",
+        "http://192.168.124.147:5002/api/auth/login",
         { email, password }
       );
 

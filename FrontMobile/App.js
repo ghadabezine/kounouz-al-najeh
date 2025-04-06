@@ -68,7 +68,7 @@ export default function App() {
               {(props) => <Login {...props} setIsAuthenticated={setIsAuthenticated} />}
             </Stack.Screen>
             <Stack.Screen name="Register" component={Register} />
-          </>
+          </> 
         ) : (
           <>
             {/* ✅ Show Bottom Tabs if Authenticated */}
