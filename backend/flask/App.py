@@ -27,6 +27,10 @@ question_generator = pipeline(
 # Extract main keyword using spaCy
 def extract_main_keyword(text):
     doc = nlp(text)
+    print("\n🧾 Parsed Document:")
+    for token in doc:
+        print(f"{token.text:<15} | POS: {token.pos_:<10} | DEP: {token.dep_}")
+    
     for token in doc:
         if token.pos_ in ["NOUN", "PROPN"] and token.is_alpha:
             return token.text.lower()
@@ -67,7 +71,7 @@ def generate_quiz():
         tokens = question_generator.tokenizer.encode(content, truncation=False)
         if len(tokens) > 100:
             print(f"✂️ Slicing tokens from 100 to 612 (original length: {len(tokens)})")
-            tokens = tokens[2400:3700]
+            tokens = tokens[2000:3700]
             content = question_generator.tokenizer.decode(tokens, skip_special_tokens=True)
         else:
             print("⚠️ Less than 100 tokens in input. Using full text.")
