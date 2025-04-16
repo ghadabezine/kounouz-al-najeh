@@ -24,7 +24,7 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://192.168.124.147:5002/api/subjects");
+      const response = await fetch("http://192.168.1.56:5002/api/subjects");
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
@@ -130,7 +130,11 @@ export default function CourseListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
+  container: {
+    flex: 1,
+    backgroundColor: "#F0EBF8", // Matching main background
+    paddingHorizontal: 20,
+  },
   backButton: {
     position: "absolute",
     top: 20,
@@ -139,24 +143,32 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   header: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "700",
-    marginVertical: 20,
-    color: "#6C5B7B",
+    marginTop: 60,
+    marginBottom: 20,
+    color: "#333",
     textAlign: "center",
   },
-  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-  courseItem: {
-    padding: 18,
-    marginBottom: 12,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  courseName: { fontSize: 20, fontWeight: "600", color: "#333" },
+  courseItem: {
+    backgroundColor: "#fff",
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F67280", // Pink accent like challengeBtn
+    elevation: 3,
+  },
+  courseName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
   modalBackground: {
     flex: 1,
     justifyContent: "center",
@@ -165,33 +177,48 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 24,
     borderRadius: 15,
     width: "90%",
     maxWidth: 400,
     alignItems: "center",
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "700",
     color: "#6C5B7B",
-    marginBottom: 12,
+    marginBottom: 16,
+    textAlign: "center",
   },
   addButton: {
-    paddingVertical: 14,
-    backgroundColor: "#F9A826",
-    borderRadius: 8,
-    width: "100%",
+    marginTop: 10,
+    backgroundColor: "#F67280", // Same as challengeBtn
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
-  addButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
+  addButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "600",
+  },
   closeButton: {
-    paddingVertical: 14,
     marginTop: 12,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
-    width: "100%",
+    backgroundColor: "#E0E0E0",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
-  menuText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  menuText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
 });

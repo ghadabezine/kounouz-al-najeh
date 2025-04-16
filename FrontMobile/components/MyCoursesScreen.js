@@ -41,8 +41,15 @@ export default function MyCoursesScreen({ navigation }) {
     setModalVisible(false);
   };
 
+  /** ✅ Edit course details */
+  const editCourse = () => {
+    // Navigate to EditCourseScreen with the selected course
+    closeModal();
+    navigation.navigate("EditCourseScreen", { course: selectedCourse });
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <Text style={styles.header}>My Courses</Text>
 
       {myCourses.length === 0 ? (
@@ -53,14 +60,10 @@ export default function MyCoursesScreen({ navigation }) {
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={styles.courseItem}
-<<<<<<< HEAD
+              style={styles.card}
               onPress={() => openModal(item)}
-=======
-              onPress={() => navigation.navigate("GenerateQuizScreen", { subjectId: item._id })}
->>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
             >
-              <Text style={styles.courseName}>{item.name}</Text>
+              <Text style={styles.cardTitle}>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
@@ -126,62 +129,94 @@ export default function MyCoursesScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F0EBF8",
+  },
   header: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "700",
-    marginVertical: 20,
+    marginBottom: 16,
+    color: "#333",
     textAlign: "center",
+  },
+  card: {
+    backgroundColor: "#fff",
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 8,
+    borderLeftWidth: 10,
+    borderLeftColor: "#123458",
+    elevation: 3,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+    color: "#333",
   },
   noCourses: {
     textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "#777",
+    marginTop: 40,
+    fontSize: 18,
+    color: "#999",
+    fontStyle: "italic",
   },
-  courseItem: {
-    padding: 18,
-    marginBottom: 12,
-    backgroundColor: "#6C5B7B",
-    borderRadius: 12,
-  },
-  courseName: { fontSize: 20, fontWeight: "600", color: "#fff" },
   modalBackground: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 15,
-    width: "90%",
-    maxWidth: 400,
+    borderRadius: 20,
+    padding: 24,
+    width: "88%",
+    maxWidth: 420,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: "700",
+    fontWeight: "bold",
     color: "#6C5B7B",
-    marginBottom: 12,
+    marginBottom: 18,
+    textAlign: "center",
   },
   modalButton: {
-    paddingVertical: 14,
-    backgroundColor: "#F9A826",
-    borderRadius: 8,
     width: "100%",
+    backgroundColor: "#c7efff",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginVertical: 6,
     alignItems: "center",
-    marginVertical: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  modalButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
+  modalButtonText: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#1E3E62",
+  },
   closeButton: {
-    paddingVertical: 14,
-    marginTop: 12,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
     width: "100%",
+    backgroundColor: "#E0E0E0",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 10,
     alignItems: "center",
   },
-  closeButtonText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#555",
+  },
 });

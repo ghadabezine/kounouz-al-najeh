@@ -1,115 +1,115 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
+  Image,
   TouchableOpacity,
+  Text,
   StyleSheet,
-  ScrollView,
-  Alert,
   ActivityIndicator,
+  ScrollView,
   Linking,
+  Alert,
+  SafeAreaView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function ProfileScreen({ navigation }) {
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadData = async () => {
       try {
         const storedUser = await AsyncStorage.getItem("user");
+        const storedImage = await AsyncStorage.getItem("profileImage");
+
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         } else {
           fetchProfile();
         }
+
+        if (storedImage) {
+          setImage(storedImage);
+        }
       } catch (error) {
-        console.error("❌ Error loading stored user:", error.message);
+        console.error("Error loading data:", error.message);
       } finally {
         setLoading(false);
       }
     };
-    loadUser();
+    loadData();
   }, []);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const imageUri = result.assets[0].uri;
+      saveImageLocally(imageUri);
+    }
+  };
+
+  const saveImageLocally = async (uri) => {
+    try {
+      setUploading(true);
+      const filename = uri.split("/").pop();
+      const localUri = FileSystem.documentDirectory + filename;
+
+      await FileSystem.copyAsync({
+        from: uri,
+        to: localUri,
+      });
+
+      await AsyncStorage.setItem("profileImage", localUri);
+      setImage(localUri);
+      setUploading(false);
+    } catch (error) {
+      console.error("Error saving image:", error);
+      setUploading(false);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+      if (!token) return navigation.replace("Login");
 
-      if (!token) {
-        console.error("❌ No token found in AsyncStorage");
-        navigation.replace("Login");
-        return;
-      }
-
-      console.log("📢 Token retrieved:", token);
-
-<<<<<<< HEAD
-      const response = await fetch(
-        "http://192.168.124.147:5002/api/auth/profile",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-=======
-      const response = await fetch("http://192.168.1.56:5001/api/auth/profile", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+      const res = await fetch("http://192.168.1.56:5002/api/auth/profile", {
+        headers: { Authorization: `Bearer ${token}` },
       });
->>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ API Error:", errorText);
-        throw new Error(`HTTP status ${response.status}`);
-      }
+      if (!res.ok) throw new Error(`Status ${res.status}`);
 
-      const data = await response.json();
-      console.log("📢 API Response:", data);
-
-      await AsyncStorage.setItem("user", JSON.stringify(data)); // Store user data
+      const data = await res.json();
+      await AsyncStorage.setItem("user", JSON.stringify(data));
       setUser(data);
     } catch (error) {
-      console.error("❌ Fetching Profile Error:", error.message);
-    } finally {
-      setLoading(false);
+      console.error("Fetch profile error:", error.message);
     }
   };
 
   const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("token");
-      await AsyncStorage.removeItem("user");
-      navigation.replace("SignInScreen");
-    } catch (error) {
-      console.error("❌ Logout Error:", error.message);
-    }
-  };
-
-  const handleGoToMoodle = () => {
-    Linking.openURL("https://moodle.youruniversity.edu");
-  };
-
-  const handleGoToOutlook = () => {
-    Linking.openURL("https://outlook.office.com");
+    await AsyncStorage.multiRemove(["token", "user", "profileImage"]);
+    navigation.replace("SignInScreen");
   };
 
   const handleEditProfile = () => {
-    if (user) {
-      navigation.navigate("EditProfile", { user, setUser });
-    } else {
-      Alert.alert("Error", "User data is not available.");
-    }
+    if (user) navigation.navigate("EditProfile", { user, setUser });
+    else Alert.alert("Error", "User data not available.");
   };
+
+  const openLink = (url) => Linking.openURL(url);
 
   if (loading) {
     return (
@@ -120,152 +120,175 @@ export default function ProfileScreen({ navigation }) {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="user-circle" size={80} color="#F9A826" />
-        <Text style={styles.username}>
-          {user?.firstName} {user?.lastName}
-        </Text>
-        <Text style={styles.email}>{user?.email}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.card}>
+          <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+            {uploading ? (
+              <ActivityIndicator size="large" color="#6C5B7B" />
+            ) : (
+              <Image
+                source={
+                  image
+                    ? { uri: image }
+                    : require("../assets/default-avatar.png")
+                }
+                style={styles.avatar}
+              />
+            )}
+            <Text style={styles.editText}>Tap to change photo</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleEditProfile} style={styles.editButton}>
-          <Icon name="pencil" size={16} color="#fff" />
-          <Text style={styles.editButtonText}>Edit Profile</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.info}>
+            <Text style={styles.nameText}>
+              {user?.firstName} {user?.lastName}
+            </Text>
+            <Text style={styles.email}>{user?.email}</Text>
+            <Text style={styles.detail}>
+              Student ID: {user?.studentId || "N/A"}
+            </Text>
+            <Text style={styles.detail}>Major: {user?.major || "N/A"}</Text>
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Profile Information</Text>
-        <Text style={styles.contactInfo}>Email: {user?.email}</Text>
-        <Text style={styles.contactInfo}>
-          Student ID: {user?.studentId || "N/A"}
-        </Text>
-        <Text style={styles.contactInfo}>
-          Major: {user?.major || "Not specified"}
-        </Text>
-      </View>
+          <TouchableOpacity
+            onPress={handleEditProfile}
+            style={styles.editProfileButton}
+          >
+            <Text style={styles.editProfileText}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
 
-      <TouchableOpacity onPress={handleGoToMoodle} style={styles.moodleButton}>
-        <Icon name="graduation-cap" size={20} color="#fff" />
-        <Text style={styles.buttonText}>Go to Moodle</Text>
-      </TouchableOpacity>
+        {/* Buttons Section */}
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity
+            onPress={() => openLink("https://moodle.youruniversity.edu")}
+            style={styles.moodleButton}
+          >
+            <Icon name="graduation-cap" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Go to Moodle</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={handleGoToOutlook}
-        style={styles.outlookButton}
-      >
-        <Icon name="envelope" size={20} color="#fff" />
-        <Text style={styles.buttonText}>Go to Outlook</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => openLink("https://outlook.office.com")}
+            style={styles.outlookButton}
+          >
+            <Icon name="envelope" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Go to Outlook</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Icon name="sign-out" size={20} color="#fff" />
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Icon name="sign-out" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: "#F1F1F1",
-    padding: 20,
+    backgroundColor: "#F0EBF8",
+  },
+  container: {
+    padding: 24,
+    alignItems: "center",
   },
   loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F1F1F1",
   },
-  header: {
-    alignItems: "center",
-    marginBottom: 25,
-    backgroundColor: "#6C5B7B",
+  card: {
+    width: "100%",
+    backgroundColor: "#fff",
+    borderRadius: 20,
     padding: 20,
-    borderRadius: 12,
+    marginBottom: 30,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
     elevation: 5,
+    alignItems: "center",
   },
-  username: {
-    fontSize: 24,
+  avatarContainer: {
+    alignItems: "center",
+  },
+  avatar: {
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 3,
+    borderColor: "#6C5B7B",
+  },
+  editText: {
+    marginTop: 8,
+    color: "#F9A826",
+    fontSize: 14,
     fontWeight: "600",
-    color: "#fff",
-    marginTop: 10,
+  },
+  info: {
+    marginTop: 20,
+    alignItems: "center",
+  },
+  nameText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#6C5B7B",
   },
   email: {
     fontSize: 16,
-    color: "#F9A826",
-    marginBottom: 12,
+    color: "#444",
+    marginBottom: 6,
   },
-  editButton: {
-    backgroundColor: "#F9A826",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 12,
-  },
-  editButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-    marginLeft: 10,
-  },
-  section: {
-    backgroundColor: "#fff",
-    padding: 18,
-    borderRadius: 10,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 10,
-    color: "#333",
-  },
-  contactInfo: {
-    fontSize: 16,
+  detail: {
+    fontSize: 14,
     color: "#666",
   },
+  editProfileButton: {
+    marginTop: 20,
+    backgroundColor: "#6C5B7B",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  editProfileText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  buttonsContainer: {
+    width: "100%",
+  },
   moodleButton: {
-    backgroundColor: "#0077b6",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
     flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#6C5B7B",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
     justifyContent: "center",
-    marginBottom: 15,
   },
   outlookButton: {
-    backgroundColor: "#0078D4",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
     flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9A826",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 10,
     justifyContent: "center",
-    marginBottom: 15,
   },
   logoutButton: {
-    backgroundColor: "#6C5B7B",
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
     flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E74C3C",
+    padding: 14,
+    borderRadius: 12,
     justifyContent: "center",
-    marginTop: 20,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "600",
-    marginLeft: 12,
+    fontWeight: "bold",
+    marginLeft: 10,
   },
 });

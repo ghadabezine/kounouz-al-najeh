@@ -1,244 +1,160 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
-  SafeAreaView,
   StyleSheet,
   ScrollView,
-  Animated,
+  TouchableOpacity,
+  SafeAreaView,
 } from "react-native";
-import { Calendar } from "react-native-calendars";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
-const progressData = {
-  course: "React Native Basics",
-  progress: 65, // Percentage progress
-};
-
-const motivationalQuotes = [
-  "The only way to do great work is to love what you do.",
-  "Success is the sum of small efforts, repeated day in and day out.",
-  "Don't watch the clock; do what it does. Keep going.",
-  "The future belongs to those who believe in the beauty of their dreams.",
-  "Your limitation—it’s only your imagination.",
+// Array of quotes
+const quotes = [
+  `"Success is the sum of small efforts, repeated day in and day out." – R. Collier`,
+  `"The only way to do great work is to love what you do." – Steve Jobs`,
+  `"It always seems impossible until it's done." – Nelson Mandela`,
+  `"Your time is limited, don't waste it living someone else's life." – Steve Jobs`,
+  `"Don't watch the clock; do what it does. Keep going." – Sam Levenson`,
+  `"Believe you can and you're halfway there." – Theodore Roosevelt`,
+  `"The future belongs to those who believe in the beauty of their dreams." – Eleanor Roosevelt`,
+  `"The only limit to our realization of tomorrow is our doubts of today." – Franklin D. Roosevelt`,
+  `"Act as if what you do makes a difference. It does." – William James`,
+  `"Success is not final, failure is not fatal: It is the courage to continue that counts." – Winston Churchill`,
 ];
+const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-export default function HomeScreen({ navigation }) {
-  const [quote, setQuote] = useState("");
-  const progressAnim = useState(new Animated.Value(0))[0];
-
-  useEffect(() => {
-    const randomQuote =
-      motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-    setQuote(randomQuote);
-
-    Animated.timing(progressAnim, {
-      toValue: progressData.progress,
-      duration: 800,
-      useNativeDriver: false,
-    }).start();
-  }, []);
-
+const HomeScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* App Name */}
-        <Text style={styles.appName}>Kounouz Al Najah</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color="#000" />
+        </TouchableOpacity>
 
-        {/* Description */}
-        <Text style={styles.descriptionText}>
-          Explore courses and generate quizzes!
-        </Text>
+        <Text style={styles.header}>🎓 Welcome back, Student!</Text>
+        {/* Quote Wall */}
+        <Card
+          icon="lightbulb-on-outline"
+          title="Quote of the Day"
+          color="#355C7D"
+        >
+          <Text style={styles.cardText}>{randomQuote}</Text>
+        </Card>
 
-        {/* Greeting */}
-        <Text style={styles.greetingText}>
-          Good {new Date().getHours() < 12 ? "Morning" : "Afternoon"}!
-        </Text>
-
-        {/* Progress Bar */}
-        <View style={styles.progressContainer}>
-          <Text style={styles.progressTitle}>
-            Progress in {progressData.course}
+        {/* Progress Tracker */}
+        <Card icon="trending-up" title="Your Progress Tracker" color="#6C5B7B">
+          <Text style={styles.cardText}>
+            You're 65% through your current term courses.
           </Text>
-          <View style={styles.progressBar}>
-            <Animated.View
-              style={[
-                styles.progressFill,
-                {
-                  width: progressAnim.interpolate({
-                    inputRange: [0, 100],
-                    outputRange: ["0%", "100%"],
-                  }),
-                },
-              ]}
-            />
-          </View>
-          <Text style={styles.progressText}>
-            {progressData.progress}% completed
+        </Card>
+
+        {/* Attendance Overview */}
+        <Card icon="calendar-check" title="Attendance Overview" color="#355C7D">
+          <Text style={styles.cardText}>
+            Average attendance: 88%. Keep it up!
           </Text>
-        </View>
+        </Card>
 
-        {/* Motivational Quote */}
-        <Text style={styles.quoteText}>"{quote}"</Text>
+        {/* Term Timeline */}
+        <Card icon="timeline-clock" title="Term Timeline" color="#F67280">
+          <Text style={styles.cardText}>
+            Week 11 of 12 • Midterms Done • 1 Weeks to Finals
+          </Text>
+        </Card>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
+        {/* Daily Challenge */}
+        <Card icon="gamepad-variant" title="Daily Challenge" color="#F8B195">
+          <Text style={styles.cardText}>
+            🧠 Solve 3 case-based MCQs before 10PM!
+          </Text>
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("CourseList")}
+            style={styles.challengeBtn}
+            onPress={() => navigation.navigate("QuickBrainQuiz")}
           >
-            <Text style={styles.buttonText}>Explore Courses</Text>
+            <Text style={{ color: "#fff" }}>Start Challenge</Text>
           </TouchableOpacity>
+        </Card>
 
+        {/* GPA Calculator */}
+        <Card icon="calculator-variant" title="GPA Calculator" color="#6C5B7B">
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Profile")}
+            onPress={() => navigation.navigate("GPACalculator")}
           >
-            <Text style={styles.buttonText}>My Profile</Text>
+            <Text style={styles.link}>Tap to calculate your GPA →</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("UpcomingEvents")}
-          >
-            <Text style={styles.buttonText}>Upcoming Events</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Notifications")}
-          >
-            <Text style={styles.buttonText}>Notifications</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Calendar */}
-        <View style={styles.calendarContainer}>
-          <Text style={styles.sectionTitle}>Upcoming Vacations and Exams</Text>
-          <Calendar
-            current={"2025-02-01"}
-            theme={{
-              todayTextColor: "#6C5B7B",
-              arrowColor: "#F9A826",
-              monthTextColor: "#333",
-              textMonthFontWeight: "bold",
-              selectedDayBackgroundColor: "#F9A826",
-              selectedDayTextColor: "#fff",
-            }}
-          />
-        </View>
+        </Card>
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
+
+const Card = ({ icon, title, children, color }) => (
+  <View style={[styles.card, { borderLeftColor: color }]}>
+    <View style={styles.cardHeader}>
+      <MaterialCommunityIcons name={icon} size={24} color={color} />
+      <Text style={styles.cardTitle}>{title}</Text>
+    </View>
+    <View>{children}</View>
+  </View>
+);
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: "#E8E8E8",
+    backgroundColor: "#F0EBF8", // Match your app's background
   },
-  scrollViewContent: {
-    alignItems: "center",
+  scrollContainer: {
     padding: 20,
+    paddingBottom: 40,
   },
-  backButton: {
-    alignSelf: "flex-start",
-    marginLeft: 10,
-    marginBottom: 10,
-    backgroundColor: "#ddd",
-    padding: 8,
-    borderRadius: 5,
+  container: {
+    padding: 16,
+    backgroundColor: "#f4f4f8",
   },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#6C5B7B",
-  },
-  appName: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#6C5B7B",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  descriptionText: {
-    fontSize: 16,
-    color: "#777",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  greetingText: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#F9A826",
-    textAlign: "center",
-    marginBottom: 15,
-  },
-  progressContainer: {
-    width: "90%",
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  progressTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 5,
-  },
-  progressBar: {
-    width: "100%",
-    height: 10,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 5,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#6C5B7B",
-    borderRadius: 5,
-  },
-  progressText: {
-    marginTop: 5,
-    fontSize: 14,
+  header: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 16,
     color: "#333",
   },
-  quoteText: {
-    fontSize: 16,
-    fontStyle: "italic",
-    color: "#333",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-  buttonContainer: {
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  button: {
-    backgroundColor: "#6C5B7B",
-    paddingVertical: 12,
-    paddingHorizontal: 40,
-    borderRadius: 10,
-    marginVertical: 8,
-    width: "80%",
-    alignItems: "center",
+  card: {
+    backgroundColor: "#fff",
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F67280",
     elevation: 3,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
   },
-  calendarContainer: {
-    marginTop: 30,
-    width: "100%",
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+    color: "#333",
+  },
+  cardText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  link: {
+    color: "#007bff",
+    fontSize: 16,
+    textDecorationLine: "underline",
+  },
+  challengeBtn: {
+    marginTop: 10,
+    backgroundColor: "#F67280",
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
   },
 });
+
+export default HomeScreen;

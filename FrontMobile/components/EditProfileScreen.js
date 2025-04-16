@@ -4,19 +4,18 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
+  SafeAreaView,
   Alert,
+  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { launchImageLibrary } from "react-native-image-picker";
 
-const EditProfileScreen = ({ navigation, route }) => {
-  const { user, setUser } = route.params; // Get setUser from params
+export default function EditProfileScreen({ navigation, route }) {
+  const { user, setUser } = route.params;
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
-  const [profileImage, setProfileImage] = useState(user.profileImage);
 
   const handleSave = async () => {
     if (!firstName || !lastName || !email) {
@@ -26,143 +25,97 @@ const EditProfileScreen = ({ navigation, route }) => {
 
     try {
       const token = await AsyncStorage.getItem("token");
-<<<<<<< HEAD
+
       const res = await fetch(
-        "http://192.168.124.147:5002/api/auth/updateProfile",
+        "http://192.168.1.56:5002/api/auth/updateProfile",
         {
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ firstName, lastName, email, profileImage }),
+          body: JSON.stringify({ firstName, lastName, email }),
         }
       );
-=======
-      const res = await fetch("http://192.168.1.56:5001/api/auth/updateProfile", {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ firstName, lastName, email }),
-      });
->>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
 
       if (!res.ok) throw new Error("Failed to update profile");
 
-      const updatedUser = { firstName, lastName, email, profileImage };
-
-      // Store updated user data in AsyncStorage
+      const updatedUser = { ...user, firstName, lastName, email };
       await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
-
       setUser(updatedUser);
-      Alert.alert("Success", "Profile updated successfully!");
       navigation.goBack();
     } catch (error) {
-      console.error("Error updating profile:", error);
-      Alert.alert("Error", "Failed to update profile.");
+      Alert.alert("Update failed", error.message);
     }
   };
 
-  const pickImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: "photo",
-        includeBase64: false,
-      },
-      (response) => {
-        if (response.didCancel) {
-          console.log("User cancelled image picker");
-        } else if (response.errorCode) {
-          console.error("ImagePicker Error: ", response.errorMessage);
-        } else {
-          setProfileImage(response.uri);
-        }
-      }
-    );
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Edit Profile</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Edit Profile</Text>
 
-      <TouchableOpacity onPress={pickImage} style={styles.imageButton}>
-        {profileImage ? (
-          <Image source={{ uri: profileImage }} style={styles.profileImage} />
-        ) : (
-          <Text style={styles.imageText}>Add Profile Picture</Text>
-        )}
-      </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-      <TextInput
-        style={styles.input}
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholder="First Name"
-      />
-      <TextInput
-        style={styles.input}
-        value={lastName}
-        onChangeText={setLastName}
-        placeholder="Last Name"
-      />
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
-
-      <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save Changes</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveText}>Save Changes</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F0EBF8",
+  },
+  container: {
+    padding: 24,
+    alignItems: "center",
+  },
   title: {
     fontSize: 24,
+    color: "#6C5B7B",
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
   input: {
     width: "100%",
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    marginBottom: 15,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 14,
     fontSize: 16,
+    marginBottom: 16,
+    elevation: 2,
   },
   saveButton: {
     backgroundColor: "#6C5B7B",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    marginTop: 10,
   },
-  saveButtonText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-  imageButton: {
-    backgroundColor: "#F9A826",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  imageText: {
-    fontSize: 16,
+  saveText: {
     color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
-
-export default EditProfileScreen;

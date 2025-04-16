@@ -31,17 +31,10 @@ const Login = ({ navigation, setIsAuthenticated }) => {
     setLoading(true); // Start loading when login request is triggered
 
     try {
-<<<<<<< HEAD
       const response = await axios.post(
-        "http://192.168.124.147:5002/api/auth/login",
+        "http://192.168.1.56:5002/api/auth/login",
         { email, password }
       );
-=======
-      const response = await axios.post("http://192.168.1.56:5001/api/auth/login", {
-        email,
-        password,
-      });
->>>>>>> 3f1b52810b524eb5ce1b801302da17103bb40edf
 
       if (response.data.token) {
         await AsyncStorage.setItem("token", response.data.token);
