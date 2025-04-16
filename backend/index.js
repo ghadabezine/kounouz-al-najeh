@@ -8,6 +8,7 @@ const userRoutes = require("./routes/userRoutes");
 const fileRoutes = require("./routes/fileRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const quizRoutes = require("./routes/quizRoutes");
+const chapterRoutes = require('./routes/chapterRoutes');
 // ✅ Add this under your other routes
 
 const app = express();
@@ -31,11 +32,15 @@ app.use(express.urlencoded({ extended: true })); // Parses URL-encoded requests
 // Connect to MongoDB
 connectDB();
 
+
+
+
 // Routes
 app.use("/api/auth", authRoutes);     // Auth endpoints
 app.use("/api/users", userRoutes);    // User endpoints
 app.use("/api/files", fileRoutes);    // File endpoints
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/quizzes", quizRoutes);
+app.use('/api/chapters', chapterRoutes);
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

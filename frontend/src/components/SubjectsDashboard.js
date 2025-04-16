@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "../styles/SubjectsDashboard.css";
 import { FaPen } from "react-icons/fa";
+
 const SubjectsDashboard = ({
     subjects,
     onFileUpload,
     onCreateQuiz,
     onViewQuizzes,
+    onViewChapters,
     onDeleteSubject,
     onAddSubject,
     onEditSubject,
@@ -33,8 +35,6 @@ const SubjectsDashboard = ({
 
     return (
         <div className="dashboard">
-
-
             <button className="add-button" onClick={() => setShowAddPopup(true)}>
                 + Add Course
             </button>
@@ -53,13 +53,11 @@ const SubjectsDashboard = ({
                                 setShowEditPopup(true);
                             }}
                         >
-                            <FaPen style={{ marginRight: "5px" }} /> 
-                           
+                            <FaPen style={{ marginRight: "5px" }} />
                         </button>
 
-                        <h2>{subject.name}</h2>
+                        <h2 onClick={() => onViewChapters(subject)} style={{ cursor: 'pointer' }}>{subject.name}</h2>
 
-                        {/* Button container for horizontal alignment */}
                         <div className="button-container">
                             <button className="button" onClick={() => onFileUpload(subject)}>
                                 Upload File
@@ -101,7 +99,7 @@ const SubjectsDashboard = ({
                             type="text"
                             value={editSubject.name}
                             onChange={(e) => setEditSubject({ ...editSubject, name: e.target.value })}
-                            placeholder="Enter new course name"
+                            placeholder="Enter course name"
                         />
                         <div className="popup-buttons">
                             <button onClick={handleEditSubject}>Confirm</button>

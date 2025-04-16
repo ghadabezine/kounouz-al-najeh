@@ -10,6 +10,7 @@ import TakeQuiz from './components/TakeQuiz';
 import Dashboard from "./components/SubjectsDashboard";
 import FileUpload from "./components/FileDashboard";
 import ViewQuizzes from "./components/ViewQuizzes";
+import ChapterList from "./components/ChapterList";
 import Login from "./components/Login";
 import UserModal from './components/UserModal';
 import './styles/App.css';
@@ -23,6 +24,16 @@ const App = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Check for existing token on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      setIsAuthenticated(true);
+      setActivePage('home');
+    }
+  }, []);
 
   // Fetch subjects when authenticated
   useEffect(() => {
@@ -38,12 +49,23 @@ const App = () => {
     }
   }, [activePage, isAuthenticated]);
 
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    delete axios.defaults.headers.common['Authorization'];
+    setIsAuthenticated(false);
+    setActivePage('login');
+  };
+
   // Fetch users from the backend
   const fetchUsers = async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/users');
       setUsers(response.data);
     } catch (error) {
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
       console.error('Error fetching users:', error);
     }
   };
@@ -90,7 +112,7 @@ const App = () => {
   const handleAddSubject = async (name) => {
     try {
       const response = await axios.post("http://localhost:5001/api/subjects", { name });
-      fetchSubjects(); // Refetch subjects to update the UI
+      fetchSubjects();
       return response.data;
     } catch (err) {
       console.error("❌ Error adding subject:", err);
@@ -101,7 +123,7 @@ const App = () => {
   const handleDeleteSubject = async (id) => {
     try {
       await axios.delete(`http://localhost:5001/api/subjects/${id}`);
-      fetchSubjects(); // Refetch subjects to update the UI
+      fetchSubjects();
     } catch (err) {
       console.error("❌ Error deleting subject:", err);
     }
@@ -111,7 +133,7 @@ const App = () => {
   const handleEditSubject = async (id, name) => {
     try {
       const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
-      fetchSubjects(); // Refetch subjects to update the UI
+      fetchSubjects();
       return response.data;
     } catch (err) {
       console.error("❌ Error updating subject:", err);
@@ -125,13 +147,13 @@ const App = () => {
         <Login
           setIsAuthenticated={(status) => {
             setIsAuthenticated(status);
-            if (status) setActivePage('home'); // Navigate to home on successful login
+            if (status) setActivePage('home');
           }}
         />
       ) : (
         <>
           {/* Show header only after authentication */}
-          <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} />
+          <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} onLogout={handleLogout} />
 
           <main>
             {activePage === 'home' && <div className="home"></div>}
@@ -162,6 +184,10 @@ const App = () => {
                     setSelectedSubject(subject);
                     setActivePage('viewQuizzes');
                   }}
+                  onViewChapters={(subject) => {
+                    setSelectedSubject(subject);
+                    setActivePage('chapters');
+                  }}
                   onDeleteSubject={handleDeleteSubject}
                   onAddSubject={handleAddSubject}
                   onEditSubject={handleEditSubject}
@@ -176,6 +202,26 @@ const App = () => {
                 setSelectedSubject(null);
                 setActivePage('subjects');
               }} />
+            )}
+
+            {activePage === 'viewQuizzes' && selectedSubject && (
+              <ViewQuizzes
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage('subjects');
+                }}
+              />
+            )}
+
+            {activePage === 'chapters' && selectedSubject && (
+              <ChapterList
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage('subjects');
+                }}
+              />
             )}
 
             {activePage === 'fileUpload' && selectedSubject && (
@@ -201,22 +247,20 @@ const App = () => {
                 {quizId && <TakeQuiz quizId={quizId} />}
               </div>
             )}
-
-            {activePage === 'viewQuizzes' && selectedSubject && (
-              <ViewQuizzes subject={selectedSubject} goBack={() => {
-                setSelectedSubject(null);
-                setActivePage('subjects');
-              }} />
-            )}
           </main>
 
-          {isModalOpen && (
-            <UserModal closeModal={closeModal}>
-              <UserForm fetchUsers={fetchUsers} editingUser={editingUser} setEditingUser={setEditingUser} closeModal={closeModal} />
-            </UserModal>
-          )}
-
           <Footer />
+
+          {isModalOpen && (
+            <UserModal
+              user={editingUser}
+              onClose={closeModal}
+              onSuccess={() => {
+                closeModal();
+                fetchUsers();
+              }}
+            />
+          )}
         </>
       )}
     </div>
