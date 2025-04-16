@@ -103,10 +103,10 @@ export default function App() {
             <Stack.Screen name="QuizScreen" component={QuizScreen} />
             <Stack.Screen name="ExamScreen" component={ExamScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="Quick Quiz" component={QuickBrainQuiz} />
+            <Stack.Screen name="QuickBrainQuiz" component={QuickBrainQuiz} />
             <Stack.Screen name="QuizResult" component={QuizResult} />
             <Stack.Screen
-              name="GpaCalculator"
+              name="GPACalculator"
               component={GPACalculatorScreen}
             />
           </>
