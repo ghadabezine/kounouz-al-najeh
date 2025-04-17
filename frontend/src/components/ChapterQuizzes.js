@@ -84,14 +84,12 @@ const ChapterQuizzes = ({ chapter, goBack }) => {
     return (
         <div className="chapter-quizzes">
             <div className="quizzes-header">
-                <h2>Quizzes for {chapter.title}</h2>
+                <h2>Quizzes for {chapter.name}</h2>
                 <button onClick={goBack} className="back-button">Back to Chapters</button>
             </div>
-
             <button className="add-button" onClick={() => setShowAddPopup(true)}>
                 + Add Quiz
             </button>
-
             <div className="quizzes-grid">
                 {quizzes.map(quiz => (
                     <div key={quiz._id} className="quiz-card">
@@ -120,7 +118,6 @@ const ChapterQuizzes = ({ chapter, goBack }) => {
                     </div>
                 ))}
             </div>
-
             {showAddPopup && (
                 <div className="popup-overlay">
                     <div className="popup-content">
@@ -181,7 +178,6 @@ const ChapterQuizzes = ({ chapter, goBack }) => {
                     </div>
                 </div>
             )}
-
             {showEditPopup && editingQuiz && (
                 <div className="popup-overlay">
                     <div className="popup-content">
@@ -242,4 +238,4 @@ const ChapterQuizzes = ({ chapter, goBack }) => {
     );
 };
 
-export default ChapterQuizzes; 
+export default ChapterQuizzes;

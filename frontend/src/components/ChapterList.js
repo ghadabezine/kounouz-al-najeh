@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/ChapterList.css';
 
-const ChapterList = ({ subject, goBack }) => {
+const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizzes }) => {
   const [chapters, setChapters] = useState([]);
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -20,7 +20,6 @@ const ChapterList = ({ subject, goBack }) => {
       setChapters(response.data);
       setError(null);
     } catch (error) {
-      console.error('Error fetching chapters:', error);
       setError('Failed to fetch chapters. Please try again.');
     }
   };
@@ -30,7 +29,6 @@ const ChapterList = ({ subject, goBack }) => {
       setError('Chapter name cannot be empty');
       return;
     }
-
     try {
       const response = await axios.post('http://localhost:5001/api/chapters', {
         name: newChapter,
@@ -41,22 +39,17 @@ const ChapterList = ({ subject, goBack }) => {
       setShowAddPopup(false);
       setError(null);
     } catch (error) {
-      console.error('Error adding chapter:', error);
       setError(error.response?.data?.error || 'Failed to add chapter');
     }
   };
 
   const handleDeleteChapter = async (chapterId) => {
-    if (!window.confirm('Are you sure you want to delete this chapter?')) {
-      return;
-    }
-
+    if (!window.confirm('Are you sure you want to delete this chapter?')) return;
     try {
       await axios.delete(`http://localhost:5001/api/chapters/${chapterId}`);
       setChapters(chapters.filter(chapter => chapter._id !== chapterId));
       setError(null);
     } catch (error) {
-      console.error('Error deleting chapter:', error);
       setError(error.response?.data?.error || 'Failed to delete chapter');
     }
   };
@@ -66,19 +59,17 @@ const ChapterList = ({ subject, goBack }) => {
       setError('Chapter name cannot be empty');
       return;
     }
-
     try {
       const response = await axios.put(`http://localhost:5001/api/chapters/${editingChapter.id}`, {
         name: editingChapter.name
       });
-      setChapters(chapters.map(chapter => 
+      setChapters(chapters.map(chapter =>
         chapter._id === editingChapter.id ? response.data : chapter
       ));
       setEditingChapter({ id: '', name: '' });
       setShowEditPopup(false);
       setError(null);
     } catch (error) {
-      console.error('Error editing chapter:', error);
       setError(error.response?.data?.error || 'Failed to edit chapter');
     }
   };
@@ -89,30 +80,27 @@ const ChapterList = ({ subject, goBack }) => {
         <h2>{subject.name} - Chapters</h2>
         <button onClick={goBack} className="back-button">Back to Courses</button>
       </div>
-
       {error && <div className="error-message">{error}</div>}
-
       <button className="add-button" onClick={() => setShowAddPopup(true)}>
         + Add Chapter
       </button>
-
       <div className="chapters-grid">
         {chapters.map((chapter) => (
           <div key={chapter._id} className="chapter-card">
             <h3>{chapter.name}</h3>
             <div className="chapter-actions">
+              <button onClick={() => onFileUpload(chapter)}>Upload File</button>
+              <button onClick={() => onCreateQuiz(chapter)}>Create Quiz</button>
+              <button onClick={() => onViewQuizzes(chapter)}>View Quizzes</button>
               <button onClick={() => {
                 setEditingChapter({ id: chapter._id, name: chapter.name });
                 setShowEditPopup(true);
-              }}>
-                Edit
-              </button>
+              }}>Edit</button>
               <button onClick={() => handleDeleteChapter(chapter._id)}>Delete</button>
             </div>
           </div>
         ))}
       </div>
-
       {showAddPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -130,7 +118,6 @@ const ChapterList = ({ subject, goBack }) => {
           </div>
         </div>
       )}
-
       {showEditPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -152,4 +139,4 @@ const ChapterList = ({ subject, goBack }) => {
   );
 };
 
-export default ChapterList; 
+export default ChapterList;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/FileDashboard.css";
 
-const FileDashboard = ({ subject, goBack }) => {
+const FileDashboard = ({ chapter, goBack }) => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
@@ -10,12 +10,12 @@ const FileDashboard = ({ subject, goBack }) => {
   const [newFilename, setNewFilename] = useState("");
 
   useEffect(() => {
-    if (subject) fetchFiles();
-  }, [subject]);
+    if (chapter) fetchFiles();
+  }, [chapter]);
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/api/files/subject/${subject._id}`);
+      const res = await axios.get(`http://localhost:5001/api/files/chapter/${chapter._id}`);
       setFiles(res.data);
     } catch (err) {
       console.error("❌ Error fetching files:", err);
@@ -30,7 +30,7 @@ const FileDashboard = ({ subject, goBack }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("subjectId", subject._id);
+    formData.append("chapterId", chapter._id);
 
     try {
       const res = await axios.post("http://localhost:5001/api/files/upload", formData);
@@ -42,7 +42,6 @@ const FileDashboard = ({ subject, goBack }) => {
         setMessage("❌ Upload failed.");
       }
     } catch (err) {
-      console.error("❌ Upload error:", err);
       setMessage("❌ Upload error.");
     }
   };
@@ -67,22 +66,19 @@ const FileDashboard = ({ subject, goBack }) => {
       alert("❌ Filename cannot be empty.");
       return;
     }
-
     try {
       await axios.patch(`http://localhost:5001/api/files/${editingFile}`, { newFilename });
       alert("✅ Filename updated!");
       setEditingFile(null);
       fetchFiles();
     } catch (err) {
-      console.error("❌ Error updating filename:", err);
       alert("❌ Failed to update filename.");
     }
   };
 
   return (
     <div className="upload-container">
-      <h2>{subject.name}</h2>
-
+      <h2>{chapter.name}</h2>
       <form onSubmit={handleUpload} className="form">
         <input type="file" onChange={handleFileChange} className="input-file" />
         <div className="button-group">
@@ -90,9 +86,7 @@ const FileDashboard = ({ subject, goBack }) => {
           <button type="button" onClick={goBack} className="button-secondary">Back</button>
         </div>
       </form>
-
       {message && <p className="message">{message}</p>}
-
       <h3>Existing Files:</h3>
       {files.length > 0 ? (
         <ul className="file-list">
@@ -125,7 +119,7 @@ const FileDashboard = ({ subject, goBack }) => {
           ))}
         </ul>
       ) : (
-        <p>No files uploaded for this subject.</p>
+        <p>No files uploaded for this chapter.</p>
       )}
     </div>
   );

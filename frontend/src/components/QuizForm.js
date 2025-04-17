@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../styles/QuizForm.css';
 
-function QuizForm({ subject, goBack }) {
+function QuizForm({ chapter, goBack }) {
   const [title, setTitle] = useState('');
   const [questions, setQuestions] = useState([
     { questionText: '', options: ['', '', '', ''], correctAnswerIndex: null }
   ]);
 
-  if (!subject) return <p>⚠️ No subject selected. Please select a subject first.</p>;
+  if (!chapter) return <p>⚠️ No chapter selected. Please select a chapter first.</p>;
 
   const addQuestion = () => {
     setQuestions(prev => [
@@ -74,7 +74,7 @@ function QuizForm({ subject, goBack }) {
 
       const response = await axios.post('http://localhost:5001/api/quizzes', {
         title,
-        subject: subject._id,
+        chapter: chapter._id, // <-- use chapter here
         questions: formattedQuestions,
       });
 
@@ -89,7 +89,7 @@ function QuizForm({ subject, goBack }) {
 
   return (
     <div className="quiz-form">
-      <h1>Create Quiz for {subject.name}</h1>
+      <h1>Create Quiz for {chapter.name}</h1>
 
       <label>Quiz Title:</label>
       <input
