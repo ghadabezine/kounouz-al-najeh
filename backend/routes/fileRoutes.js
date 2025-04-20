@@ -1,16 +1,24 @@
 const express = require("express");
-const multer = require("multer");
-const { uploadFile, getFiles, getFile, deleteFile, updateFilename,getFilesBySubject } = require("../controllers/FileController"); // ✅ Check this path
-
 const router = express.Router();
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const {
+  createQuiz,
+  getQuizzesByChapter,
+  deleteQuiz
+} = require('../controllers/QuizController');
+const {
+  uploadFile,
+  getFilesByChapter,
+  deleteFile
+} = require('../controllers/FileController');
 
-// ✅ Route definitions
-router.post("/upload", upload.single("file"), uploadFile); // ✅ Works if uploadFile is defined
-router.get("/", getFiles);                                // 🚩 The error points here
-router.get("/:filename", getFile);                         // ✅ Make sure getFile is defined
-router.delete("/:filename", deleteFile);                   // ✅ deleteFile should be defined
-router.patch("/:filename", updateFilename);                // ✅ updateFilename should be defined
-router.get("/subject/:subjectId", getFilesBySubject);
+// Quiz routes
+router.post("/:chapterId/quizzes", createQuiz);
+router.get("/:chapterId/quizzes", getQuizzesByChapter);
+router.delete("/quizzes/:quizId", deleteQuiz);
+
+// File routes
+router.post("/:chapterId/files", uploadFile);
+router.get("/:chapterId/files", getFilesByChapter);
+router.delete("/files/:fileId", deleteFile);
+
 module.exports = router;

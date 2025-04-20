@@ -1,4 +1,4 @@
-const Chapter = require('../models/chapterModel');
+const Chapter = require('../models/Chapter');
 const Subject = require('../models/Subject');
 
 // Get all chapters for a subject

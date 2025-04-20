@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import UserForm from './components/UserForm';
+import QuizForm from './components/QuizForm';
 import UserList from './components/UserList';
 import FileDashboard from './components/FileDashboard';
 import ChapterQuizzes from './components/ChapterQuizzes';
@@ -50,11 +50,34 @@ const App = () => {
       console.error("❌ Error fetching subjects:", err);
     }
   };
+  const handleAddSubject = async (name) => {
+    try {
+      const response = await axios.post("http://localhost:5001/api/subjects", { name });
+      setSubjects(prev => [...prev, response.data]);
+    } catch (err) {
+      console.error("❌ Error adding subject:", err);
+    }
+  };
 
-  // Subject CRUD handlers (same as before)
-  const handleAddSubject = async (name) => { /* ... */ };
-  const handleDeleteSubject = async (id) => { /* ... */ };
-  const handleEditSubject = async (id, name) => { /* ... */ };
+  const handleDeleteSubject = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/subjects/${id}`);
+      setSubjects(prev => prev.filter(subject => subject._id !== id));
+    } catch (err) {
+      console.error("❌ Error deleting subject:", err);
+    }
+  };
+
+  const handleEditSubject = async (id, name) => {
+    try {
+      const response = await axios.put(`http://localhost:5001/api/subjects/${id}`, { name });
+      setSubjects(prev => prev.map(subject => 
+        subject._id === id ? response.data : subject
+      ));
+    } catch (err) {
+      console.error("❌ Error editing subject:", err);
+    }
+  };
 
   return (
     <div className="container">
@@ -114,15 +137,16 @@ const App = () => {
               />
             )}
 
-            {activePage === 'createQuiz' && selectedChapter && (
-              <ChapterQuizzes
-                chapter={selectedChapter}
-                goBack={() => {
-                  setSelectedChapter(null);
-                  setActivePage('chapters');
-                }}
-              />
-            )}
+{activePage === 'createQuiz' && selectedChapter && (
+  <QuizForm
+    chapter={selectedChapter}
+    goBack={() => {
+      setSelectedChapter(null);
+      setActivePage('chapters');
+    }}
+  />
+)}
+
 
             {activePage === 'viewQuizzes' && selectedChapter && (
               <ChapterQuizzes
