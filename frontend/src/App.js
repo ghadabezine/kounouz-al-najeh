@@ -6,6 +6,7 @@ import QuizForm from './components/QuizForm';
 import UserList from './components/UserList';
 import FileDashboard from './components/FileDashboard';
 import ChapterQuizzes from './components/ChapterQuizzes';
+import ViewQuizzes from './components/ViewQuizzes';
 import Dashboard from "./components/SubjectsDashboard";
 import ChapterList from "./components/ChapterList";
 import Login from "./components/Login";
@@ -147,16 +148,16 @@ const App = () => {
   />
 )}
 
+{activePage === 'viewQuizzes' && selectedChapter && (
+  <ViewQuizzes  // Changed from ChapterQuizzes
+    chapter={selectedChapter}  // Changed from subject
+    goBack={() => {
+      setSelectedChapter(null);
+      setActivePage('chapters');
+    }}
+  />
+)}
 
-            {activePage === 'viewQuizzes' && selectedChapter && (
-              <ChapterQuizzes
-                chapter={selectedChapter}
-                goBack={() => {
-                  setSelectedChapter(null);
-                  setActivePage('chapters');
-                }}
-              />
-            )}
           </main>
           <Footer />
           {isModalOpen && (

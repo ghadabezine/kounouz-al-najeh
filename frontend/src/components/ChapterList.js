@@ -11,18 +11,18 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchChapters = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5001/api/chapters/subject/${subject._id}`
+        );
+        setChapters(response.data);
+      } catch (error) {
+        setError('Failed to fetch chapters');
+      }
+    };
     fetchChapters();
   }, [subject]);
-
-  const fetchChapters = async () => {
-    try {
-      const response = await axios.get(`http://localhost:5001/api/chapters/subject/${subject._id}`);
-      setChapters(response.data);
-      setError(null);
-    } catch (error) {
-      setError('Failed to fetch chapters. Please try again.');
-    }
-  };
 
   const handleAddChapter = async () => {
     if (!newChapter.trim()) {
@@ -37,9 +37,8 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
       setChapters([...chapters, response.data]);
       setNewChapter('');
       setShowAddPopup(false);
-      setError(null);
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to add chapter');
+      setError(error.response?.data?.error || 'Failed to create chapter');
     }
   };
 
@@ -48,76 +47,85 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
     try {
       await axios.delete(`http://localhost:5001/api/chapters/${chapterId}`);
       setChapters(chapters.filter(chapter => chapter._id !== chapterId));
-      setError(null);
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to delete chapter');
+      setError('Failed to delete chapter');
     }
   };
 
   const handleEditChapter = async () => {
-    if (!editingChapter.name.trim()) {
-      setError('Chapter name cannot be empty');
-      return;
-    }
+    if (!editingChapter.name.trim()) return;
     try {
-      const response = await axios.put(`http://localhost:5001/api/chapters/${editingChapter.id}`, {
-        name: editingChapter.name
-      });
-      setChapters(chapters.map(chapter =>
+      const response = await axios.put(
+        `http://localhost:5001/api/chapters/${editingChapter.id}`,
+        { name: editingChapter.name }
+      );
+      setChapters(chapters.map(chapter => 
         chapter._id === editingChapter.id ? response.data : chapter
       ));
       setEditingChapter({ id: '', name: '' });
       setShowEditPopup(false);
-      setError(null);
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to edit chapter');
+      setError('Failed to update chapter');
     }
   };
 
   return (
     <div className="chapter-list">
-      <div className="chapter-header">
-        <h2>{subject.name} - Chapters</h2>
-        <button onClick={goBack} className="back-button">Back to Courses</button>
+      <div className="header">
+        <button onClick={goBack} className="back-button">
+          ← Back to Subjects
+        </button>
+        <h2>{subject.name} Chapters</h2>
       </div>
-      {error && <div className="error-message">{error}</div>}
+
+      {error && <div className="error">{error}</div>}
+
       <button className="add-button" onClick={() => setShowAddPopup(true)}>
         + Add Chapter
       </button>
-      <div className="chapters-grid">
-        {chapters.map((chapter) => (
-          <div key={chapter._id} className="chapter-card">
+
+      <div className="grid">
+        {chapters.map(chapter => (
+          <div key={chapter._id} className="card">
             <h3>{chapter.name}</h3>
-            <div className="chapter-actions">
+            <div className="actions">
               <button onClick={() => onFileUpload(chapter)}>Upload File</button>
               <button onClick={() => onCreateQuiz(chapter)}>Create Quiz</button>
               <button onClick={() => onViewQuizzes(chapter)}>View Quizzes</button>
               <button onClick={() => {
                 setEditingChapter({ id: chapter._id, name: chapter.name });
                 setShowEditPopup(true);
-              }}>Edit</button>
-              <button onClick={() => handleDeleteChapter(chapter._id)}>Delete</button>
+              }}>
+                Edit
+              </button>
+              <button onClick={() => handleDeleteChapter(chapter._id)}>
+                Delete
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Add Chapter Popup */}
       {showAddPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
-            <h3>Add New Chapter</h3>
+            <h3>New Chapter</h3>
             <input
               type="text"
               value={newChapter}
               onChange={(e) => setNewChapter(e.target.value)}
-              placeholder="Enter chapter name"
+              placeholder="Chapter name"
             />
-            <div className="popup-buttons">
-              <button onClick={handleAddChapter}>Confirm</button>
+            <div className="popup-actions">
+              <button onClick={handleAddChapter}>Create</button>
               <button onClick={() => setShowAddPopup(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Edit Chapter Popup */}
       {showEditPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -125,12 +133,17 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
             <input
               type="text"
               value={editingChapter.name}
-              onChange={(e) => setEditingChapter({ ...editingChapter, name: e.target.value })}
-              placeholder="Enter chapter name"
+              onChange={(e) => setEditingChapter({
+                ...editingChapter,
+                name: e.target.value
+              })}
             />
-            <div className="popup-buttons">
-              <button onClick={handleEditChapter}>Confirm</button>
-              <button onClick={() => setShowEditPopup(false)}>Cancel</button>
+            <div className="popup-actions">
+              <button onClick={handleEditChapter}>Save</button>
+              <button onClick={() => {
+                setEditingChapter({ id: '', name: '' });
+                setShowEditPopup(false);
+              }}>Cancel</button>
             </div>
           </div>
         </div>
