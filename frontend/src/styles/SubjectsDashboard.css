@@ -1,139 +1,239 @@
 .dashboard {
-    padding: 20px;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f8f5ff;
+    min-height: 100vh;
+    background-image: linear-gradient(135deg, #f8f5ff 0%, #fff1f9 100%);
 }
 
-.title {
-    font-size: 24px;
-    margin-bottom: 20px;
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.05);
+    border: 1px solid rgba(147, 107, 251, 0.1);
+}
+
+.dashboard-header h2 {
+    margin: 0;
+    color: #5b3e96;
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #5b3e96 0%, #8e44ad 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .add-button {
-    background-color: #4CAF50;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
     color: white;
-    padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.2);
 }
 
-.grid {
+.add-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(147, 107, 251, 0.3);
+    background: linear-gradient(135deg, #8e44ad 0%, #936bfb 100%);
+}
+
+.subjects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 1.5rem;
+    padding: 1rem;
 }
 
-.card {
-    background-color: #ffffff;
-
-    border: 1px solid #fffcfc;
-    border-radius: 10px;
-    padding: 25px;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.button-container {
-    display: flex;
-    justify-content: center;
-    /* Center the buttons horizontally */
-    gap: 10px;
-    /* Adds space between buttons */
-    width: 100%;
-    /* Make sure it spans the full width of the card */
-    margin-top: auto;
-    /* Push buttons to the bottom */
-}
-
-
-.button {
-    background-color: #bdbfdc;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 1px;
-    font-size: 10px;
-    font-weight: bold;
-    bottom: 10px;
-}
-
-.delete-button {
-    position: absolute;
-    top: 5px;
-    bottom: 10px;
-    right: 10px;
+.subject-card {
     background-color: white;
-    color: rgb(255, 12, 12);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 35px;
-    font-size: 18px;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(147, 107, 251, 0.1);
+    position: relative;
+    overflow: hidden;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
 }
 
-.delete-button:active {
-    background-color: #b30000 !important;
-    /* Dark red on click */
-}
-
-.edit-button {
+.subject-card::before {
+    content: '';
     position: absolute;
-    top: 10px;
-    right: 40px;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 35px;
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #936bfb 0%, #8e44ad 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.edit-button:active {
-    background-color: #b30000 !important;
-    /* Dark red on click */
+.subject-card:hover::before {
+    opacity: 1;
+}
+
+.subject-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(147, 107, 251, 0.15);
+}
+
+.subject-card h3 {
+    margin: 0 0 1rem 0;
+    color: #5b3e96;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.card-footer {
+    margin-top: 1rem;
+    text-align: center;
+    color: #8e44ad;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.card-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.subject-card:hover .card-actions {
+    opacity: 1;
+}
+
+.card-actions button {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    transition: all 0.3s ease;
+}
+
+.card-actions .edit-icon {
+    color: #936bfb;
+}
+
+.card-actions .edit-icon:hover {
+    background-color: rgba(147, 107, 251, 0.1);
+    transform: scale(1.1);
+}
+
+.card-actions .delete-icon {
+    color: #d6336c;
+}
+
+.card-actions .delete-icon:hover {
+    background-color: rgba(214, 51, 108, 0.1);
+    transform: scale(1.1);
+}
+
+.card-actions svg {
+    width: 16px;
+    height: 16px;
 }
 
 .popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    right: 0;
+    bottom: 0;
+    background-color: rgba(91, 62, 150, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
 }
 
 .popup-content {
     background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(147, 107, 251, 0.15);
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid rgba(147, 107, 251, 0.1);
+}
+
+.popup-content h3 {
+    margin: 0 0 1.5rem 0;
+    color: #5b3e96;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 .popup-content input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e2d8ff;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.popup-content input:focus {
+    outline: none;
+    border-color: #936bfb;
+    box-shadow: 0 0 0 3px rgba(147, 107, 251, 0.1);
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 .popup-buttons button {
-    margin: 5px;
-    padding: 10px 20px;
+    padding: 0.75rem 1.5rem;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: white;
+}
+
+.popup-buttons button:first-child {
+    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
+}
+
+.popup-buttons button:first-child:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.2);
+    filter: brightness(1.1);
+}
+
+.popup-buttons button:last-child {
+    background: linear-gradient(135deg, #d6336c 0%, #c2185b 100%);
+}
+
+.popup-buttons button:last-child:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(214, 51, 108, 0.2);
+    filter: brightness(1.1);
 }

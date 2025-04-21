@@ -71,42 +71,55 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
 
   return (
     <div className="chapter-list">
-      <div className="header">
+      <div className="chapter-header">
         <button onClick={goBack} className="back-button">
           ← Back to Subjects
         </button>
         <h2>{subject.name} Chapters</h2>
       </div>
 
-      {error && <div className="error">{error}</div>}
+      {error && <div className="error-message">{error}</div>}
 
       <button className="add-button" onClick={() => setShowAddPopup(true)}>
         + Add Chapter
       </button>
 
-      <div className="grid">
+      <div className="chapters-grid">
         {chapters.map(chapter => (
-          <div key={chapter._id} className="card">
+          <div key={chapter._id} className="chapter-card">
+            <div className="card-actions">
+              <button 
+                className="edit-icon"
+                onClick={() => {
+                  setEditingChapter({ id: chapter._id, name: chapter.name });
+                  setShowEditPopup(true);
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+              <button 
+                className="delete-icon"
+                onClick={() => handleDeleteChapter(chapter._id)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
             <h3>{chapter.name}</h3>
-            <div className="actions">
+            <div className="chapter-actions">
               <button onClick={() => onFileUpload(chapter)}>Upload File</button>
               <button onClick={() => onCreateQuiz(chapter)}>Create Quiz</button>
               <button onClick={() => onViewQuizzes(chapter)}>View Quizzes</button>
-              <button onClick={() => {
-                setEditingChapter({ id: chapter._id, name: chapter.name });
-                setShowEditPopup(true);
-              }}>
-                Edit
-              </button>
-              <button onClick={() => handleDeleteChapter(chapter._id)}>
-                Delete
-              </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Add Chapter Popup */}
       {showAddPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -117,7 +130,7 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
               onChange={(e) => setNewChapter(e.target.value)}
               placeholder="Chapter name"
             />
-            <div className="popup-actions">
+            <div className="popup-buttons">
               <button onClick={handleAddChapter}>Create</button>
               <button onClick={() => setShowAddPopup(false)}>Cancel</button>
             </div>
@@ -125,7 +138,6 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
         </div>
       )}
 
-      {/* Edit Chapter Popup */}
       {showEditPopup && (
         <div className="popup-overlay">
           <div className="popup-content">
@@ -138,7 +150,7 @@ const ChapterList = ({ subject, goBack, onFileUpload, onCreateQuiz, onViewQuizze
                 name: e.target.value
               })}
             />
-            <div className="popup-actions">
+            <div className="popup-buttons">
               <button onClick={handleEditChapter}>Save</button>
               <button onClick={() => {
                 setEditingChapter({ id: '', name: '' });

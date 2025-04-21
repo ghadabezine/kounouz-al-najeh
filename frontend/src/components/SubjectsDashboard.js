@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import "../styles/SubjectsDashboard.css";
-import { FaPen } from "react-icons/fa";
 
 const SubjectsDashboard = ({
     subjects,
-    onFileUpload,
-    onCreateQuiz,
-    onViewQuizzes,
     onViewChapters,
     onDeleteSubject,
     onAddSubject,
@@ -35,39 +31,48 @@ const SubjectsDashboard = ({
 
     return (
         <div className="dashboard">
-            <button className="add-button" onClick={() => setShowAddPopup(true)}>
-                + Add Course
-            </button>
+            <div className="dashboard-header">
+                <h2>Your Courses</h2>
+                <button className="add-button" onClick={() => setShowAddPopup(true)}>
+                    + Add Course
+                </button>
+            </div>
 
-            <div className="grid">
+            <div className="subjects-grid">
                 {subjects.map((subject) => (
-                    <div key={subject._id} className="card">
-                        <button className="delete-button" onClick={() => onDeleteSubject(subject._id)}>
-                            X
-                        </button>
-
-                        <button
-                            className="edit-button"
-                            onClick={() => {
-                                setEditSubject({ id: subject._id, name: subject.name });
-                                setShowEditPopup(true);
-                            }}
-                        >
-                            <FaPen style={{ marginRight: "5px" }} />
-                        </button>
-
-                        <h2 onClick={() => onViewChapters(subject)} style={{ cursor: 'pointer' }}>{subject.name}</h2>
-
-                        <div className="button-container">
-                            <button className="button" onClick={() => onFileUpload(subject)}>
-                                Upload File
+                    <div key={subject._id} className="subject-card" onClick={() => onViewChapters(subject)}>
+                        <div className="card-actions">
+                            <button 
+                                className="edit-icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditSubject({ id: subject._id, name: subject.name });
+                                    setShowEditPopup(true);
+                                }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                </svg>
                             </button>
-                            <button className="button" onClick={() => onCreateQuiz(subject)}>
-                                Create Quiz
+                            <button 
+                                className="delete-icon"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (window.confirm('Are you sure you want to delete this course?')) {
+                                        onDeleteSubject(subject._id);
+                                    }
+                                }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
                             </button>
-                            <button className="button" onClick={() => onViewQuizzes(subject)}>
-                                View Quizzes
-                            </button>
+                        </div>
+                        <h3>{subject.name}</h3>
+                        <div className="card-footer">
+                            <span>Click to view chapters</span>
                         </div>
                     </div>
                 ))}
@@ -84,7 +89,7 @@ const SubjectsDashboard = ({
                             placeholder="Enter course name"
                         />
                         <div className="popup-buttons">
-                            <button onClick={handleAddSubject}>Confirm</button>
+                            <button onClick={handleAddSubject}>Create</button>
                             <button onClick={() => setShowAddPopup(false)}>Cancel</button>
                         </div>
                     </div>
@@ -102,8 +107,11 @@ const SubjectsDashboard = ({
                             placeholder="Enter course name"
                         />
                         <div className="popup-buttons">
-                            <button onClick={handleEditSubject}>Confirm</button>
-                            <button onClick={() => setShowEditPopup(false)}>Cancel</button>
+                            <button onClick={handleEditSubject}>Save</button>
+                            <button onClick={() => {
+                                setEditSubject({ id: "", name: "" });
+                                setShowEditPopup(false);
+                            }}>Cancel</button>
                         </div>
                     </div>
                 </div>
