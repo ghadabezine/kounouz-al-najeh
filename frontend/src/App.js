@@ -11,7 +11,6 @@ import Dashboard from "./components/SubjectsDashboard";
 import ChapterList from "./components/ChapterList";
 import Login from "./components/Login";
 import UserModal from './components/UserModal';
-import AdminDashboard from './components/AdminDashboard';
 import Statistics from './components/Statistics';
 import './styles/App.css';
 

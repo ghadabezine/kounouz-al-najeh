@@ -15,7 +15,7 @@ const FileDashboard = ({ chapter, goBack }) => {
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/api/files/chapter/${chapter._id}`);
+      const res = await axios.get(`http://localhost:5001/api/files/${chapter._id}/files`);
       setFiles(res.data);
     } catch (err) {
       console.error("❌ Error fetching files:", err);
@@ -30,10 +30,12 @@ const FileDashboard = ({ chapter, goBack }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("chapterId", chapter._id);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/files/upload", formData);
+      const res = await axios.post(
+        `http://localhost:5001/api/files/${chapter._id}/files`,
+        formData
+      );
       if (res.status === 201) {
         setMessage("✅ File uploaded successfully!");
         setFile(null);
@@ -42,13 +44,14 @@ const FileDashboard = ({ chapter, goBack }) => {
         setMessage("❌ Upload failed.");
       }
     } catch (err) {
+      console.error("❌ Upload error:", err);
       setMessage("❌ Upload error.");
     }
   };
 
-  const handleDelete = async (filename) => {
+  const handleDelete = async (fileId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/files/${filename}`);
+      await axios.delete(`http://localhost:5001/api/files/${fileId}`);
       alert("✅ File deleted!");
       fetchFiles();
     } catch (err) {
@@ -67,7 +70,9 @@ const FileDashboard = ({ chapter, goBack }) => {
       return;
     }
     try {
-      await axios.patch(`http://localhost:5001/api/files/${editingFile}`, { newFilename });
+      await axios.patch(`http://localhost:5001/api/files/${editingFile}`, {
+        newFilename,
+      });
       alert("✅ Filename updated!");
       setEditingFile(null);
       fetchFiles();
@@ -106,12 +111,16 @@ const FileDashboard = ({ chapter, goBack }) => {
                 </>
               ) : (
                 <>
-                  <a href={`http://localhost:5001/api/files/${file._id}`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={`http://localhost:5001/api/files/${file._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {file.filename}
                   </a>
                   <div className="button-container">
                     <button className="edit-btn" onClick={() => handleEdit(file)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(file.filename)}>Delete</button>
+                    <button className="delete-btn" onClick={() => handleDelete(file._id)}>Delete</button>
                   </div>
                 </>
               )}
