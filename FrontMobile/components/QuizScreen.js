@@ -21,7 +21,7 @@ export default function GenerateQuizScreen({ route }) {
     const fetchQuiz = async () => {
       try {
         const response = await fetch(
-          "http://192.168.1.56:5002/api/quizzes/generate-quiz",
+          "http://192.168.100.7:5002/generate-quiz",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

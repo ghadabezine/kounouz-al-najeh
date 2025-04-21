@@ -85,7 +85,7 @@ export default function ProfileScreen({ navigation }) {
       const token = await AsyncStorage.getItem("token");
       if (!token) return navigation.replace("Login");
 
-      const res = await fetch("http://192.168.1.56:5002/api/auth/profile", {
+      const res = await fetch("http://192.168.100.7:5002/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
