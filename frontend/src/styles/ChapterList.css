@@ -2,81 +2,78 @@
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    background-color: #f8f5ff;
+    background-color: #fdf4f8;
     min-height: 100vh;
-    background-image: linear-gradient(135deg, #f8f5ff 0%, #fff1f9 100%);
+    background-image: linear-gradient(135deg, #fff5f9 0%, #f3e5ff 100%);
 }
 
 .chapter-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 2rem;
     margin-bottom: 2rem;
     padding: 1.5rem;
     background-color: white;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.05);
-    border: 1px solid rgba(147, 107, 251, 0.1);
+    box-shadow: 0 4px 15px rgba(247, 168, 184, 0.1);
+    border: 1px solid rgba(247, 168, 184, 0.1);
 }
 
 .chapter-header h2 {
     margin: 0;
-    color: #5b3e96;
     font-size: 1.8rem;
     font-weight: 600;
-    background: linear-gradient(90deg, #5b3e96 0%, #8e44ad 100%);
+    background: linear-gradient(90deg, #F7A8B8 0%, #936bfb 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .back-button {
     padding: 0.75rem 1.5rem;
-    background-color: #f8f5ff;
-    border: 1px solid #e2d8ff;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    color: #5b3e96;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.back-button:hover {
-    background-color: #e2d8ff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(147, 107, 251, 0.1);
-}
-
-.add-button {
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
+    background: linear-gradient(135deg, #F7A8B8 0%, #ffb7c5 100%);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(247, 168, 184, 0.2);
+}
+
+.back-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(247, 168, 184, 0.3);
+    filter: brightness(1.1);
+}
+
+.add-button {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #936bfb 0%, #F7A8B8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
     font-size: 1rem;
     box-shadow: 0 4px 15px rgba(147, 107, 251, 0.2);
+    margin-bottom: 2rem;
 }
 
 .add-button:hover {
     transform: translateY(-1px);
     box-shadow: 0 6px 20px rgba(147, 107, 251, 0.3);
-    background: linear-gradient(135deg, #8e44ad 0%, #936bfb 100%);
+    filter: brightness(1.1);
 }
 
 .error-message {
-    background-color: #fff1f8;
-    color: #d6336c;
+    background-color: rgba(247, 168, 184, 0.1);
+    color: #F7A8B8;
     padding: 1rem;
     border-radius: 8px;
-    margin-bottom: 2rem;
-    text-align: center;
-    border: 1px solid #ffd9ec;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(247, 168, 184, 0.2);
 }
 
 .chapters-grid {
@@ -90,9 +87,9 @@
     background-color: white;
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.05);
+    box-shadow: 0 4px 15px rgba(247, 168, 184, 0.05);
     transition: all 0.3s ease;
-    border: 1px solid rgba(147, 107, 251, 0.1);
+    border: 1px solid rgba(247, 168, 184, 0.1);
     position: relative;
     overflow: hidden;
 }
@@ -104,7 +101,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #936bfb 0%, #8e44ad 100%);
+    background: linear-gradient(90deg, #F7A8B8 0%, #936bfb 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -115,158 +112,15 @@
 
 .chapter-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(147, 107, 251, 0.15);
+    box-shadow: 0 8px 25px rgba(247, 168, 184, 0.15);
 }
 
 .chapter-card h3 {
-    margin: 0 0 1.5rem 0;
-    color: #5b3e96;
+    margin: 0 0 1rem 0;
+    color: #936bfb;
     font-size: 1.4rem;
     font-weight: 600;
-}
-
-.chapter-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.chapter-actions button {
-    padding: 0.75rem 1.25rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.9rem;
-    flex: 1;
-    min-width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: white;
-    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
-    box-shadow: 0 2px 8px rgba(147, 107, 251, 0.15);
-}
-
-/* Upload File button */
-.chapter-actions button:nth-child(1) {
-    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
-}
-
-/* Create Quiz button */
-.chapter-actions button:nth-child(2) {
-    background: linear-gradient(135deg, #a66aec 0%, #9b59b6 100%);
-}
-
-/* View Quizzes button */
-.chapter-actions button:nth-child(3) {
-    background: linear-gradient(135deg, #b86ad9 0%, #8e44ad 100%);
-}
-
-/* Edit button */
-.chapter-actions button:nth-child(4) {
-    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-}
-
-/* Delete button */
-.chapter-actions button:nth-child(5) {
-    background: linear-gradient(135deg, #d6336c 0%, #c2185b 100%);
-}
-
-.chapter-actions button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.25);
-    filter: brightness(1.1);
-}
-
-/* Special hover effect for delete button */
-.chapter-actions button:nth-child(5):hover {
-    box-shadow: 0 4px 15px rgba(214, 51, 108, 0.25);
-}
-
-.popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(91, 62, 150, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-}
-
-.popup-content {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 25px rgba(147, 107, 251, 0.15);
-    width: 90%;
-    max-width: 500px;
-    border: 1px solid rgba(147, 107, 251, 0.1);
-}
-
-.popup-content h3 {
-    margin: 0 0 1.5rem 0;
-    color: #5b3e96;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.popup-content input {
-    width: 100%;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #e2d8ff;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.popup-content input:focus {
-    outline: none;
-    border-color: #936bfb;
-    box-shadow: 0 0 0 3px rgba(147, 107, 251, 0.1);
-}
-
-.popup-buttons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
-
-.popup-buttons button {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    color: white;
-}
-
-.popup-buttons button:first-child {
-    background: linear-gradient(135deg, #936bfb 0%, #8e44ad 100%);
-}
-
-.popup-buttons button:first-child:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.2);
-    filter: brightness(1.1);
-}
-
-.popup-buttons button:last-child {
-    background: linear-gradient(135deg, #d6336c 0%, #c2185b 100%);
-}
-
-.popup-buttons button:last-child:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(214, 51, 108, 0.2);
-    filter: brightness(1.1);
+    text-align: center;
 }
 
 .card-actions {
@@ -307,15 +161,134 @@
 }
 
 .card-actions .delete-icon {
-    color: #d6336c;
+    color: #F7A8B8;
 }
 
 .card-actions .delete-icon:hover {
-    background-color: rgba(214, 51, 108, 0.1);
+    background-color: rgba(247, 168, 184, 0.1);
     transform: scale(1.1);
 }
 
 .card-actions svg {
     width: 16px;
     height: 16px;
+}
+
+.chapter-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.chapter-actions button {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: white;
+    background: linear-gradient(135deg, #936bfb 0%, #b794f6 100%);
+    box-shadow: 0 2px 8px rgba(147, 107, 251, 0.15);
+}
+
+.chapter-actions button:nth-child(2) {
+    background: linear-gradient(135deg, #F7A8B8 0%, #ffb7c5 100%);
+    box-shadow: 0 2px 8px rgba(247, 168, 184, 0.15);
+}
+
+.chapter-actions button:nth-child(3) {
+    background: linear-gradient(135deg, #936bfb 0%, #F7A8B8 100%);
+    box-shadow: 0 2px 8px rgba(147, 107, 251, 0.15);
+}
+
+.chapter-actions button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(247, 168, 184, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.popup-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(247, 168, 184, 0.15);
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid rgba(247, 168, 184, 0.1);
+}
+
+.popup-content h3 {
+    margin: 0 0 1.5rem 0;
+    color: #936bfb;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.popup-content input {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f8e1e7;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.popup-content input:focus {
+    outline: none;
+    border-color: #F7A8B8;
+    box-shadow: 0 0 0 3px rgba(247, 168, 184, 0.1);
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.popup-buttons button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: white;
+}
+
+.popup-buttons button:first-child {
+    background: linear-gradient(135deg, #936bfb 0%, #F7A8B8 100%);
+}
+
+.popup-buttons button:first-child:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(147, 107, 251, 0.2);
+    filter: brightness(1.1);
+}
+
+.popup-buttons button:last-child {
+    background: linear-gradient(135deg, #F7A8B8 0%, #ffb7c5 100%);
+}
+
+.popup-buttons button:last-child:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(247, 168, 184, 0.2);
+    filter: brightness(1.1);
 }

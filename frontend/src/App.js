@@ -11,6 +11,8 @@ import Dashboard from "./components/SubjectsDashboard";
 import ChapterList from "./components/ChapterList";
 import Login from "./components/Login";
 import UserModal from './components/UserModal';
+import AdminDashboard from './components/AdminDashboard';
+import Statistics from './components/Statistics';
 import './styles/App.css';
 
 const App = () => {
@@ -91,7 +93,11 @@ const App = () => {
         <>
           <Header setActivePage={setActivePage} setSelectedSubject={setSelectedSubject} onLogout={handleLogout} />
           <main>
-            {activePage === 'home' && <div className="home"></div>}
+            {activePage === 'home' && (
+              <div className="home">
+                <Statistics />
+              </div>
+            )}
 
             {activePage === 'subjects' && !selectedSubject && (
               <Dashboard
@@ -138,25 +144,25 @@ const App = () => {
               />
             )}
 
-{activePage === 'createQuiz' && selectedChapter && (
-  <QuizForm
-    chapter={selectedChapter}
-    goBack={() => {
-      setSelectedChapter(null);
-      setActivePage('chapters');
-    }}
-  />
-)}
+            {activePage === 'createQuiz' && selectedChapter && (
+              <QuizForm
+                chapter={selectedChapter}
+                goBack={() => {
+                  setSelectedChapter(null);
+                  setActivePage('chapters');
+                }}
+              />
+            )}
 
-{activePage === 'viewQuizzes' && selectedChapter && (
-  <ViewQuizzes  // Changed from ChapterQuizzes
-    chapter={selectedChapter}  // Changed from subject
-    goBack={() => {
-      setSelectedChapter(null);
-      setActivePage('chapters');
-    }}
-  />
-)}
+            {activePage === 'viewQuizzes' && selectedChapter && (
+              <ViewQuizzes  // Changed from ChapterQuizzes
+                chapter={selectedChapter}  // Changed from subject
+                goBack={() => {
+                  setSelectedChapter(null);
+                  setActivePage('chapters');
+                }}
+              />
+            )}
 
           </main>
           <Footer />
