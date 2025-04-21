@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { AntDesign } from "@expo/vector-icons"; // Using Expo icons for a back arrow
 
 export default function CourseListScreen() {
   const [isMenuVisible, setMenuVisible] = useState(false);
@@ -23,7 +24,7 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://192.168.54.241:5001/api/subjects"); // Replace with your actual API
+      const response = await fetch("http://192.168.1.56:5002/api/subjects");
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();
@@ -65,6 +66,14 @@ export default function CourseListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* ✅ Go Back Button */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <AntDesign name="arrowleft" size={24} color="#6C5B7B" />
+      </TouchableOpacity>
+
       <Text style={styles.header}>Explore Courses</Text>
 
       {loading ? (
@@ -74,10 +83,13 @@ export default function CourseListScreen() {
           data={courses}
           keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.courseItem} onPress={() => {
-              setSelectedCourse(item);
-              setMenuVisible(true);
-            }}>
+            <TouchableOpacity
+              style={styles.courseItem}
+              onPress={() => {
+                setSelectedCourse(item);
+                setMenuVisible(true);
+              }}
+            >
               <Text style={styles.courseName}>{item.name}</Text>
             </TouchableOpacity>
           )}
@@ -86,16 +98,27 @@ export default function CourseListScreen() {
 
       {/* ✅ Modal for Course Details */}
       {isMenuVisible && selectedCourse && (
-        <Modal transparent={true} animationType="fade" visible={isMenuVisible} onRequestClose={() => setMenuVisible(false)}>
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={isMenuVisible}
+          onRequestClose={() => setMenuVisible(false)}
+        >
           <View style={styles.modalBackground}>
             <View style={styles.menuContainer}>
               <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
 
-              <TouchableOpacity onPress={handleAddToMyCourses} style={styles.addButton}>
+              <TouchableOpacity
+                onPress={handleAddToMyCourses}
+                style={styles.addButton}
+              >
                 <Text style={styles.addButtonText}>Add to My Courses</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => setMenuVisible(false)} style={styles.closeButton}>
+              <TouchableOpacity
+                onPress={() => setMenuVisible(false)}
+                style={styles.closeButton}
+              >
                 <Text style={styles.menuText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -107,38 +130,95 @@ export default function CourseListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 20, backgroundColor: "#f5f5f5" },
-  header: { fontSize: 28, fontWeight: "700", marginVertical: 20, color: "#6C5B7B", textAlign: "center" },
-  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-  courseItem: {
-    padding: 18,
-    marginBottom: 12,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+  container: {
+    flex: 1,
+    backgroundColor: "#F0EBF8", // Matching main background
+    paddingHorizontal: 20,
   },
-  courseName: { fontSize: 20, fontWeight: "600", color: "#333" },
-  modalBackground: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" },
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginTop: 60,
+    marginBottom: 20,
+    color: "#333",
+    textAlign: "center",
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  courseItem: {
+    backgroundColor: "#fff",
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F67280", // Pink accent like challengeBtn
+    elevation: 3,
+  },
+  courseName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   menuContainer: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 24,
     borderRadius: 15,
     width: "90%",
     maxWidth: 400,
     alignItems: "center",
+    elevation: 5,
   },
-  modalTitle: { fontSize: 24, fontWeight: "700", color: "#6C5B7B", marginBottom: 12 },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#6C5B7B",
+    marginBottom: 16,
+    textAlign: "center",
+  },
   addButton: {
-    paddingVertical: 14,
-    backgroundColor: "#F9A826",
-    borderRadius: 8,
-    width: "100%",
+    marginTop: 10,
+    backgroundColor: "#F67280", // Same as challengeBtn
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
+    width: "100%",
   },
-  addButtonText: { fontSize: 16, color: "#fff", fontWeight: "600" },
-  closeButton: { paddingVertical: 14, marginTop: 12, backgroundColor: "#ccc", borderRadius: 8, width: "100%", alignItems: "center" },
-  menuText: { fontSize: 16, fontWeight: "600", color: "#333" },
+  addButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  closeButton: {
+    marginTop: 12,
+    backgroundColor: "#E0E0E0",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  menuText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+  },
 });

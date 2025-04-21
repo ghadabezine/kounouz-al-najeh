@@ -10,25 +10,16 @@ import {
   TextInput,
   ScrollView,
 } from "react-native";
-import { WebView } from "react-native-webview"; // Correct import for WebView
-import Icon from "react-native-vector-icons/MaterialIcons"; // or another icon set like FontAwesome
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 // Sample data
 const quizzes = [
-  { id: "1", title: "React Native Quiz #1", link: "https://example.com/quiz1" },
-  { id: "2", title: "React Native Quiz #2", link: "https://example.com/quiz2" },
+  { id: "1", title: "React Native Quiz #1" },
+  { id: "2", title: "React Native Quiz #2" },
 ];
 const exams = [
-  {
-    id: "1",
-    title: "React Native Final Exam",
-    link: "https://example.com/exam1",
-  },
-  {
-    id: "2",
-    title: "React Native Midterm Exam",
-    link: "https://example.com/exam2",
-  },
+  { id: "1", title: "React Native Final Exam" },
+  { id: "2", title: "React Native Midterm Exam" },
 ];
 const courses = [
   {
@@ -47,11 +38,10 @@ const courses = [
   },
 ];
 
-export default function CourseDetailScreen({ navigation }) {
+export default function CourseDetailScreen() {
   const [question, setQuestion] = useState("");
   const [qna, setQna] = useState([]);
   const [rating, setRating] = useState(0);
-  const [showVideo, setShowVideo] = useState(false); // State to control video display
 
   const handleAskQuestion = () => {
     if (question) {
@@ -83,70 +73,62 @@ export default function CourseDetailScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Courses Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Available Courses</Text>
+        {/* Course Section */}
+        <View style={styles.container}>
+          <Text style={styles.header}>Courses</Text>
           <FlatList
             data={courses}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.card}>
-                <Text style={styles.cardText}>{item.title}</Text>
-                <Text style={styles.cardDescription}>{item.description}</Text>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{item.title}</Text>
+                </View>
+                <Text style={styles.cardText}>{item.description}</Text>
                 <TouchableOpacity
-                  onPress={() => setShowVideo(true)} // Set showVideo to true when clicked
-                  style={styles.askButton}
+                  onPress={() => alert("Course PDF link: " + item.pdfLink)}
+                  style={styles.challengeBtn}
                 >
-                  <Text style={styles.askButtonText}>View Course PDF</Text>
+                  <Text style={styles.cardText}>View Course PDF</Text>
                 </TouchableOpacity>
               </View>
             )}
           />
         </View>
 
-        {/* Old Quizzes */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Old Quizzes</Text>
+        {/* Quizzes Section */}
+        <View style={styles.container}>
+          <Text style={styles.header}>Quizzes</Text>
           <FlatList
             data={quizzes}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
+              <View style={styles.card}>
                 <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
+              </View>
             )}
           />
         </View>
 
-        {/* Past Exams */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Past Exams</Text>
+        {/* Exams Section */}
+        <View style={styles.container}>
+          <Text style={styles.header}>Exams</Text>
           <FlatList
             data={exams}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={
-                  () => navigation.navigate("WebView", { link: item.link }) // Correct navigation to WebView
-                }
-                style={styles.card}
-              >
+              <View style={styles.card}>
                 <Text style={styles.cardText}>{item.title}</Text>
-              </TouchableOpacity>
+              </View>
             )}
           />
         </View>
 
         {/* Q&A Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ask a Question</Text>
+        <View style={styles.container}>
+          <Text style={styles.header}>Ask a Question</Text>
           <TextInput
             style={styles.input}
             placeholder="Ask your question here..."
@@ -155,26 +137,26 @@ export default function CourseDetailScreen({ navigation }) {
           />
           <TouchableOpacity
             onPress={handleAskQuestion}
-            style={styles.askButton}
+            style={styles.challengeBtn}
           >
-            <Text style={styles.askButtonText}>Ask Question</Text>
+            <Text style={styles.cardText}>Ask Question</Text>
           </TouchableOpacity>
         </View>
 
         {/* Display Q&A */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Student Questions</Text>
+        <View style={styles.container}>
+          <Text style={styles.header}>Student Questions</Text>
           <FlatList
             data={qna}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View style={styles.qnaCard}>
-                <Text style={styles.qnaQuestion}>{item.question}</Text>
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>{item.question}</Text>
                 <FlatList
                   data={item.answers}
                   keyExtractor={(answer, index) => index.toString()}
                   renderItem={({ item }) => (
-                    <Text style={styles.qnaAnswer}>{item}</Text>
+                    <Text style={styles.cardText}>{item}</Text>
                   )}
                 />
                 <View style={styles.qnaActions}>
@@ -196,9 +178,9 @@ export default function CourseDetailScreen({ navigation }) {
           />
         </View>
 
-        {/* Course Rating */}
-        <View style={styles.ratingContainer}>
-          <Text style={styles.sectionTitle}>Rate this Course</Text>
+        {/* Course Rating Section */}
+        <View style={styles.container}>
+          <Text style={styles.header}>Rate this Course</Text>
           <View style={styles.rating}>
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity key={star} onPress={() => handleRating(star)}>
@@ -217,40 +199,47 @@ export default function CourseDetailScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    paddingTop: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#F0EBF8", // Match your app's background
   },
   scrollContainer: {
-    paddingBottom: 20,
+    padding: 20,
+    paddingBottom: 40,
   },
-  section: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
+  container: {
+    padding: 16,
+    backgroundColor: "#f4f4f8",
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#6C5B7B", // Soft purple
-    marginBottom: 10,
+  header: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#333",
   },
   card: {
     backgroundColor: "#fff",
-    padding: 15,
+    marginBottom: 16,
+    padding: 16,
     borderRadius: 8,
-    marginBottom: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: "#D4C9BE",
     elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+    color: "#333",
   },
   cardText: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#6C5B7B", // Soft purple
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#555",
-    marginVertical: 5,
+    color: "#fff",
   },
   input: {
     height: 50,
@@ -260,33 +249,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
   },
-  askButton: {
-    backgroundColor: "#F9A826", // Golden Yellow
-    padding: 15,
-    borderRadius: 8,
+  challengeBtn: {
+    marginTop: 10,
+    backgroundColor: "#5A72A0", // Updated to match the color palette
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
     alignItems: "center",
-  },
-  askButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  qnaCard: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 3,
-  },
-  qnaQuestion: {
-    fontWeight: "bold",
-    fontSize: 16,
-    color: "#6C5B7B", // Soft purple
-  },
-  qnaAnswer: {
-    fontSize: 14,
-    color: "#555",
-    marginLeft: 10,
-    marginTop: 5,
   },
   qnaActions: {
     flexDirection: "row",
@@ -295,10 +264,6 @@ const styles = StyleSheet.create({
   },
   qnaActionButton: {
     padding: 5,
-  },
-  ratingContainer: {
-    alignItems: "center",
-    marginTop: 20,
   },
   rating: {
     flexDirection: "row",

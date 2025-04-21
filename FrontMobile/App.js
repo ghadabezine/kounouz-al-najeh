@@ -1,9 +1,13 @@
+import "react-native-reanimated"; // Important for Reanimated
 import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 
+// Screens
 import Login from "./components/SignInScreen";
 import Register from "./components/RegisterScreen";
 import HomeScreen from "./components/HomeScreen";
@@ -12,16 +16,18 @@ import ProfileScreen from "./components/ProfileScreen";
 import CourseDetailScreen from "./components/CourseDetailScreen";
 import QuizScreen from "./components/QuizScreen";
 import ExamScreen from "./components/ExamScreen";
-import CourseListScreen from "./components/CourseListScreen"; // Explore Courses
-
-import GenerateQuizScreen from "./components/GenerateQuizScreen";
-
+import CourseListScreen from "./components/CourseListScreen";
 import EditProfileScreen from "./components/EditProfileScreen";
+import QuickBrainQuiz from "./components/QuickBrainQuiz";
+import QuizResult from "./components/QuizResult";
+import GPACalculatorScreen from "./components/GPACalculator";
 
+// Navigators
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
-/** ✅ Bottom Tabs Navigation */
+// ✅ Bottom Tab Navigator
 function BottomTabs() {
   return (
     <Tab.Navigator
@@ -29,7 +35,6 @@ function BottomTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === "Home") iconName = "home";
-
           else if (route.name === "Courses") iconName = "book";
           else if (route.name === "Profile") iconName = "person";
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -37,6 +42,7 @@ function BottomTabs() {
         tabBarActiveTintColor: "#007bff",
         tabBarInactiveTintColor: "gray",
         tabBarStyle: { backgroundColor: "#fff", paddingBottom: 5, height: 60 },
+        headerShown: false,
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
@@ -46,15 +52,28 @@ function BottomTabs() {
   );
 }
 
-/** ✅ Main App with Authentication Handling */
+// ✅ Drawer Navigator
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="Home"
+    >
+      <Drawer.Screen name="Home" component={BottomTabs} />
+      <Drawer.Screen name="All Courses" component={CourseListScreen} />
+      <Drawer.Screen name="Quick Quiz" component={QuickBrainQuiz} />
+    </Drawer.Navigator>
+  );
+}
+
+// ✅ Main App Component
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    /** ✅ Check for authentication token */
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem("token");
-      setIsAuthenticated(!!token); // ✅ Set true if token exists
+      setIsAuthenticated(!!token);
     };
     checkLoginStatus();
   }, []);
@@ -62,29 +81,34 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* ✅ Show Login/Register if NOT authenticated */}
         {!isAuthenticated ? (
           <>
             <Stack.Screen name="Login">
-              {(props) => <Login {...props} setIsAuthenticated={setIsAuthenticated} />}
+              {(props) => (
+                <Login {...props} setIsAuthenticated={setIsAuthenticated} />
+              )}
             </Stack.Screen>
             <Stack.Screen name="Register" component={Register} />
           </>
         ) : (
           <>
-            {/* ✅ Show Bottom Tabs if Authenticated */}
-            <Stack.Screen name="Main" component={BottomTabs} />
-            <Stack.Screen name="CourseList" component={CourseListScreen} />
-            <Stack.Screen name="CourseDetailScreen" component={CourseDetailScreen} />
+            {/* Main Authenticated App with Drawer and Tabs */}
+            <Stack.Screen name="Home" component={DrawerNavigator} />
+
+            {/* Screens outside of tabs/drawers */}
+            <Stack.Screen
+              name="CourseDetailScreen"
+              component={CourseDetailScreen}
+            />
             <Stack.Screen name="QuizScreen" component={QuizScreen} />
             <Stack.Screen name="ExamScreen" component={ExamScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-            <Stack.Screen name="MyCoursesScreen" component={MyCoursesScreen} />
-            <Stack.Screen name="GenerateQuizScreen" component={GenerateQuizScreen} />
-
-
-
+            <Stack.Screen name="QuickBrainQuiz" component={QuickBrainQuiz} />
+            <Stack.Screen name="QuizResult" component={QuizResult} />
+            <Stack.Screen
+              name="GPACalculator"
+              component={GPACalculatorScreen}
+            />
           </>
         )}
       </Stack.Navigator>

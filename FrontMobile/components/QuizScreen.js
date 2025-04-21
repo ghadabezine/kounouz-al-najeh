@@ -1,103 +1,162 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
 } from "react-native";
 
-export default function QuizScreen() {
-  const [loading, setLoading] = useState(false);
-  const [quiz, setQuiz] = useState(null);
+export default function GenerateQuizScreen({ route }) {
+  const { subjectId } = route.params;
 
-  const generateQuiz = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setQuiz([
-        {
-          question: "What is React Native?",
-          answer: "A framework for building mobile apps using React.",
-        },
-        {
-          question: "What is State in React?",
-          answer:
-            "State is a built-in object that holds data about a component.",
-        },
-      ]);
-      setLoading(false);
-    }, 2000); // Simulating AI quiz generation
+  const [quiz, setQuiz] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const response = await fetch(
+          "http://192.168.1.56:5002/api/quizzes/generate-quiz",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subjectId }),
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to generate quiz.");
+        const data = await response.json();
+        if (!data.quiz || !Array.isArray(data.quiz) || data.quiz.length === 0) {
+          throw new Error("No questions received.");
+        }
+        setQuiz(data.quiz);
+      } catch (error) {
+        console.error("❌ Error fetching quiz:", error);
+        Alert.alert("Error", error.message || "Failed to load quiz");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [subjectId]);
+
+  const handleNext = () => {
+    if (currentIndex < quiz.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedOption(null);
+    } else {
+      Alert.alert("🎉 Quiz Complete", "You've completed the quiz!");
+    }
+  };
+
+  const handleOptionSelect = (option) => {
+    if (!selectedOption) setSelectedOption(option);
+  };
+
+  const currentQuestion = quiz[currentIndex];
+
+  const getOptionText = (opt) => {
+    // Extracts just "mode" from "D. mode"
+    return opt.split(". ")[1]?.trim();
+  };
+
+  const getOptionStyle = (opt) => {
+    const actualText = getOptionText(opt);
+    const isCorrect = actualText === currentQuestion.answer;
+    const isSelected = opt === selectedOption;
+
+    if (!selectedOption) return styles.option;
+    if (isCorrect) return [styles.option, styles.correctAnswer];
+    if (isSelected && !isCorrect) return [styles.option, styles.wrongAnswer];
+
+    return styles.option;
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>AI-Generated Quiz</Text>
-
+    <ScrollView contentContainerStyle={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color="#F9A826" style={styles.loader} />
-      ) : quiz ? (
-        quiz.map((q, index) => (
-          <View key={index} style={styles.quizCard}>
-            <Text style={styles.question}>{q.question}</Text>
-            <Text style={styles.answer}>{q.answer}</Text>
-          </View>
-        ))
+        <ActivityIndicator size="large" color="#6C5B7B" />
+      ) : currentQuestion ? (
+        <>
+          <Text style={styles.question}>{currentQuestion.question}</Text>
+
+          {currentQuestion.options.map((opt, index) => (
+            <TouchableOpacity
+              key={index}
+              style={getOptionStyle(opt)}
+              onPress={() => handleOptionSelect(opt)}
+              disabled={selectedOption !== null}
+            >
+              <Text style={styles.optionText}>{opt}</Text>
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        </>
       ) : (
-        <TouchableOpacity onPress={generateQuiz} style={styles.generateButton}>
-          <Text style={styles.generateButtonText}>Generate Quiz</Text>
-        </TouchableOpacity>
+        <Text style={styles.errorText}>No questions available.</Text>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+    flexGrow: 1,
     justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#6C5B7B", // Soft purple
-  },
-  loader: {
-    marginVertical: 20,
-  },
-  quizCard: {
-    backgroundColor: "#f9f9f9",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
   },
   question: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 20,
+    marginBottom: 20,
+    fontWeight: "600",
     color: "#333",
-    marginBottom: 5,
   },
-  answer: {
-    fontSize: 14,
-    color: "#555",
-  },
-  generateButton: {
-    backgroundColor: "#F9A826", // Golden yellow
+  option: {
+    backgroundColor: "#fff",
     padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    marginVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
-  generateButtonText: {
-    color: "#fff",
+  correctAnswer: {
+    backgroundColor: "#C8E6C9", // light green
+    borderColor: "#4CAF50",
+  },
+  wrongAnswer: {
+    backgroundColor: "#FFCDD2", // light red
+    borderColor: "#F44336",
+  },
+  optionText: {
     fontSize: 16,
+    color: "#333",
+  },
+  nextButton: {
+    marginTop: 20,
+    backgroundColor: "#6C5B7B",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  nextButtonText: {
+    color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
+  },
+  errorText: {
+    fontSize: 18,
+    textAlign: "center",
+    color: "red",
   },
 });
+``;
