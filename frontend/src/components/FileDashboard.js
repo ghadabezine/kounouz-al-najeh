@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../styles/FileDashboard.css";
 
-const FileDashboard = ({ subject, goBack }) => {
+const FileDashboard = ({ chapter, goBack }) => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState([]);
@@ -10,12 +10,12 @@ const FileDashboard = ({ subject, goBack }) => {
   const [newFilename, setNewFilename] = useState("");
 
   useEffect(() => {
-    if (subject) fetchFiles();
-  }, [subject]);
+    if (chapter) fetchFiles();
+  }, [chapter]);
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/api/files/subject/${subject._id}`);
+      const res = await axios.get(`http://localhost:5001/api/files/${chapter._id}/files`);
       setFiles(res.data);
     } catch (err) {
       console.error("❌ Error fetching files:", err);
@@ -30,10 +30,12 @@ const FileDashboard = ({ subject, goBack }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("subjectId", subject._id);
 
     try {
-      const res = await axios.post("http://localhost:5001/api/files/upload", formData);
+      const res = await axios.post(
+        `http://localhost:5001/api/files/${chapter._id}/files`,
+        formData
+      );
       if (res.status === 201) {
         setMessage("✅ File uploaded successfully!");
         setFile(null);
@@ -47,9 +49,9 @@ const FileDashboard = ({ subject, goBack }) => {
     }
   };
 
-  const handleDelete = async (filename) => {
+  const handleDelete = async (fileId) => {
     try {
-      await axios.delete(`http://localhost:5001/api/files/${filename}`);
+      await axios.delete(`http://localhost:5001/api/files/${fileId}`);
       alert("✅ File deleted!");
       fetchFiles();
     } catch (err) {
@@ -67,22 +69,21 @@ const FileDashboard = ({ subject, goBack }) => {
       alert("❌ Filename cannot be empty.");
       return;
     }
-
     try {
-      await axios.patch(`http://localhost:5001/api/files/${editingFile}`, { newFilename });
+      await axios.patch(`http://localhost:5001/api/files/${editingFile}`, {
+        newFilename,
+      });
       alert("✅ Filename updated!");
       setEditingFile(null);
       fetchFiles();
     } catch (err) {
-      console.error("❌ Error updating filename:", err);
       alert("❌ Failed to update filename.");
     }
   };
 
   return (
     <div className="upload-container">
-      <h2>{subject.name}</h2>
-
+      <h2>{chapter.name}</h2>
       <form onSubmit={handleUpload} className="form">
         <input type="file" onChange={handleFileChange} className="input-file" />
         <div className="button-group">
@@ -90,9 +91,7 @@ const FileDashboard = ({ subject, goBack }) => {
           <button type="button" onClick={goBack} className="button-secondary">Back</button>
         </div>
       </form>
-
       {message && <p className="message">{message}</p>}
-
       <h3>Existing Files:</h3>
       {files.length > 0 ? (
         <ul className="file-list">
@@ -112,12 +111,16 @@ const FileDashboard = ({ subject, goBack }) => {
                 </>
               ) : (
                 <>
-                  <a href={`http://localhost:5001/api/files/${file._id}`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={`http://localhost:5001/api/files/${file._id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {file.filename}
                   </a>
                   <div className="button-container">
                     <button className="edit-btn" onClick={() => handleEdit(file)}>Edit</button>
-                    <button className="delete-btn" onClick={() => handleDelete(file.filename)}>Delete</button>
+                    <button className="delete-btn" onClick={() => handleDelete(file._id)}>Delete</button>
                   </div>
                 </>
               )}
@@ -125,7 +128,7 @@ const FileDashboard = ({ subject, goBack }) => {
           ))}
         </ul>
       ) : (
-        <p>No files uploaded for this subject.</p>
+        <p>No files uploaded for this chapter.</p>
       )}
     </div>
   );

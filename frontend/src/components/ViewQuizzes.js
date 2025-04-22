@@ -3,24 +3,26 @@ import axios from 'axios';
 import logo from '../assets/logo.jpg';
 import '../styles/viewQuizzes.css';
 
-const ViewQuizzes = ({ subject, goBack }) => {
+const ViewQuizzes = ({ chapter, goBack }) => {
     const [quizzes, setQuizzes] = useState([]);
     const [expandedQuiz, setExpandedQuiz] = useState(null);
     const [editingQuestion, setEditingQuestion] = useState(null);
     const [editingQuiz, setEditingQuiz] = useState(null);
-
-    // Fetch quizzes for the selected subject
-    useEffect(() => {
-        const fetchQuizzes = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5001/api/quizzes?subject=${subject._id}`);
-                setQuizzes(response.data);
-            } catch (error) {
-                console.error('Error fetching quizzes:', error);
-            }
-        };
-        fetchQuizzes();
-    }, [subject]);
+// Change from subject-based to chapter-based fetching
+useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5001/api/quizzes/${chapter._id}/quizzes`
+        );
+        setQuizzes(response.data);
+      } catch (error) {
+        console.error('Error fetching quizzes:', error);
+      }
+    };
+    fetchQuizzes();
+  }, [chapter]);  // Changed from [subject]
+  
 
     // Toggle quiz expansion
     const toggleQuiz = (quizId) => {
@@ -128,7 +130,8 @@ const ViewQuizzes = ({ subject, goBack }) => {
             </div>
 
             {/* Page title */}
-            <h1 className="title">Quizzes for {subject.name}</h1>
+            <h1 className="title">Quizzes for {chapter.name}</h1>
+
 
             {/* Quizzes list */}
             <div className="quiz-list">

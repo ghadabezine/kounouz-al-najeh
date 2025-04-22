@@ -65,21 +65,19 @@ function QuizForm({ chapter, goBack }) {
       }
     }
 
-  
     try {
       const formattedQuestions = questions.map(q => ({
         questionText: q.questionText,
         options: q.options,
         correctAnswer: q.options[q.correctAnswerIndex]
       }));
-  
-      // FIX: Use the proper URL structure matching your backend routes
-      const response = await axios.post(`http://localhost:5001/api/quizzes/${chapter._id}/quizzes`, {
+
+      const response = await axios.post('http://localhost:5001/api/quizzes', {
         title,
+        chapter: chapter._id, // <-- use chapter here
         questions: formattedQuestions,
-        // Chapter ID is now in the URL, not needed in body
       });
-  
+
       alert(`✅ Quiz Created: ${response.data._id}`);
       goBack();
     } catch (err) {

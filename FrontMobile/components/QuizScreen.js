@@ -9,31 +9,37 @@ import {
   ScrollView,
 } from "react-native";
 
-export default function GenerateQuizScreen({ route }) {
-  const { subjectId } = route.params;
+export default function GenerateQuizScreen({ route, navigation }) {
+  const { chapterId, quiz: passedQuiz } = route.params;
 
   const [quiz, setQuiz] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      if (passedQuiz) {
+        setQuiz(passedQuiz);
+        setLoading(false);
+        return;
+      }
+
       try {
-        const response = await fetch(
-          "http://192.168.100.7:5002/generate-quiz",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ subjectId }),
-          }
-        );
+        const response = await fetch("http://192.168.100.7:5002/generate-quiz", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chapterId }),
+        });
 
         if (!response.ok) throw new Error("Failed to generate quiz.");
         const data = await response.json();
+
         if (!data.quiz || !Array.isArray(data.quiz) || data.quiz.length === 0) {
           throw new Error("No questions received.");
         }
+
         setQuiz(data.quiz);
       } catch (error) {
         console.error("❌ Error fetching quiz:", error);
@@ -44,36 +50,48 @@ export default function GenerateQuizScreen({ route }) {
     };
 
     fetchQuiz();
-  }, [subjectId]);
+  }, [chapterId]);
+
+  const handleOptionSelect = (option) => {
+    if (selectedOption) return;
+
+    const letter = option.split(".")[0].trim();
+    const isCorrect = letter === quiz[currentIndex].answer;
+
+    const updatedQuiz = [...quiz];
+    updatedQuiz[currentIndex].userAnswer = letter;
+
+    setQuiz(updatedQuiz);
+    if (isCorrect) setScore(score + 1);
+    setSelectedOption(option);
+  };
 
   const handleNext = () => {
     if (currentIndex < quiz.length - 1) {
       setCurrentIndex(currentIndex + 1);
       setSelectedOption(null);
     } else {
-      Alert.alert("🎉 Quiz Complete", "You've completed the quiz!");
+      navigation.navigate("QuizResultScreen", {
+        quiz,
+        score,
+      });
     }
-  };
-
-  const handleOptionSelect = (option) => {
-    if (!selectedOption) setSelectedOption(option);
   };
 
   const currentQuestion = quiz[currentIndex];
 
-  const getOptionText = (opt) => {
-    // Extracts just "mode" from "D. mode"
-    return opt.split(". ")[1]?.trim();
-  };
-
   const getOptionStyle = (opt) => {
-    const actualText = getOptionText(opt);
-    const isCorrect = actualText === currentQuestion.answer;
-    const isSelected = opt === selectedOption;
+    const selected = selectedOption === opt;
+    const letter = opt.split(".")[0].trim();
+    const isCorrect = letter === currentQuestion.answer;
 
-    if (!selectedOption) return styles.option;
-    if (isCorrect) return [styles.option, styles.correctAnswer];
-    if (isSelected && !isCorrect) return [styles.option, styles.wrongAnswer];
+    if (!selectedOption) {
+      return selected ? [styles.option, styles.selectedOption] : styles.option;
+    }
+
+    if (selected && isCorrect) return [styles.option, styles.correctAnswer];
+    if (selected && !isCorrect) return [styles.option, styles.wrongAnswer];
+    if (!selected && isCorrect) return [styles.option, styles.correctAnswer];
 
     return styles.option;
   };
@@ -84,7 +102,9 @@ export default function GenerateQuizScreen({ route }) {
         <ActivityIndicator size="large" color="#6C5B7B" />
       ) : currentQuestion ? (
         <>
-          <Text style={styles.question}>{currentQuestion.question}</Text>
+          <Text style={styles.question}>
+            {currentIndex + 1}. {currentQuestion.question}
+          </Text>
 
           {currentQuestion.options.map((opt, index) => (
             <TouchableOpacity
@@ -98,7 +118,9 @@ export default function GenerateQuizScreen({ route }) {
           ))}
 
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>Next</Text>
+            <Text style={styles.nextButtonText}>
+              {currentIndex === quiz.length - 1 ? "Finish" : "Next"}
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -129,12 +151,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
+  selectedOption: {
+    backgroundColor: "#D1C4E9", // 🟣 Purple
+    borderColor: "#673AB7",
+  },
   correctAnswer: {
-    backgroundColor: "#C8E6C9", // light green
+    backgroundColor: "#C8E6C9", // ✅ Green
     borderColor: "#4CAF50",
   },
   wrongAnswer: {
-    backgroundColor: "#FFCDD2", // light red
+    backgroundColor: "#FFCDD2", // ❌ Red
     borderColor: "#F44336",
   },
   optionText: {
@@ -159,4 +185,3 @@ const styles = StyleSheet.create({
     color: "red",
   },
 });
-``;

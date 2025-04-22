@@ -1,4 +1,3 @@
-// models/Quiz.js
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
@@ -9,9 +8,9 @@ const questionSchema = new mongoose.Schema({
 
 const quizSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  subject: {
+  chapter: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Subject",  
+    ref: "Chapter",  
     required: true,
   },
   questions: [questionSchema],

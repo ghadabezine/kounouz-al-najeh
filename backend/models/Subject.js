@@ -5,6 +5,13 @@ const SubjectSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  chapters: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Chapter",
+      default: [],
+    },
+  ],
   resources: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -14,7 +21,7 @@ const SubjectSchema = new mongoose.Schema({
   quizzes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Quiz", // Reference to the quizzes collection
+      ref: "Quiz",
     },
   ],
 }, { timestamps: true });

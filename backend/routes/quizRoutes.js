@@ -1,24 +1,23 @@
 const express = require("express");
-const { createQuiz, getQuizzesBySubject, deleteQuiz, deleteQuestion, editQuestion, updateQuiz } = require("../controllers/QuizController");
+const {
+  createQuiz,
+  getQuizzesByChapter,
+  updateQuiz,
+  deleteQuiz
+} = require("../controllers/QuizController");
 
 const router = express.Router();
 
-// Create a new quiz
-router.post("/", createQuiz);
+// Create a new quiz for a chapter
+router.post("/:chapterId/quizzes", createQuiz);
 
-// Get quizzes by subject
-router.get("/", getQuizzesBySubject);
+// Get quizzes by chapter
+router.get("/:chapterId/quizzes", getQuizzesByChapter);
+
+// Update a quiz
+router.put("/quizzes/:quizId", updateQuiz);
 
 // Delete a quiz
-router.delete("/:quizId", deleteQuiz);
-
-// Delete a question from a quiz
-router.delete("/:quizId/questions/:questionIndex", deleteQuestion);
-
-// Edit a question in a quiz
-router.put("/:quizId/questions/:questionIndex", editQuestion);
-
-// Update a quiz (add or modify questions)
-router.put("/:quizId", updateQuiz);
+router.delete("/quizzes/:quizId", deleteQuiz);
 
 module.exports = router;

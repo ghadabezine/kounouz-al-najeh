@@ -1,16 +1,32 @@
 const express = require("express");
-const multer = require("multer");
-const { uploadFile, getFiles, getFile, deleteFile, updateFilename,getFilesBySubject } = require("../controllers/FileController"); // ✅ Check this path
-
 const router = express.Router();
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = require("../middleware/upload");
+const {
+  uploadFile,
+  getFilesByChapter,
+  deleteFile,
+} = require("../controllers/FileController");
+const mongoose = require("mongoose");
+const { connectDB } = require("../config/db");
 
-// ✅ Route definitions
-router.post("/upload", upload.single("file"), uploadFile); // ✅ Works if uploadFile is defined
-router.get("/", getFiles);                                // 🚩 The error points here
-router.get("/:filename", getFile);                         // ✅ Make sure getFile is defined
-router.delete("/:filename", deleteFile);                   // ✅ deleteFile should be defined
-router.patch("/:filename", updateFilename);                // ✅ updateFilename should be defined
-router.get("/subject/:subjectId", getFilesBySubject);
+// Existing File Routes
+router.post("/:chapterId/files", upload.single("file"), uploadFile);
+router.get("/:chapterId/files", getFilesByChapter);
+router.delete("/files/:fileId", deleteFile);
+
+// ✅ Add this route at the bottom of this file:
+router.get("/view/:fileId", async (req, res) => {
+  try {
+    const { gridFSBucket } = await connectDB(); // Make sure this returns the bucket
+    const fileId = new mongoose.Types.ObjectId(req.params.fileId);
+    const downloadStream = gridFSBucket.openDownloadStream(fileId);
+
+    res.set("Content-Type", "application/pdf");
+    downloadStream.pipe(res);
+  } catch (error) {
+    console.error("Error streaming file:", error);
+    res.status(500).json({ error: "Failed to stream file" });
+  }
+});
+
 module.exports = router;

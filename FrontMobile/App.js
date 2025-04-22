@@ -6,6 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
+import QuizResultScreen from "./components/QuizResultScreen";
 
 // Screens
 import Login from "./components/SignInScreen";
@@ -105,6 +106,8 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="QuickBrainQuiz" component={QuickBrainQuiz} />
             <Stack.Screen name="QuizResult" component={QuizResult} />
+            <Stack.Screen name="QuizResultScreen" component={QuizResultScreen} />
+
             <Stack.Screen
               name="GPACalculator"
               component={GPACalculatorScreen}

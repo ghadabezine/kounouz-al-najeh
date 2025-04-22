@@ -6,17 +6,18 @@ import os
 app = Flask(__name__)
 openai.api_key = "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"
 
-NODE_BACKEND_URL = "http://localhost:5001"  # Use local IP if Flask runs on another machine
+# 🔧 Update to use local IP if Node.js is running on a different machine
+NODE_BACKEND_URL = "http://192.168.100.7:5001"  # Replace with actual IP if needed
 
-def fetch_and_concatenate_content(subject_id):
+def fetch_and_concatenate_content(chapter_id):
     try:
-        url = f"{NODE_BACKEND_URL}/subject/{subject_id}"
+        url = f"{NODE_BACKEND_URL}/api/files/{chapter_id}/files"
         print(f"🌐 Requesting parsed files from Node.js: {url}")
         response = requests.get(url)
 
         print(f"🔁 Node.js responded with status: {response.status_code}")
         if response.status_code != 200:
-            raise Exception(f"Failed to fetch files for subjectId: {subject_id}")
+            raise Exception(f"Failed to fetch files for chapterId: {chapter_id}")
 
         files = response.json()
         print(f"📂 Received {len(files)} file(s)")
@@ -25,7 +26,7 @@ def fetch_and_concatenate_content(subject_id):
         print(f"📜 Combined content length: {len(combined)}")
 
         if not combined:
-            raise Exception("No extractable content found in subject resources.")
+            raise Exception("No extractable content found in chapter resources.")
         return combined
     except Exception as e:
         print(f"❌ Error fetching content: {e}")
@@ -69,16 +70,16 @@ Respond in JSON like:
 def generate_quiz():
     try:
         print("📩 POST /generate-quiz called")
-        data = request.get_json()
+        data = request.get_json(force=True)
         print("📦 Raw request data:", data)
 
-        subject_id = data.get("subjectId")
-        print("🔍 Extracted subjectId:", subject_id)
+        chapter_id = data.get("chapterId")
+        print("🔍 Extracted chapterId:", chapter_id)
 
-        if not subject_id:
-            return jsonify({"error": "Missing subjectId"}), 400
+        if not chapter_id:
+            return jsonify({"error": "Missing chapterId"}), 400
 
-        content = fetch_and_concatenate_content(subject_id)
+        content = fetch_and_concatenate_content(chapter_id)
         quiz = generate_quiz_with_openai(content)
         print("🎉 Quiz generated successfully!")
         return jsonify({"quiz": quiz})

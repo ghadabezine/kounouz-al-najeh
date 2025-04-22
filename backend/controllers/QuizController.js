@@ -1,136 +1,92 @@
 const Quiz = require("../models/quizModel");
-const Subject = require("../models/Subject");
+const Chapter = require("../models/Chapter");
 
-// Create a new quiz
+// Create a new quiz for a chapter
 const createQuiz = async (req, res) => {
-    try {
-        const { title, questions, subject } = req.body;
+  try {
+    const { chapterId } = req.params;
+    const { title, questions } = req.body;
 
-        const subjectDoc = await Subject.findById(subject);
-        if (!subjectDoc) {
-            return res.status(404).json({ error: "Subject not found." });
-        }
+    const chapter = await Chapter.findById(chapterId);
+    if (!chapter) return res.status(404).json({ error: "Chapter not found" });
 
-        const quiz = new Quiz({ title, subject, questions });
-        await quiz.save();
+    const quiz = new Quiz({
+      title,
+      chapter: chapterId,
+      questions: questions.map(q => ({
+        questionText: q.questionText,
+        options: q.options,
+        correctAnswer: q.correctAnswer
+      }))
+    });
 
-        subjectDoc.quizzes.push(quiz._id);
-        await subjectDoc.save();
+    await quiz.save();
+    chapter.quizzes.push(quiz._id);
+    await chapter.save();
 
-        res.status(201).json(quiz);
-    } catch (err) {
-        console.error("❌ Error creating quiz:", err);
-        res.status(500).json({ error: "Failed to create quiz." });
-    }
+    res.status(201).json(quiz);
+  } catch (err) {
+    console.error("Quiz creation error:", err);
+    res.status(500).json({ error: "Failed to create quiz" });
+  }
 };
 
-// Get quizzes by subject
-const getQuizzesBySubject = async (req, res) => {
-    try {
-        const { subject } = req.query;
-        const quizzes = await Quiz.find({ subject });
-        res.status(200).json(quizzes);
-    } catch (err) {
-        console.error("❌ Error fetching quizzes:", err);
-        res.status(500).json({ error: "Failed to fetch quizzes." });
-    }
+// Get quizzes by chapter
+const getQuizzesByChapter = async (req, res) => {
+  try {
+    const { chapterId } = req.params;
+    const quizzes = await Quiz.find({ chapter: chapterId })
+      .populate('chapter', 'name')
+      .sort({ createdAt: -1 });
+    res.json(quizzes);
+  } catch (err) {
+    console.error("Quiz fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch quizzes" });
+  }
+};
+
+// Update a quiz
+const updateQuiz = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+    const { title, questions } = req.body;
+
+    const quiz = await Quiz.findByIdAndUpdate(
+      quizId,
+      { title, questions },
+      { new: true, runValidators: true }
+    );
+
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+    res.json(quiz);
+  } catch (err) {
+    console.error("Quiz update error:", err);
+    res.status(500).json({ error: "Failed to update quiz" });
+  }
 };
 
 // Delete a quiz
 const deleteQuiz = async (req, res) => {
-    try {
-        const { quizId } = req.params;
-        const quiz = await Quiz.findByIdAndDelete(quizId);
-        if (!quiz) {
-            return res.status(404).json({ error: "Quiz not found." });
-        }
+  try {
+    const { quizId } = req.params;
+    const quiz = await Quiz.findByIdAndDelete(quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
 
-        // Remove the quiz reference from the subject
-        await Subject.updateOne(
-            { _id: quiz.subject },
-            { $pull: { quizzes: quizId } }
-        );
+    await Chapter.findByIdAndUpdate(
+      quiz.chapter,
+      { $pull: { quizzes: quizId } }
+    );
 
-        res.status(200).json({ message: "Quiz deleted successfully." });
-    } catch (err) {
-        console.error("❌ Error deleting quiz:", err);
-        res.status(500).json({ error: "Failed to delete quiz." });
-    }
+    res.json({ message: "Quiz deleted successfully" });
+  } catch (err) {
+    console.error("Quiz deletion error:", err);
+    res.status(500).json({ error: "Failed to delete quiz" });
+  }
 };
 
-// Delete a question from a quiz
-const deleteQuestion = async (req, res) => {
-    try {
-        const { quizId, questionIndex } = req.params;
-        const quiz = await Quiz.findById(quizId);
-        if (!quiz) {
-            return res.status(404).json({ error: "Quiz not found." });
-        }
-
-        // Validate question index
-        if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
-            return res.status(400).json({ error: "Invalid question index." });
-        }
-
-        // Remove the question at the specified index
-        quiz.questions.splice(questionIndex, 1);
-        await quiz.save();
-
-        res.status(200).json({ message: "Question deleted successfully." });
-    } catch (err) {
-        console.error("❌ Error deleting question:", err);
-        res.status(500).json({ error: "Failed to delete question." });
-    }
+module.exports = {
+  createQuiz,
+  getQuizzesByChapter,
+  updateQuiz,
+  deleteQuiz
 };
-
-// Edit a question in a quiz
-const editQuestion = async (req, res) => {
-    try {
-        const { quizId, questionIndex } = req.params;
-        const { questionText, options, correctAnswer } = req.body;
-
-        const quiz = await Quiz.findById(quizId);
-        if (!quiz) {
-            return res.status(404).json({ error: "Quiz not found." });
-        }
-
-        // Validate question index
-        if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
-            return res.status(400).json({ error: "Invalid question index." });
-        }
-
-        // Update the question at the specified index
-        quiz.questions[questionIndex] = { questionText, options, correctAnswer };
-        await quiz.save();
-
-        res.status(200).json({ message: "Question updated successfully." });
-    } catch (err) {
-        console.error("❌ Error editing question:", err);
-        res.status(500).json({ error: "Failed to edit question." });
-    }
-};
-
-// Update a quiz (add or modify questions)
-const updateQuiz = async (req, res) => {
-    try {
-        const { quizId } = req.params;
-        const { title, questions } = req.body;
-
-        const quiz = await Quiz.findById(quizId);
-        if (!quiz) {
-            return res.status(404).json({ error: "Quiz not found." });
-        }
-
-        // Update the quiz title and questions
-        quiz.title = title || quiz.title;
-        quiz.questions = questions || quiz.questions;
-        await quiz.save();
-
-        res.status(200).json({ message: "Quiz updated successfully.", quiz });
-    } catch (err) {
-        console.error("❌ Error updating quiz:", err);
-        res.status(500).json({ error: "Failed to update quiz." });
-    }
-};
-
-module.exports = { createQuiz, getQuizzesBySubject, deleteQuiz, deleteQuestion, editQuestion, updateQuiz };
