@@ -1,139 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import '../styles/Statistics.css';
+import React from 'react';
 
-const Statistics = () => {
-    const [stats, setStats] = useState({
-        users: 0,
-        courses: 0,
-        chapters: 0,
-        quizzes: 0
-    });
-
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchStatistics = async () => {
-            try {
-                // Get all subjects first
-                const subjectsRes = await axios.get("http://localhost:5001/api/subjects");
-                const subjects = subjectsRes.data;
-
-                // Get chapters for all subjects
-                let totalChapters = 0;
-                let totalQuizzes = 0;
-
-                // Fetch chapters for each subject
-                const chaptersPromises = subjects.map(subject =>
-                    axios.get(`http://localhost:5001/api/chapters/subject/${subject._id}`)
-                );
-                const chaptersResponses = await Promise.all(chaptersPromises);
-                
-                // Count chapters and fetch quizzes for each chapter
-                for (const response of chaptersResponses) {
-                    const chapters = response.data;
-                    totalChapters += chapters.length;
-
-                    // Fetch quizzes for each chapter
-                    const quizzesPromises = chapters.map(chapter =>
-                        axios.get(`http://localhost:5001/api/quizzes/chapter/${chapter._id}`)
-                    );
-                    const quizzesResponses = await Promise.all(quizzesPromises);
-                    
-                    // Count total quizzes
-                    quizzesResponses.forEach(quizRes => {
-                        totalQuizzes += quizRes.data.length;
-                    });
-                }
-
-                // Get users count
-                const usersRes = await axios.get('http://localhost:5001/api/users');
-
-                setStats({
-                    users: usersRes.data.length,
-                    courses: subjects.length,
-                    chapters: totalChapters,
-                    quizzes: totalQuizzes
-                });
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching statistics:', error);
-                setLoading(false);
-            }
-        };
-
-        fetchStatistics();
-    }, []);
-
-    const statCards = [
-        {
-            title: 'Total Users',
-            value: stats.users,
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                </svg>
-            )
-        },
-        {
-            title: 'Active Courses',
-            value: stats.courses,
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                </svg>
-            )
-        },
-        {
-            title: 'Total Chapters',
-            value: stats.chapters,
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
-            )
-        },
-        {
-            title: 'Available Quizzes',
-            value: stats.quizzes,
-            icon: (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 11l3 3L22 4" />
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-                </svg>
-            )
-        }
-    ];
-
-    if (loading) {
-        return (
-            <div className="statistics-container">
-                <div className="statistics-loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading statistics...</p>
+const Statistics = ({ isDarkMode }) => {
+    return (
+        <div>
+            <div className="stats-container">
+                <div className="stat-card">
+                    <h3>26</h3>
+                    <p>Total Subjects</p>
+                </div>
+                <div className="stat-card">
+                    <h3>156</h3>
+                    <p>Total Chapters</p>
+                </div>
+                <div className="stat-card">
+                    <h3>48</h3>
+                    <p>Active Users</p>
+                </div>
+                <div className="stat-card">
+                    <h3>89%</h3>
+                    <p>Completion Rate</p>
                 </div>
             </div>
-        );
-    }
 
-    return (
-        <div className="statistics-container">
-            <h1 className="statistics-title">Dashboard Overview</h1>
-            <div className="statistics-grid">
-                {statCards.map((card, index) => (
-                    <div key={index} className="stat-card">
-                        <div className="stat-icon">
-                            {card.icon}
+            <div className="dashboard-grid">
+                <div className="content-card">
+                    <h2>Recent Activity</h2>
+                    <div className="activity-list">
+                        <div className="activity-item">
+                            <span className="status-tag completed">Completed</span>
+                            <p>Medical Terminology Course</p>
                         </div>
-                        <div className="stat-info">
-                            <h3>{card.title}</h3>
-                            <div className="stat-value">{card.value}</div>
+                        <div className="activity-item">
+                            <span className="status-tag upcoming">Upcoming</span>
+                            <p>Anatomy and Physiology</p>
                         </div>
                     </div>
-                ))}
+                </div>
+
+                <div className="content-card">
+                    <h2>Performance Overview</h2>
+                    <div className="performance-stats">
+                        <div className="stat-item">
+                            <p>Average Score</p>
+                            <h3>92%</h3>
+                        </div>
+                        <div className="stat-item">
+                            <p>Completed Courses</p>
+                            <h3>12</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="content-card">
+                    <h2>Quick Actions</h2>
+                    <div className="action-buttons">
+                        <button className="action-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M12 5v14M5 12h14"/>
+                            </svg>
+                            Add New Subject
+                        </button>
+                        <button className="action-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Export Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -7,111 +7,133 @@ const SubjectsDashboard = ({
     onDeleteSubject,
     onAddSubject,
     onEditSubject,
+    isDarkMode
 }) => {
-    const [showAddPopup, setShowAddPopup] = useState(false);
-    const [showEditPopup, setShowEditPopup] = useState(false);
-    const [newSubject, setNewSubject] = useState("");
-    const [editSubject, setEditSubject] = useState({ id: "", name: "" });
+    const [isAdding, setIsAdding] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editingSubject, setEditingSubject] = useState(null);
+    const [newSubjectName, setNewSubjectName] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const handleAddSubject = () => {
-        if (newSubject.trim()) {
-            onAddSubject(newSubject);
-            setNewSubject("");
-            setShowAddPopup(false);
+    const handleAdd = () => {
+        if (newSubjectName.trim()) {
+            onAddSubject(newSubjectName);
+            setNewSubjectName('');
+            setIsAdding(false);
         }
     };
 
-    const handleEditSubject = () => {
-        if (editSubject.name.trim()) {
-            onEditSubject(editSubject.id, editSubject.name);
-            setEditSubject({ id: "", name: "" });
-            setShowEditPopup(false);
+    const handleEdit = () => {
+        if (newSubjectName.trim() && editingSubject) {
+            onEditSubject(editingSubject._id, newSubjectName);
+            setNewSubjectName('');
+            setIsEditing(false);
+            setEditingSubject(null);
         }
     };
+
+    const startEdit = (e, subject) => {
+        e.stopPropagation(); // Prevent card click
+        setEditingSubject(subject);
+        setNewSubjectName(subject.name);
+        setIsEditing(true);
+    };
+
+    const handleDelete = (e, subjectId) => {
+        e.stopPropagation(); // Prevent card click
+        if (window.confirm('Are you sure you want to delete this subject?')) {
+            onDeleteSubject(subjectId);
+        }
+    };
+
+    const filteredSubjects = subjects.filter(subject =>
+        subject.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <div className="dashboard">
-            <div className="dashboard-header">
-                <h2>Your Courses</h2>
-                <button className="add-button" onClick={() => setShowAddPopup(true)}>
-                    + Add Course
-                </button>
+        <div>
+            <div className="search-bar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                    type="text"
+                    placeholder="Search subjects..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
-            <div className="subjects-grid">
-                {subjects.map((subject) => (
-                    <div key={subject._id} className="subject-card" onClick={() => onViewChapters(subject)}>
-                        <div className="card-actions">
-                            <button 
-                                className="edit-icon"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditSubject({ id: subject._id, name: subject.name });
-                                    setShowEditPopup(true);
-                                }}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            <div className="stats-container">
+                <div className="stat-card">
+                    <h3>{subjects.length}</h3>
+                    <p>Total Subjects</p>
+                </div>
+                <div className="stat-card">
+                    <h3>{subjects.filter(s => s.chapters?.length > 0).length}</h3>
+                    <p>Active Subjects</p>
+                </div>
+            </div>
+
+            <button className="action-button" onClick={() => setIsAdding(true)}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Add New Subject
+            </button>
+
+            <div className="dashboard-grid">
+                {filteredSubjects.map(subject => (
+                    <div 
+                        key={subject._id} 
+                        className="content-card"
+                        onClick={() => onViewChapters(subject)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <div className="card-icons">
+                            <button className="icon-button edit" onClick={(e) => startEdit(e, subject)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                 </svg>
                             </button>
-                            <button 
-                                className="delete-icon"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (window.confirm('Are you sure you want to delete this course?')) {
-                                        onDeleteSubject(subject._id);
-                                    }
-                                }}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
+                            <button className="icon-button delete" onClick={(e) => handleDelete(e, subject._id)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
                                 </svg>
                             </button>
                         </div>
-                        <h3>{subject.name}</h3>
-                        <div className="card-footer">
-                            <span>Click to view chapters</span>
-                        </div>
+                        <h2>{subject.name}</h2>
+                        <p>{subject.chapters?.length || 0} Chapters</p>
                     </div>
                 ))}
             </div>
 
-            {showAddPopup && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
-                        <h3>Add New Course</h3>
+            {(isAdding || isEditing) && (
+                <div className="modal-overlay">
+                    <div className="modal">
+                        <h2>{isEditing ? 'Edit Subject' : 'Add New Subject'}</h2>
                         <input
                             type="text"
-                            value={newSubject}
-                            onChange={(e) => setNewSubject(e.target.value)}
-                            placeholder="Enter course name"
+                            placeholder="Enter subject name"
+                            value={newSubjectName}
+                            onChange={(e) => setNewSubjectName(e.target.value)}
+                            autoFocus
                         />
-                        <div className="popup-buttons">
-                            <button onClick={handleAddSubject}>Create</button>
-                            <button onClick={() => setShowAddPopup(false)}>Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {showEditPopup && (
-                <div className="popup-overlay">
-                    <div className="popup-content">
-                        <h3>Edit Course</h3>
-                        <input
-                            type="text"
-                            value={editSubject.name}
-                            onChange={(e) => setEditSubject({ ...editSubject, name: e.target.value })}
-                            placeholder="Enter course name"
-                        />
-                        <div className="popup-buttons">
-                            <button onClick={handleEditSubject}>Save</button>
-                            <button onClick={() => {
-                                setEditSubject({ id: "", name: "" });
-                                setShowEditPopup(false);
-                            }}>Cancel</button>
+                        <div className="modal-actions">
+                            <button className="action-button" onClick={isEditing ? handleEdit : handleAdd}>
+                                {isEditing ? 'Save Changes' : 'Add Subject'}
+                            </button>
+                            <button className="action-button" onClick={() => {
+                                setIsAdding(false);
+                                setIsEditing(false);
+                                setEditingSubject(null);
+                                setNewSubjectName('');
+                            }}>
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 </div>
