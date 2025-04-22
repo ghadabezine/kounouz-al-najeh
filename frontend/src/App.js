@@ -24,6 +24,7 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
 
   // Fetch users when the active page is 'users' and authenticated
   useEffect(() => {
@@ -132,6 +133,15 @@ const App = () => {
     document.body.classList.toggle('dark-mode');
   };
 
+  // Add this function to filter users
+  const filteredUsers = users.filter(user => {
+    const searchTerm = userSearchTerm.toLowerCase();
+    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+    const email = user.email.toLowerCase();
+    
+    return fullName.includes(searchTerm) || email.includes(searchTerm);
+  });
+
   return (
     <div className={`container ${isDarkMode ? 'dark-mode' : ''}`}>
       {!isAuthenticated ? (
@@ -238,7 +248,8 @@ const App = () => {
                   <input
                     type="text"
                     placeholder="Search users..."
-                    onChange={(e) => {/* Add search functionality */}}
+                    value={userSearchTerm}
+                    onChange={(e) => setUserSearchTerm(e.target.value)}
                   />
                 </div>
 
@@ -254,7 +265,7 @@ const App = () => {
                 </div>
 
                 <UserList 
-                  users={users} 
+                  users={filteredUsers} 
                   handleDelete={handleDelete} 
                   handleEdit={handleEdit}
                   isDarkMode={isDarkMode}
