@@ -16,9 +16,24 @@
 }
 
 .header-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     margin: 0;
+}
+
+.header-title span {
     font-size: 1.5rem;
     font-weight: 600;
+    color: white;
+}
+
+.header-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .back-button {
@@ -196,18 +211,4 @@ nav ul li a:hover {
 
 .dark-mode .profile-picture:hover {
     background: rgba(255, 255, 255, 0.2);
-}
-
-.header-logo {
-    width: 50px;
-    height: auto;
-    border-radius: 50%;
-}
-
-.header-title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
 }

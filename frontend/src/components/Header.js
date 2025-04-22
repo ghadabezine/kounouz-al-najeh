@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/Header.css';
+import logo from '../assets/logo.jpg';
 
 const Header = ({ 
     activePage, 
@@ -27,7 +28,10 @@ const Header = ({
     return (
         <header className="header">
             <div className="header-left">
-                <h1 className="header-title">Kounouz Al Najeh</h1>
+                <div className="header-title">
+                    <img src={logo} alt="Kounouz Al Najeh Logo" className="header-logo" />
+                    <span>Kounouz Al Najeh</span>
+                </div>
                 {activePage !== 'home' && (
                     <button className="back-button" onClick={handleBack}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
