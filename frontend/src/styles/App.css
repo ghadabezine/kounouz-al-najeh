@@ -9,6 +9,12 @@
     --spacing-sm: 8px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
+    --card-bg: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --dark-card-bg: #1f2937;
+    --dark-text-primary: #f3f4f6;
+    --dark-text-secondary: #9ca3af;
 }
 
 body {
@@ -51,7 +57,7 @@ main {
 }
 
 .stat-card {
-    background: white;
+    background: var(--card-bg);
     padding: var(--spacing-lg);
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
@@ -59,6 +65,7 @@ main {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    transition: var(--transition);
 }
 
 .stat-card h3 {
@@ -67,11 +74,30 @@ main {
     background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dark-mode .stat-card h3 {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .stat-card p {
-    color: #666;
+    font-size: 1rem;
+    color: var(--text-secondary);
     margin: var(--spacing-sm) 0 0;
+    font-weight: 500;
+}
+
+.dark-mode .stat-card {
+    background: var(--dark-card-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .stat-card p {
+    color: var(--dark-text-secondary);
 }
 
 /* Content Cards */
@@ -105,27 +131,28 @@ main {
 
 /* Action Buttons */
 .action-button {
-    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
     border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
-    font-weight: 600;
-    transition: var(--transition);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
+    transition: all 0.2s ease;
 }
 
 .action-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .action-button svg {
     width: 20px;
     height: 20px;
+    stroke: currentColor;
 }
 
 /* Status Tags */
@@ -151,27 +178,31 @@ main {
 
 /* Search Bar */
 .search-bar {
-    background: white;
-    border-radius: 12px;
-    padding: 12px 20px;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-bottom: var(--spacing-lg);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    margin: 1rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.search-bar svg {
+    color: var(--text-secondary);
 }
 
 .search-bar input {
     border: none;
     background: none;
-    flex: 1;
+    width: 100%;
     font-size: 1rem;
-    color: #2c3e50;
+    color: var(--text-primary);
+    outline: none;
 }
 
-.search-bar input:focus {
-    outline: none;
+.search-bar input::placeholder {
+    color: var(--text-secondary);
 }
 
 /* Dark Mode Styles */
@@ -183,7 +214,7 @@ main {
 .dark-mode .content-card,
 .dark-mode .stat-card,
 .dark-mode .search-bar {
-    background: #2d2d2d;
+    background: var(--dark-card-bg);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -193,15 +224,15 @@ main {
 
 .dark-mode .content-card p,
 .dark-mode .stat-card p {
-    color: #999;
+    color: var(--dark-text-secondary);
 }
 
 .dark-mode .search-bar input {
-    color: #ffffff;
+    color: var(--dark-text-primary);
 }
 
 .dark-mode .search-bar input::placeholder {
-    color: #666;
+    color: var(--dark-text-secondary);
 }
 
 /* Responsive Design */
@@ -401,5 +432,32 @@ main {
 .chapter-meta-item svg {
     width: 16px;
     height: 16px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .dashboard-header {
+    background: var(--dark-card-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.dark-mode .dashboard-title {
+    color: var(--dark-text-primary);
 }
   

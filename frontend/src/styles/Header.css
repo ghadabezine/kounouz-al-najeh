@@ -75,18 +75,56 @@
     height: 1.5rem;
 }
 
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.25rem;
+    border-radius: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.profile-section:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-picture {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.profile-picture svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    stroke: currentColor;
+}
+
+.profile-picture:hover {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .logout-button {
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     border: none;
     border-radius: 0.5rem;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .logout-button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* Navigation Styles */
@@ -142,6 +180,22 @@ nav ul li a:hover {
 
 .dark-mode nav ul li a:hover {
     color: #ffffff;
+}
+
+.dark-mode .profile-section {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .profile-section:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .profile-picture {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .profile-picture:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .header-logo {
