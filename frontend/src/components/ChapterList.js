@@ -123,7 +123,7 @@ const ChapterList = ({
                     <p>Total Chapters</p>
                 </div>
                 <div className="stat-card">
-                    <h3>{chapters.filter(c => c.files?.length > 0).length}</h3>
+                    <h3>{chapters.filter(c => c.resources?.length > 0).length}</h3>
                     <p>Chapters with Content</p>
                 </div>
                 <div className="stat-card">

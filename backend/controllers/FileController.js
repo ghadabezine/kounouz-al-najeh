@@ -54,10 +54,13 @@ const uploadFile = async (req, res) => {
             metadata: { permission: "View Only" },
             chapter: chapterId,
             content: parsed.text,
+            fileId: uploadStream.id // <-- Store actual GridFS file ID
           });
+          
 
           await fileDoc.save();
-          chapter.resources.push(fileDoc._id);
+          chapter.resources.push(fileDoc._id); // Keep this as is, but make sure `fileDoc._id` is a valid Mongoose ObjectId, not `uploadStream.id`
+
           await chapter.save();
 
           res.status(201).json({
@@ -94,7 +97,12 @@ const deleteFile = async (req, res) => {
     const { fileId } = req.params;
     
     // Delete from GridFS
-    await gridFSBucket.delete(mongoose.Types.ObjectId(fileId));
+    const file = await File.findById(fileId);
+if (!file) return res.status(404).json({ error: "File not found" });
+
+await gridFSBucket.delete(file.fileId); // Delete from GridFS using stored fileId
+await File.findByIdAndDelete(fileId);   // Delete metadata from collection
+
     
     // Delete from File collection
     await File.findByIdAndDelete(fileId);
