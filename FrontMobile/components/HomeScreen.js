@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,21 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard
 } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  Feather,
+  MaterialIcons,
+} from "@expo/vector-icons";
 
-// Array of quotes
 const quotes = [
   `"Success is the sum of small efforts, repeated day in and day out." – R. Collier`,
   `"The only way to do great work is to love what you do." – Steve Jobs`,
@@ -33,41 +44,25 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         <Text style={styles.header}>🎓 Welcome back, Student!</Text>
-        {/* Quote Wall */}
-        <Card
-          icon="lightbulb-on-outline"
-          title="Quote of the Day"
-          color="#355C7D"
-        >
+
+        <Card icon="lightbulb-on-outline" title="Quote of the Day" color="#355C7D">
           <Text style={styles.cardText}>{randomQuote}</Text>
         </Card>
 
-        {/* Progress Tracker */}
         <Card icon="trending-up" title="Your Progress Tracker" color="#6C5B7B">
-          <Text style={styles.cardText}>
-            You're 65% through your current term courses.
-          </Text>
+          <Text style={styles.cardText}>You're 65% through your current term courses.</Text>
         </Card>
 
-        {/* Attendance Overview */}
         <Card icon="calendar-check" title="Attendance Overview" color="#355C7D">
-          <Text style={styles.cardText}>
-            Average attendance: 88%. Keep it up!
-          </Text>
+          <Text style={styles.cardText}>Average attendance: 88%. Keep it up!</Text>
         </Card>
 
-        {/* Term Timeline */}
         <Card icon="timeline-clock" title="Term Timeline" color="#F67280">
-          <Text style={styles.cardText}>
-            Week 11 of 12 • Midterms Done • 1 Weeks to Finals
-          </Text>
+          <Text style={styles.cardText}>Week 11 of 12 • Midterms Done • 1 Weeks to Finals</Text>
         </Card>
 
-        {/* Daily Challenge */}
         <Card icon="gamepad-variant" title="Daily Challenge" color="#F8B195">
-          <Text style={styles.cardText}>
-            🧠 Solve 3 case-based MCQs before 10PM!
-          </Text>
+          <Text style={styles.cardText}>🧠 Solve 3 case-based MCQs before 10PM!</Text>
           <TouchableOpacity
             style={styles.challengeBtn}
             onPress={() => navigation.navigate("QuickBrainQuiz")}
@@ -76,21 +71,20 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </Card>
 
-        {/* GPA Calculator */}
         <Card icon="calculator-variant" title="GPA Calculator" color="#6C5B7B">
-          <TouchableOpacity
-            onPress={() => navigation.navigate("GPACalculator")}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("GPACalculator")}>
             <Text style={styles.link}>Tap to calculate your GPA →</Text>
           </TouchableOpacity>
         </Card>
       </ScrollView>
+
+      <ChatBot />
     </SafeAreaView>
   );
 };
 
 const Card = ({ icon, title, children, color }) => (
-  <View style={[styles.card, { borderLeftColor: color }]}>
+  <View style={[styles.card, { borderLeftColor: color }]}> 
     <View style={styles.cardHeader}>
       <MaterialCommunityIcons name={icon} size={24} color={color} />
       <Text style={styles.cardTitle}>{title}</Text>
@@ -99,18 +93,121 @@ const Card = ({ icon, title, children, color }) => (
   </View>
 );
 
+const ChatBot = () => {
+  const [visible, setVisible] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    { role: "assistant", text: "👋 Hi! I'm your assistant. Ask me anything." },
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [showTip, setShowTip] = useState(true);
+
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+    const userMessage = { role: "user", text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://192.168.100.7:5002/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage.text }),
+      });
+      const data = await response.json();
+      const reply = data.reply || "Sorry, I couldn't understand that.";
+      setMessages((prev) => [...prev, { role: "assistant", text: reply }]);
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", text: "Something went wrong. Try again." },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        setShowTip(false);
+        Keyboard.dismiss();
+      }}
+    >
+      <>
+        {showTip && (
+          <View style={styles.chatTip}>
+            <MaterialIcons name="smart-toy" size={24} color="#6C5B7B" />
+            <Text style={styles.chatTipText}>Need help?</Text>
+            <TouchableOpacity onPress={() => setShowTip(false)}>
+              <Text style={styles.chatTipClose}>✖</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        <TouchableOpacity
+          style={styles.chatIcon}
+          onPress={() => setVisible(true)}
+        >
+          <Feather name="message-circle" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <Modal visible={visible} transparent animationType="slide">
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.chatModal}
+          >
+            <View style={styles.chatBox}>
+              <ScrollView style={{ flex: 1 }}>
+                {messages.map((msg, i) => (
+                  <Text
+                    key={i}
+                    style={{
+                      padding: 8,
+                      marginVertical: 4,
+                      backgroundColor: msg.role === "user" ? "#DCF8C6" : "#EEE",
+                      alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                      borderRadius: 8,
+                      maxWidth: "80%",
+                    }}
+                  >
+                    {msg.text}
+                  </Text>
+                ))}
+                {loading && <ActivityIndicator size="small" color="#6C5B7B" />}
+              </ScrollView>
+
+              <View style={styles.chatInputRow}>
+                <TextInput
+                  value={input}
+                  onChangeText={setInput}
+                  placeholder="Ask me anything..."
+                  style={styles.chatInput}
+                />
+                <TouchableOpacity onPress={sendMessage}>
+                  <Feather name="send" size={20} color="#6C5B7B" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setVisible(false)}>
+                  <Text style={{ color: "red", marginLeft: 10 }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+      </>
+    </TouchableWithoutFeedback>
+  );
+};
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F0EBF8", // Match your app's background
+    backgroundColor: "#F0EBF8",
   },
   scrollContainer: {
     padding: 20,
     paddingBottom: 40,
-  },
-  container: {
-    padding: 16,
-    backgroundColor: "#f4f4f8",
   },
   header: {
     fontSize: 24,
@@ -154,6 +251,68 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
+  },
+  chatIcon: {
+    position: "absolute",
+    bottom: 30,
+    right: 20,
+    backgroundColor: "#6C5B7B",
+    padding: 14,
+    borderRadius: 30,
+    elevation: 5,
+    zIndex: 999,
+  },
+  chatTip: {
+    position: "absolute",
+    bottom: 85,
+    right: 20,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    zIndex: 999,
+    elevation: 3,
+  },
+  chatTipText: {
+    color: "#333",
+    fontSize: 16,
+    fontWeight: "500",
+    marginLeft: 5,
+  },
+  chatTipClose: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: "#999",
+    fontWeight: "bold",
+  },
+  chatModal: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.2)",
+  },
+  chatBox: {
+    backgroundColor: "#fff",
+    height: "60%",
+    padding: 10,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  chatInputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+    gap: 10,
+  },
+  chatInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 8,
   },
 });
 

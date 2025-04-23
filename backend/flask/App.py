@@ -87,6 +87,33 @@ def generate_quiz():
     except Exception as e:
         print(f"💥 Unexpected error: {e}")
         return jsonify({"error": str(e)}), 500
+@app.route("/chat", methods=["POST"])
+def chat():
+    try:
+        data = request.get_json(force=True)
+        user_message = data.get("message", "").strip()
+
+        if not user_message:
+            return jsonify({"error": "Message is required"}), 400
+
+        print("💬 Incoming message:", user_message)
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # Use gpt-4 if needed
+            messages=[
+                {"role": "system", "content": "You are a helpful student assistant."},
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.7,
+        )
+
+        reply = response.choices[0].message.content.strip()
+        print("🤖 GPT Reply:", reply)
+        return jsonify({ "reply": reply })
+
+    except Exception as e:
+        print("❌ Chat error:", e)
+        return jsonify({ "error": str(e) }), 500
 
 if __name__ == "__main__":
     print("🚀 Flask app running at http://0.0.0.0:5002")
