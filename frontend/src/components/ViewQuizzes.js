@@ -69,25 +69,23 @@ useEffect(() => {
     // Save the edited question
     const handleSaveQuestion = async (updatedQuestion) => {
         try {
+            // Send the update request to the backend
             await axios.put(
                 `http://localhost:5001/api/quizzes/${editingQuestion.quizId}/questions/${editingQuestion.questionIndex}`,
-                updatedQuestion
+                {
+                    questionText: updatedQuestion.questionText,
+                    options: updatedQuestion.options,
+                    correctAnswer: updatedQuestion.correctAnswer
+                }
             );
 
-            // Update the quizzes state to reflect the edited question
-            const updatedQuizzes = quizzes.map((quiz) => {
-                if (quiz._id === editingQuestion.quizId) {
-                    return {
-                        ...quiz,
-                        questions: quiz.questions.map((q, index) =>
-                            index === editingQuestion.questionIndex ? updatedQuestion : q
-                        ),
-                    };
-                }
-                return quiz;
-            });
-
-            setQuizzes(updatedQuizzes);
+            // Fetch the updated quiz data
+            const response = await axios.get(
+                `http://localhost:5001/api/quizzes/${chapter._id}/quizzes`
+            );
+            
+            // Update the quizzes state with fresh data
+            setQuizzes(response.data);
             setEditingQuestion(null); // Close the edit popup
         } catch (error) {
             console.error("Error editing question:", error);
@@ -102,14 +100,21 @@ useEffect(() => {
     // Save the edited quiz
     const handleSaveQuiz = async (updatedQuiz) => {
         try {
-            await axios.put(`http://localhost:5001/api/quizzes/${updatedQuiz._id}`, updatedQuiz);
-
-            // Update the quizzes state to reflect the changes
-            const updatedQuizzes = quizzes.map((quiz) =>
-                quiz._id === updatedQuiz._id ? updatedQuiz : quiz
+            await axios.put(
+                `http://localhost:5001/api/quizzes/${updatedQuiz._id}`, 
+                {
+                    title: updatedQuiz.title,
+                    questions: updatedQuiz.questions
+                }
             );
 
-            setQuizzes(updatedQuizzes);
+            // Fetch the updated quiz data
+            const response = await axios.get(
+                `http://localhost:5001/api/quizzes/${chapter._id}/quizzes`
+            );
+            
+            // Update the quizzes state with fresh data
+            setQuizzes(response.data);
             setEditingQuiz(null); // Close the edit popup
         } catch (error) {
             console.error("Error updating quiz:", error);
