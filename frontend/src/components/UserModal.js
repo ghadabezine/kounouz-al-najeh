@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/UserModal.css";
 
-const UserModal = ({ editingUser, closeModal }) => {
+const UserModal = ({ editingUser, closeModal, fetchUsers, setEditingUser, isDarkMode }) => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -11,7 +11,21 @@ const UserModal = ({ editingUser, closeModal }) => {
   });
 
   useEffect(() => {
-    if (editingUser) setForm(editingUser);
+    if (editingUser) {
+      setForm({
+        firstName: editingUser.firstName || "",
+        lastName: editingUser.lastName || "",
+        email: editingUser.email || "",
+        password: "", // Always blank for security
+      });
+    } else {
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+      });
+    }
   }, [editingUser]);
 
   const handleChange = (e) => {
@@ -21,7 +35,6 @@ const UserModal = ({ editingUser, closeModal }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
     if (
       !form.firstName ||
       !form.lastName ||
@@ -40,7 +53,7 @@ const UserModal = ({ editingUser, closeModal }) => {
       };
 
       if (!editingUser) {
-        userData.password = form.password; // Only include password for new users
+        userData.password = form.password; // Only for new users
       }
 
       if (editingUser) {
@@ -57,6 +70,8 @@ const UserModal = ({ editingUser, closeModal }) => {
         });
       }
 
+      if (typeof fetchUsers === "function") fetchUsers();
+      if (typeof setEditingUser === "function") setEditingUser(null);
       closeModal();
     } catch (error) {
       console.error(
@@ -103,6 +118,7 @@ const UserModal = ({ editingUser, closeModal }) => {
             value={form.password}
             onChange={handleChange}
             required={!editingUser}
+            autoComplete="new-password"
           />
           <div className="modal-buttons">
             <button type="submit">{editingUser ? "Update" : "Add"}</button>

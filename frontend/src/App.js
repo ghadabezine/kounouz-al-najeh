@@ -284,15 +284,13 @@ const App = () => {
             )}
           </main>
           {isModalOpen && (
-            <UserModal closeModal={closeModal} isDarkMode={isDarkMode}>
-              <UserForm 
-                fetchUsers={fetchUsers} 
-                editingUser={editingUser} 
-                setEditingUser={setEditingUser} 
-                closeModal={closeModal}
-                isDarkMode={isDarkMode}
-              />
-            </UserModal>
+            <UserModal
+              editingUser={editingUser}
+              closeModal={closeModal}
+              fetchUsers={fetchUsers}
+              setEditingUser={setEditingUser}
+              isDarkMode={isDarkMode}
+            />
           )}
 
           <Footer isDarkMode={isDarkMode} />
