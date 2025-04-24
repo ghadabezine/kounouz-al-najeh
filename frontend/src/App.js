@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import QuizForm from './components/QuizForm';
@@ -13,6 +14,18 @@ import Login from "./components/Login";
 import UserModal from './components/UserModal';
 import Statistics from './components/Statistics';
 import './styles/App.css';
+
+// Page transition component
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.3, ease: "easeInOut" }}
+  >
+    {children}
+  </motion.div>
+);
 
 const App = () => {
   const [users, setUsers] = useState([]);
@@ -168,10 +181,12 @@ const App = () => {
   return (
     <div className={`container ${isDarkMode ? 'dark-mode' : ''}`}>
       {!isAuthenticated ? (
-        <Login setIsAuthenticated={status => {
-          setIsAuthenticated(status);
-          if (status) navigateTo('home');
-        }} />
+        <PageTransition>
+          <Login setIsAuthenticated={status => {
+            setIsAuthenticated(status);
+            if (status) navigateTo('home');
+          }} />
+        </PageTransition>
       ) : (
         <>
           <Header 
@@ -186,102 +201,118 @@ const App = () => {
             onLogout={handleLogout}
           />
           <main>
-            {activePage === 'home' && (
-              <div className="home">
-                <Statistics isDarkMode={isDarkMode} />
-              </div>
-            )}
+            <AnimatePresence mode="wait">
+              {activePage === 'home' && (
+                <PageTransition key="home">
+                  <div className="home">
+                    <Statistics isDarkMode={isDarkMode} />
+                  </div>
+                </PageTransition>
+              )}
 
-            {activePage === 'subjects' && !selectedSubject && (
-              <Dashboard
-                subjects={subjects}
-                onViewChapters={subject => navigateTo('chapters', subject)}
-                onDeleteSubject={handleDeleteSubject}
-                onAddSubject={handleAddSubject}
-                onEditSubject={handleEditSubject}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {activePage === 'chapters' && selectedSubject && !selectedChapter && (
-              <ChapterList
-                subject={selectedSubject}
-                goBack={goBack}
-                onFileUpload={chapter => navigateTo('fileUpload', selectedSubject, chapter)}
-                onCreateQuiz={chapter => navigateTo('createQuiz', selectedSubject, chapter)}
-                onViewQuizzes={chapter => navigateTo('viewQuizzes', selectedSubject, chapter)}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {activePage === 'fileUpload' && selectedChapter && (
-              <FileDashboard
-                chapter={selectedChapter}
-                goBack={goBack}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {activePage === 'createQuiz' && selectedChapter && (
-              <QuizForm
-                chapter={selectedChapter}
-                goBack={goBack}
-                isDarkMode={isDarkMode}
-              />
-            )}
-
-            {activePage === 'users' && (
-              <div>
-                <div className="dashboard-header">
-                  <h1 className="dashboard-title">User Management</h1>
-                  <button className="action-button" onClick={openModal}>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 5v14M5 12h14"/>
-                    </svg>
-                    Add New User
-                  </button>
-                </div>
-
-                <div className="search-bar">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-                    <circle cx="11" cy="11" r="8"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                  </svg>
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    value={userSearchTerm}
-                    onChange={(e) => setUserSearchTerm(e.target.value)}
+              {activePage === 'subjects' && !selectedSubject && (
+                <PageTransition key="subjects">
+                  <Dashboard
+                    subjects={subjects}
+                    onViewChapters={subject => navigateTo('chapters', subject)}
+                    onDeleteSubject={handleDeleteSubject}
+                    onAddSubject={handleAddSubject}
+                    onEditSubject={handleEditSubject}
+                    isDarkMode={isDarkMode}
                   />
-                </div>
+                </PageTransition>
+              )}
 
-                <div className="stats-container">
-                  <div className="stat-card">
-                    <h3>{users.length}</h3>
-                    <p>Total Users</p>
+              {activePage === 'chapters' && selectedSubject && !selectedChapter && (
+                <PageTransition key="chapters">
+                  <ChapterList
+                    subject={selectedSubject}
+                    goBack={goBack}
+                    onFileUpload={chapter => navigateTo('fileUpload', selectedSubject, chapter)}
+                    onCreateQuiz={chapter => navigateTo('createQuiz', selectedSubject, chapter)}
+                    onViewQuizzes={chapter => navigateTo('viewQuizzes', selectedSubject, chapter)}
+                    isDarkMode={isDarkMode}
+                  />
+                </PageTransition>
+              )}
+
+              {activePage === 'fileUpload' && selectedChapter && (
+                <PageTransition key="fileUpload">
+                  <FileDashboard
+                    chapter={selectedChapter}
+                    goBack={goBack}
+                    isDarkMode={isDarkMode}
+                  />
+                </PageTransition>
+              )}
+
+              {activePage === 'createQuiz' && selectedChapter && (
+                <PageTransition key="createQuiz">
+                  <QuizForm
+                    chapter={selectedChapter}
+                    goBack={goBack}
+                    isDarkMode={isDarkMode}
+                  />
+                </PageTransition>
+              )}
+
+              {activePage === 'users' && (
+                <PageTransition key="users">
+                  <div>
+                    <div className="dashboard-header">
+                      <h1 className="dashboard-title">User Management</h1>
+                      <button className="action-button" onClick={openModal}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Add New User
+                      </button>
+                    </div>
+
+                    <div className="search-bar">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                      </svg>
+                      <input
+                        type="text"
+                        placeholder="Search users..."
+                        value={userSearchTerm}
+                        onChange={(e) => setUserSearchTerm(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="stats-container">
+                      <div className="stat-card">
+                        <h3>{users.length}</h3>
+                        <p>Total Users</p>
+                      </div>
+                      <div className="stat-card">
+                        <h3>{users.filter(user => user.isActive).length}</h3>
+                        <p>Active Users</p>
+                      </div>
+                    </div>
+
+                    <UserList 
+                      users={filteredUsers} 
+                      handleDelete={handleDelete} 
+                      handleEdit={handleEdit}
+                      isDarkMode={isDarkMode}
+                    />
                   </div>
-                  <div className="stat-card">
-                    <h3>{users.filter(user => user.isActive).length}</h3>
-                    <p>Active Users</p>
-                  </div>
-                </div>
+                </PageTransition>
+              )}
 
-                <UserList 
-                  users={filteredUsers} 
-                  handleDelete={handleDelete} 
-                  handleEdit={handleEdit}
-                  isDarkMode={isDarkMode}
-                />
-              </div>
-            )}
-
-            {activePage === 'viewQuizzes' && selectedChapter && (
-              <ViewQuizzes
-                chapter={selectedChapter}
-                goBack={goBack}
-                isDarkMode={isDarkMode}
-              />
-            )}
+              {activePage === 'viewQuizzes' && selectedChapter && (
+                <PageTransition key="viewQuizzes">
+                  <ViewQuizzes
+                    chapter={selectedChapter}
+                    goBack={goBack}
+                    isDarkMode={isDarkMode}
+                  />
+                </PageTransition>
+              )}
+            </AnimatePresence>
           </main>
           {isModalOpen && (
             <UserModal

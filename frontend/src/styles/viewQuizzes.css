@@ -140,7 +140,7 @@
 .question-card {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 1rem;
+    padding: 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid rgba(99, 102, 241, 0.1);
 }
@@ -222,6 +222,36 @@
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
+}
+
+/* Add specific styling for quiz title input */
+.popup-content input[name="title"] {
+    width: calc(100% - 20px);
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 10px 1rem 10px;
+    font-size: 0.95rem;
+}
+
+/* Add specific styling for question text input */
+.question-card input[placeholder="Enter your question here"] {
+    width: calc(100% - 20px);
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 10px 0.75rem 10px;
+    font-size: 0.95rem;
+}
+
+/* Add specific styling for option inputs */
+.question-card input[placeholder^="Enter option"] {
+    width: calc(100% - 20px);
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem 10px;
+    font-size: 0.95rem;
+}
+
+.question-card select {
+    width: calc(100% - 20px);
+    margin: 0.5rem 10px;
+    padding: 0.5rem 0.75rem;
 }
 
 .popup-content input:focus,

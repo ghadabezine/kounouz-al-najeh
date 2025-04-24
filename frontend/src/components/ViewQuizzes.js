@@ -311,7 +311,7 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
                     name="title"
                     value={editedQuiz.title}
                     onChange={handleChange}
-                    placeholder="Quiz Title"
+                    placeholder="Enter Quiz Title"
                 />
                 <div>
                     {editedQuiz.questions.map((question, qIndex) => (
@@ -324,7 +324,7 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
                                     newQuestions[qIndex].questionText = e.target.value;
                                     setEditedQuiz({ ...editedQuiz, questions: newQuestions });
                                 }}
-                                placeholder="Question Text"
+                                placeholder="Enter your question here"
                             />
                             <div>
                                 {question.options.map((option, optIndex) => (
@@ -337,7 +337,7 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
                                             newQuestions[qIndex].options[optIndex] = e.target.value;
                                             setEditedQuiz({ ...editedQuiz, questions: newQuestions });
                                         }}
-                                        placeholder={`Option ${optIndex + 1}`}
+                                        placeholder={`Enter option ${optIndex + 1}`}
                                     />
                                 ))}
                             </div>
