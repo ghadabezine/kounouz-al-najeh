@@ -16,6 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import Icon from "react-native-vector-icons/FontAwesome";
 
+
 export default function ProfileScreen({ navigation }) {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);

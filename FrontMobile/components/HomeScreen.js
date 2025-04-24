@@ -6,13 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Image,
   Modal,
   TextInput,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
 } from "react-native";
 import {
   Ionicons,
@@ -21,6 +22,15 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 
+// 🔥 Flame Streak Icon
+const StreakIcon = ({ streakCount }) => (
+  <View style={styles.streakContainer}>
+    <Image source={require("../assets/flameBox.png")} style={styles.streakIcon} />
+    <Text style={styles.streakText}>{streakCount}</Text>
+  </View>
+);
+
+// 📚 Quotes
 const quotes = [
   `"Success is the sum of small efforts, repeated day in and day out." – R. Collier`,
   `"The only way to do great work is to love what you do." – Steve Jobs`,
@@ -39,9 +49,15 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu" size={28} color="#000" />
-        </TouchableOpacity>
+        {/* Header Row */}
+        <View style={styles.headerRow}>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Ionicons name="menu" size={28} color="#000" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Streak")}>
+            <StreakIcon streakCount={54} />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.header}>🎓 Welcome back, Student!</Text>
 
@@ -58,7 +74,7 @@ const HomeScreen = ({ navigation }) => {
         </Card>
 
         <Card icon="timeline-clock" title="Term Timeline" color="#F67280">
-          <Text style={styles.cardText}>Week 11 of 12 • Midterms Done • 1 Weeks to Finals</Text>
+          <Text style={styles.cardText}>Week 11 of 12 • Midterms Done • 1 Week to Finals</Text>
         </Card>
 
         <Card icon="gamepad-variant" title="Daily Challenge" color="#F8B195">
@@ -84,7 +100,7 @@ const HomeScreen = ({ navigation }) => {
 };
 
 const Card = ({ icon, title, children, color }) => (
-  <View style={[styles.card, { borderLeftColor: color }]}> 
+  <View style={[styles.card, { borderLeftColor: color }]}>
     <View style={styles.cardHeader}>
       <MaterialCommunityIcons name={icon} size={24} color={color} />
       <Text style={styles.cardTitle}>{title}</Text>
@@ -110,7 +126,7 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://192.168.100.7:5002/chat", {
+      const response = await fetch("http://192.168.100.7:5001/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage.text }),
@@ -129,12 +145,7 @@ const ChatBot = () => {
   };
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        setShowTip(false);
-        Keyboard.dismiss();
-      }}
-    >
+    <TouchableWithoutFeedback onPress={() => { setShowTip(false); Keyboard.dismiss(); }}>
       <>
         {showTip && (
           <View style={styles.chatTip}>
@@ -146,10 +157,7 @@ const ChatBot = () => {
           </View>
         )}
 
-        <TouchableOpacity
-          style={styles.chatIcon}
-          onPress={() => setVisible(true)}
-        >
+        <TouchableOpacity style={styles.chatIcon} onPress={() => setVisible(true)}>
           <Feather name="message-circle" size={24} color="#fff" />
         </TouchableOpacity>
 
@@ -209,6 +217,12 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
   header: {
     fontSize: 24,
     fontWeight: "700",
@@ -221,7 +235,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: "#F67280",
     elevation: 3,
   },
   cardHeader: {
@@ -251,6 +264,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
+  },
+  streakContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  streakIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 4,
+  },
+  streakText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#F67280",
   },
   chatIcon: {
     position: "absolute",

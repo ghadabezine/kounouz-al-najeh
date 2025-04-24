@@ -22,7 +22,9 @@ import EditProfileScreen from "./components/EditProfileScreen";
 import QuickBrainQuiz from "./components/QuickBrainQuiz";
 import QuizResult from "./components/QuizResult";
 import GPACalculatorScreen from "./components/GPACalculator";
-
+import NotesListScreen from "./components/NotesListScreen";
+import NoteEditorScreen from "./components/NoteEditorScreen";
+import StreakScreen from "./components/StreakScreen";
 // Navigators
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,7 +64,7 @@ function DrawerNavigator() {
     >
       <Drawer.Screen name="Home" component={BottomTabs} />
       <Drawer.Screen name="All Courses" component={CourseListScreen} />
-      <Drawer.Screen name="Quick Quiz" component={QuickBrainQuiz} />
+      <Drawer.Screen name="Note" component={NotesListScreen} />
     </Drawer.Navigator>
   );
 }
@@ -106,12 +108,20 @@ export default function App() {
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="QuickBrainQuiz" component={QuickBrainQuiz} />
             <Stack.Screen name="QuizResult" component={QuizResult} />
-            <Stack.Screen name="QuizResultScreen" component={QuizResultScreen} />
+            <Stack.Screen
+              name="QuizResultScreen"
+              component={QuizResultScreen}
+            />
 
             <Stack.Screen
               name="GPACalculator"
               component={GPACalculatorScreen}
             />
+            <Stack.Screen name="Notes" component={NotesListScreen} />
+            <Stack.Screen name="NoteEditor" component={NoteEditorScreen} />
+            <Stack.Screen name="Streak" component={StreakScreen} />
+
+
           </>
         )}
       </Stack.Navigator>

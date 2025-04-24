@@ -27,7 +27,7 @@ export default function GenerateQuizScreen({ route, navigation }) {
       }
 
       try {
-        const response = await fetch("http://192.168.100.7:5002/generate-quiz", {
+        const response = await fetch("http://192.168.100.7:5001/generate-quiz", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ chapterId }),
@@ -41,6 +41,14 @@ export default function GenerateQuizScreen({ route, navigation }) {
         }
 
         setQuiz(data.quiz);
+        await fetch("http://192.168.100.7:5001/api/users/update-streak", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
       } catch (error) {
         console.error("❌ Error fetching quiz:", error);
         Alert.alert("Error", error.message || "Failed to load quiz");
