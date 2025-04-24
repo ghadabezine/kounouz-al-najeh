@@ -70,15 +70,6 @@ const Header = ({
                             Users
                         </a>
                     </li>
-                    <li>
-                        <a 
-                            href="#" 
-                            onClick={(e) => { e.preventDefault(); setActivePage('statistics'); }}
-                            className={activePage === 'statistics' ? 'active' : ''}
-                        >
-                            Statistics
-                        </a>
-                    </li>
                 </ul>
             </nav>
             <div className="header-right">
