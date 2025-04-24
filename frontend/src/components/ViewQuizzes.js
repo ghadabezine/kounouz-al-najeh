@@ -32,7 +32,7 @@ useEffect(() => {
     // Delete a quiz
     const deleteQuiz = async (quizId) => {
         try {
-            await axios.delete(`http://localhost:5001/api/quizzes/${quizId}`);
+            await axios.delete(`http://localhost:5001/api/quizzes/quizzes/${quizId}`);
             setQuizzes(quizzes.filter((quiz) => quiz._id !== quizId));
         } catch (error) {
             console.error("Error deleting quiz:", error);
@@ -42,7 +42,7 @@ useEffect(() => {
     // Delete a question from a quiz
     const deleteQuestion = async (quizId, questionIndex) => {
         try {
-            await axios.delete(`http://localhost:5001/api/quizzes/${quizId}/questions/${questionIndex}`);
+            await axios.delete(`http://localhost:5001/api/quizzes/quizzes/${quizId}/questions/${questionIndex}`);
 
             // Update the quizzes state to reflect the deletion
             const updatedQuizzes = quizzes.map((quiz) => {
@@ -71,7 +71,7 @@ useEffect(() => {
         try {
             // Send the update request to the backend
             await axios.put(
-                `http://localhost:5001/api/quizzes/${editingQuestion.quizId}/questions/${editingQuestion.questionIndex}`,
+                `http://localhost:5001/api/quizzes/quizzes/${editingQuestion.quizId}/questions/${editingQuestion.questionIndex}`,
                 {
                     questionText: updatedQuestion.questionText,
                     options: updatedQuestion.options,
@@ -101,7 +101,7 @@ useEffect(() => {
     const handleSaveQuiz = async (updatedQuiz) => {
         try {
             await axios.put(
-                `http://localhost:5001/api/quizzes/${updatedQuiz._id}`, 
+                `http://localhost:5001/api/quizzes/quizzes/${updatedQuiz._id}`, 
                 {
                     title: updatedQuiz.title,
                     questions: updatedQuiz.questions

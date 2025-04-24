@@ -91,23 +91,16 @@ const getFilesByChapter = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch chapter files" });
   }
 };
-
 const deleteFile = async (req, res) => {
   try {
     const { fileId } = req.params;
-    
-    // Delete from GridFS
+
     const file = await File.findById(fileId);
-if (!file) return res.status(404).json({ error: "File not found" });
+    if (!file) return res.status(404).json({ error: "File not found" });
 
-await gridFSBucket.delete(file.fileId); // Delete from GridFS using stored fileId
-await File.findByIdAndDelete(fileId);   // Delete metadata from collection
+    await gridFSBucket.delete(file.fileId); // Delete from GridFS
+    await File.findByIdAndDelete(fileId);   // Delete metadata from collection
 
-    
-    // Delete from File collection
-    await File.findByIdAndDelete(fileId);
-    
-    // Remove from chapter resources
     await Chapter.updateMany(
       { resources: fileId },
       { $pull: { resources: fileId } }
@@ -119,9 +112,31 @@ await File.findByIdAndDelete(fileId);   // Delete metadata from collection
     res.status(500).json({ error: "Failed to delete file" });
   }
 };
+const updateFileName = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { newFilename } = req.body;
+
+    if (!newFilename || !newFilename.trim()) {
+      return res.status(400).json({ error: "New filename is required" });
+    }
+
+    const file = await File.findById(fileId);
+    if (!file) return res.status(404).json({ error: "File not found" });
+
+    file.filename = newFilename.trim();
+    await file.save();
+
+    res.json({ message: "File name updated successfully", file });
+  } catch (error) {
+    console.error("Error updating file name:", error);
+    res.status(500).json({ error: "Failed to update file name" });
+  }
+};
 
 module.exports = {
   uploadFile,
   getFilesByChapter,
-  deleteFile
+  deleteFile,
+  updateFileName, // Export the new method
 };

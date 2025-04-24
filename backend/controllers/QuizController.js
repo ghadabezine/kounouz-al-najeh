@@ -125,9 +125,71 @@ const deleteQuiz = async (req, res) => {
   }
 };
 
+// Edit a question in a quiz
+const editQuestion = async (req, res) => {
+  try {
+    const { quizId, questionIndex } = req.params;
+    const { questionText, options, correctAnswer } = req.body;
+
+    // Validate input
+    if (!questionText || !Array.isArray(options) || options.length < 2 || !correctAnswer) {
+      return res.status(400).json({ error: "Invalid question data" });
+    }
+
+    // Find the quiz
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    // Validate question index
+    if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
+      return res.status(400).json({ error: "Invalid question index" });
+    }
+
+    // Update the question
+    quiz.questions[questionIndex] = {
+      questionText,
+      options,
+      correctAnswer
+    };
+
+    await quiz.save();
+    res.json(quiz);
+  } catch (err) {
+    console.error("Question edit error:", err);
+    res.status(500).json({ error: "Failed to edit question" });
+  }
+};
+
+// Delete a question from a quiz
+const deleteQuestion = async (req, res) => {
+  try {
+    const { quizId, questionIndex } = req.params;
+
+    // Find the quiz
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    // Validate question index
+    if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
+      return res.status(400).json({ error: "Invalid question index" });
+    }
+
+    // Remove the question
+    quiz.questions.splice(questionIndex, 1);
+    await quiz.save();
+
+    res.json(quiz);
+  } catch (err) {
+    console.error("Question deletion error:", err);
+    res.status(500).json({ error: "Failed to delete question" });
+  }
+};
+
 module.exports = {
   createQuiz,
   getQuizzesByChapter,
   updateQuiz,
-  deleteQuiz
+  deleteQuiz,
+  editQuestion,
+  deleteQuestion
 };
