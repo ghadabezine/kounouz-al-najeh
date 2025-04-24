@@ -11,7 +11,6 @@ const quizRoutes = require("./routes/quizRoutes");
 const chapterRoutes = require('./routes/chapterRoutes');
 // ✅ Add this under your other routes
 
-const path = require("path");
 const app = express();
 
 app.use(cors());
@@ -32,9 +31,6 @@ app.use(express.urlencoded({ extended: true })); // Parses URL-encoded requests
 
 // Connect to MongoDB
 connectDB();
-
-
-
 
 
 
