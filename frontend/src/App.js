@@ -26,6 +26,29 @@ const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState('');
 
+  // Navigation helper function
+  const navigateTo = (page, subject = null, chapter = null) => {
+    setActivePage(page);
+    setSelectedSubject(subject);
+    setSelectedChapter(chapter);
+  };
+
+  // Back navigation helper function
+  const goBack = () => {
+    switch (activePage) {
+      case 'chapters':
+        navigateTo('subjects');
+        break;
+      case 'fileUpload':
+      case 'createQuiz':
+      case 'viewQuizzes':
+        navigateTo('chapters', selectedSubject);
+        break;
+      default:
+        navigateTo('home');
+    }
+  };
+
   // Fetch users when the active page is 'users' and authenticated
   useEffect(() => {
     if (activePage === 'users' && isAuthenticated) {
@@ -147,13 +170,13 @@ const App = () => {
       {!isAuthenticated ? (
         <Login setIsAuthenticated={status => {
           setIsAuthenticated(status);
-          if (status) setActivePage('home');
+          if (status) navigateTo('home');
         }} />
       ) : (
         <>
           <Header 
             activePage={activePage} 
-            setActivePage={setActivePage} 
+            setActivePage={navigateTo} 
             selectedSubject={selectedSubject}
             setSelectedSubject={setSelectedSubject}
             selectedChapter={selectedChapter}
@@ -172,10 +195,7 @@ const App = () => {
             {activePage === 'subjects' && !selectedSubject && (
               <Dashboard
                 subjects={subjects}
-                onViewChapters={subject => {
-                  setSelectedSubject(subject);
-                  setActivePage('chapters');
-                }}
+                onViewChapters={subject => navigateTo('chapters', subject)}
                 onDeleteSubject={handleDeleteSubject}
                 onAddSubject={handleAddSubject}
                 onEditSubject={handleEditSubject}
@@ -186,22 +206,10 @@ const App = () => {
             {activePage === 'chapters' && selectedSubject && !selectedChapter && (
               <ChapterList
                 subject={selectedSubject}
-                goBack={() => {
-                  setSelectedSubject(null);
-                  setActivePage('subjects');
-                }}
-                onFileUpload={chapter => {
-                  setSelectedChapter(chapter);
-                  setActivePage('fileUpload');
-                }}
-                onCreateQuiz={chapter => {
-                  setSelectedChapter(chapter);
-                  setActivePage('createQuiz');
-                }}
-                onViewQuizzes={chapter => {
-                  setSelectedChapter(chapter);
-                  setActivePage('viewQuizzes');
-                }}
+                goBack={goBack}
+                onFileUpload={chapter => navigateTo('fileUpload', selectedSubject, chapter)}
+                onCreateQuiz={chapter => navigateTo('createQuiz', selectedSubject, chapter)}
+                onViewQuizzes={chapter => navigateTo('viewQuizzes', selectedSubject, chapter)}
                 isDarkMode={isDarkMode}
               />
             )}
@@ -209,10 +217,7 @@ const App = () => {
             {activePage === 'fileUpload' && selectedChapter && (
               <FileDashboard
                 chapter={selectedChapter}
-                goBack={() => {
-                  setSelectedChapter(null);
-                  setActivePage('chapters');
-                }}
+                goBack={goBack}
                 isDarkMode={isDarkMode}
               />
             )}
@@ -220,10 +225,7 @@ const App = () => {
             {activePage === 'createQuiz' && selectedChapter && (
               <QuizForm
                 chapter={selectedChapter}
-                goBack={() => {
-                  setSelectedChapter(null);
-                  setActivePage('chapters');
-                }}
+                goBack={goBack}
                 isDarkMode={isDarkMode}
               />
             )}
@@ -276,10 +278,7 @@ const App = () => {
             {activePage === 'viewQuizzes' && selectedChapter && (
               <ViewQuizzes
                 chapter={selectedChapter}
-                goBack={() => {
-                  setSelectedChapter(null);
-                  setActivePage('chapters');
-                }}
+                goBack={goBack}
                 isDarkMode={isDarkMode}
               />
             )}
