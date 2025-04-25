@@ -205,7 +205,7 @@ const App = () => {
               {activePage === 'home' && (
                 <PageTransition key="home">
                   <div className="home">
-                    <Statistics isDarkMode={isDarkMode} />
+                    <Statistics isDarkMode={isDarkMode} setActivePage={navigateTo} />
                   </div>
                 </PageTransition>
               )}
