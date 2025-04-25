@@ -51,16 +51,57 @@ const updateQuiz = async (req, res) => {
     const { quizId } = req.params;
     const { title, questions } = req.body;
 
-    const quiz = await Quiz.findByIdAndUpdate(
-      quizId,
-      { title, questions },
-      { new: true, runValidators: true }
+    // Validate title
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return res.status(400).json({ error: "Invalid quiz title" });
+    }
+
+    // Validate questions array
+    if (!Array.isArray(questions) || questions.length === 0) {
+      return res.status(400).json({ error: "Quiz must have at least one question" });
+    }
+
+    // Validate each question's structure
+    const isValidQuestions = questions.every(q => 
+      q.questionText && 
+      Array.isArray(q.options) && 
+      q.options.length >= 2 && 
+      q.correctAnswer && 
+      q.options.includes(q.correctAnswer)
     );
 
-    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+    if (!isValidQuestions) {
+      return res.status(400).json({ 
+        error: "Invalid question format. Each question must have questionText, at least 2 options, and a valid correctAnswer" 
+      });
+    }
+
+    // Find the quiz first to preserve the chapter reference
+    const existingQuiz = await Quiz.findById(quizId);
+    if (!existingQuiz) {
+      return res.status(404).json({ error: "Quiz not found" });
+    }
+
+    // Update while preserving the chapter reference
+    const quiz = await Quiz.findByIdAndUpdate(
+      quizId,
+      { 
+        title,
+        questions,
+        chapter: existingQuiz.chapter // Preserve the chapter reference
+      },
+      { 
+        new: true, 
+        runValidators: true 
+      }
+    );
+
     res.json(quiz);
   } catch (err) {
     console.error("Quiz update error:", err);
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ error: "Validation failed", details: err.message });
+    }
     res.status(500).json({ error: "Failed to update quiz" });
   }
 };
@@ -84,9 +125,71 @@ const deleteQuiz = async (req, res) => {
   }
 };
 
+// Edit a question in a quiz
+const editQuestion = async (req, res) => {
+  try {
+    const { quizId, questionIndex } = req.params;
+    const { questionText, options, correctAnswer } = req.body;
+
+    // Validate input
+    if (!questionText || !Array.isArray(options) || options.length < 2 || !correctAnswer) {
+      return res.status(400).json({ error: "Invalid question data" });
+    }
+
+    // Find the quiz
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    // Validate question index
+    if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
+      return res.status(400).json({ error: "Invalid question index" });
+    }
+
+    // Update the question
+    quiz.questions[questionIndex] = {
+      questionText,
+      options,
+      correctAnswer
+    };
+
+    await quiz.save();
+    res.json(quiz);
+  } catch (err) {
+    console.error("Question edit error:", err);
+    res.status(500).json({ error: "Failed to edit question" });
+  }
+};
+
+// Delete a question from a quiz
+const deleteQuestion = async (req, res) => {
+  try {
+    const { quizId, questionIndex } = req.params;
+
+    // Find the quiz
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) return res.status(404).json({ error: "Quiz not found" });
+
+    // Validate question index
+    if (questionIndex < 0 || questionIndex >= quiz.questions.length) {
+      return res.status(400).json({ error: "Invalid question index" });
+    }
+
+    // Remove the question
+    quiz.questions.splice(questionIndex, 1);
+    await quiz.save();
+
+    res.json(quiz);
+  } catch (err) {
+    console.error("Question deletion error:", err);
+    res.status(500).json({ error: "Failed to delete question" });
+  }
+};
+
 module.exports = {
   createQuiz,
   getQuizzesByChapter,
   updateQuiz,
-  deleteQuiz
+  deleteQuiz,
+  editQuestion,
+  deleteQuestion
 };

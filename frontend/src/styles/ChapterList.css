@@ -188,36 +188,60 @@
 }
 
 .chapter-actions {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-top: auto;
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
-.action-button {
+.chapter-actions .action-button {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.5rem;
-    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
     border: none;
     border-radius: 8px;
-    background: var(--button-bg);
-    color: var(--button-text);
-    font-size: 0.875rem;
-    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-weight: 500;
 }
 
-.action-button svg {
-    width: 16px;
-    height: 16px;
+.chapter-actions .action-button svg {
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
-.action-button:hover {
-    background: var(--button-hover);
+.chapter-actions .action-button:hover {
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.chapter-actions .action-button:disabled {
+    background: #e5e7eb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.chapter-actions .action-button.has-quizzes {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+    position: relative;
+}
+
+.quiz-count {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+}
+
+.dark-mode .chapter-actions .action-button:disabled {
+    background: #374151;
+    color: #9ca3af;
 }
 
 .modal-overlay {

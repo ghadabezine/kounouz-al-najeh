@@ -14,6 +14,7 @@ const initDB = async () => {
 };
 initDB().catch(console.error);
 
+
 const uploadFile = async (req, res) => {
   try {
     const { chapterId } = req.params;
@@ -34,48 +35,46 @@ const uploadFile = async (req, res) => {
         chapter: chapterId 
       },
     });
-
+    
+    const gridFsFileId = uploadStream.id; // ✅ Capture ID immediately
     readableStream.pipe(uploadStream);
-
+    
     uploadStream.on("finish", async () => {
       try {
-        const chunks = [];
-        const downloadStream = gridFSBucket.openDownloadStream(uploadStream.id);
-
-        downloadStream.on("data", (chunk) => chunks.push(chunk));
-        downloadStream.on("end", async () => {
-          const buffer = Buffer.concat(chunks);
-          const parsed = await pdfParse(buffer);
-          
-          const fileDoc = new File({
-            filename: req.file.originalname,
-            length: uploadStream.length,
-            uploadDate: new Date(),
-            metadata: { permission: "View Only" },
-            chapter: chapterId,
-            content: parsed.text,
-          });
-
-          await fileDoc.save();
-          chapter.resources.push(fileDoc._id);
-          await chapter.save();
-
-          res.status(201).json({
-            message: "File uploaded to chapter successfully",
-            file: fileDoc
-          });
+        const buffer = req.file.buffer;
+        const parsed = await pdfParse(buffer);
+    
+        const fileDoc = new File({
+          filename: req.file.originalname,
+          length: uploadStream.length,
+          uploadDate: new Date(),
+          metadata: { permission: "View Only" },
+          chapter: chapterId,
+          content: parsed.text,
+          fileId: gridFsFileId // ✅ Use the stored ID, not `uploadStream.id`
+        });
+    
+        await fileDoc.save();
+        chapter.resources.push(fileDoc._id);
+        await chapter.save();
+    
+        res.status(201).json({
+          message: "File uploaded to chapter successfully",
+          file: fileDoc
         });
       } catch (err) {
         console.error("PDF processing error:", err);
         res.status(500).json({ error: "Failed to process PDF content" });
       }
     });
+    
 
   } catch (err) {
     console.error("File upload error:", err);
     res.status(500).json({ error: "File upload failed" });
   }
 };
+
 
 const getFilesByChapter = async (req, res) => {
   try {
@@ -88,32 +87,60 @@ const getFilesByChapter = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch chapter files" });
   }
 };
-
 const deleteFile = async (req, res) => {
   try {
     const { fileId } = req.params;
-    
-    // Delete from GridFS
-    await gridFSBucket.delete(mongoose.Types.ObjectId(fileId));
-    
-    // Delete from File collection
+
+    const file = await File.findById(fileId);
+    if (!file) return res.status(404).json({ error: "File not found" });
+
+    if (!file.fileId) {
+      console.warn("⚠️ fileId is undefined. Skipping GridFS deletion.");
+    } else {
+      try {
+        await gridFSBucket.delete(file.fileId);
+        console.log("🗑️ GridFS file deleted");
+      } catch (err) {
+        console.warn("⚠️ GridFS delete failed:", err.message);
+      }
+    }
+
     await File.findByIdAndDelete(fileId);
-    
-    // Remove from chapter resources
-    await Chapter.updateMany(
-      { resources: fileId },
-      { $pull: { resources: fileId } }
-    );
+    await Chapter.updateMany({ resources: fileId }, { $pull: { resources: fileId } });
 
     res.json({ message: "File deleted successfully" });
+
   } catch (error) {
-    console.error("File deletion error:", error);
+    console.error("🔥 File deletion error:", error);
     res.status(500).json({ error: "Failed to delete file" });
+  }
+};
+
+const updateFileName = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { newFilename } = req.body;
+
+    if (!newFilename || !newFilename.trim()) {
+      return res.status(400).json({ error: "New filename is required" });
+    }
+
+    const file = await File.findById(fileId);
+    if (!file) return res.status(404).json({ error: "File not found" });
+
+    file.filename = newFilename.trim();
+    await file.save();
+
+    res.json({ message: "File name updated successfully", file });
+  } catch (error) {
+    console.error("Error updating file name:", error);
+    res.status(500).json({ error: "Failed to update file name" });
   }
 };
 
 module.exports = {
   uploadFile,
   getFilesByChapter,
-  deleteFile
+  deleteFile,
+  updateFileName, // Export the new method
 };

@@ -29,23 +29,31 @@ const ChapterList = ({
             console.error('Error fetching chapters:', error);
         }
     };
-
     const handleAddChapter = async () => {
-        if (newChapterName.trim()) {
-            try {
-                await axios.post('http://localhost:5001/api/chapters', {
-                    name: newChapterName,
-                    subjectId: subject._id
-                });
+        if (!newChapterName.trim()) {
+            alert('Please enter a chapter name');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://localhost:5001/api/chapters', {
+                name: newChapterName,
+                subject: subject._id
+            });
+
+            if (response.data) {
+                await fetchChapters(); // Refresh the chapters list
                 setNewChapterName('');
                 setIsAddingChapter(false);
-                fetchChapters();
-            } catch (error) {
-                console.error('Error adding chapter:', error);
+            } else {
+                alert('Failed to add chapter. Please try again.');
             }
+        } catch (error) {
+            console.error("❌ Error adding chapter:", error);
+            alert('Failed to add chapter: ' + (error.response?.data?.error || 'Unknown error'));
         }
     };
-
+    
     const handleEditChapter = async () => {
         if (newChapterName.trim() && editingChapter) {
             try {
@@ -115,7 +123,7 @@ const ChapterList = ({
                     <p>Total Chapters</p>
                 </div>
                 <div className="stat-card">
-                    <h3>{chapters.filter(c => c.files?.length > 0).length}</h3>
+                    <h3>{chapters.filter(c => c.resources?.length > 0).length}</h3>
                     <p>Chapters with Content</p>
                 </div>
                 <div className="stat-card">
@@ -186,6 +194,22 @@ const ChapterList = ({
                                     <path d="M9 15h6"/>
                                 </svg>
                                 Create Quiz
+                            </button>
+                            <button 
+                                className={`action-button ${chapter.quizzes?.length ? 'has-quizzes' : ''}`} 
+                                onClick={() => onViewQuizzes(chapter)}
+                                disabled={!chapter.quizzes?.length}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
+                                    <path d="M8 7h2"/>
+                                    <path d="M8 11h2"/>
+                                    <path d="M8 15h2"/>
+                                </svg>
+                                View Quizzes
+                                {chapter.quizzes?.length > 0 && (
+                                    <span className="quiz-count">{chapter.quizzes.length}</span>
+                                )}
                             </button>
                         </div>
                     </div>

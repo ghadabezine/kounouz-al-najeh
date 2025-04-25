@@ -63,7 +63,6 @@ const FileDashboard = ({ chapter, goBack }) => {
     setEditingFile(file._id);
     setNewFilename(file.filename);
   };
-
   const handleUpdateFilename = async () => {
     if (!newFilename.trim()) {
       alert("❌ Filename cannot be empty.");
@@ -71,7 +70,7 @@ const FileDashboard = ({ chapter, goBack }) => {
     }
     try {
       await axios.patch(`http://localhost:5001/api/files/${editingFile}`, {
-        newFilename,
+        newFilename, // Send the new filename in the request body
       });
       alert("✅ Filename updated!");
       setEditingFile(null);
@@ -80,7 +79,6 @@ const FileDashboard = ({ chapter, goBack }) => {
       alert("❌ Failed to update filename.");
     }
   };
-
   return (
     <div className="upload-container">
       <h2>{chapter.name}</h2>

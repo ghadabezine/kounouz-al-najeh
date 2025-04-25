@@ -38,7 +38,7 @@ connectDB();
 // Routes
 app.use("/api/auth", authRoutes);     // Auth endpoints
 app.use("/api/users", userRoutes);    // User endpoints
-app.use("/api/files", fileRoutes);    // File endpoints
+app.use("/api/files", fileRoutes);    
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/quizzes", quizRoutes);
 app.use('/api/chapters', chapterRoutes);
