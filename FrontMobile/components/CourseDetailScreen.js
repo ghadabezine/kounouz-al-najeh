@@ -25,7 +25,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchChapters = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.100.7:5002/api/chapters/subject/${course._id}`
+        `http://172.20.10.7:5001/api/chapters/subject/${course._id}`
       );
       setChapters(response.data);
     } catch (error) {
@@ -36,7 +36,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchMaterials = async (chapterId) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.7:5002/api/files/${chapterId}/files`
+        `http://172.20.10.7:5001/api/files/${chapterId}/files`
       );
       setMaterials((prev) => ({ ...prev, [chapterId]: response.data }));
     } catch (error) {
@@ -47,7 +47,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchQuizzes = async (chapterId) => {
     try {
       const response = await axios.get(
-        `http://192.168.100.7:5002/api/quizzes/${chapterId}/quizzes`
+        `http://172.20.10.7:5002/api/quizzes/${chapterId}/quizzes`
       );
       setQuizzes((prev) => ({ ...prev, [chapterId]: response.data }));
     } catch (error) {
@@ -121,7 +121,7 @@ export default function CourseDetailScreen({ route, navigation }) {
                       key={file._id}
                       onPress={() =>
                         Linking.openURL(
-                          `http://192.168.100.7:5002/api/files/view/${file._id}`
+                          `http://172.20.10.7:5001/api/files/view/${file._id}`
                         )
                       }
                     >

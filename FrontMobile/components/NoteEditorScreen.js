@@ -13,8 +13,8 @@ const NoteEditorScreen = ({ route, navigation }) => {
       const token = await AsyncStorage.getItem("token");
       const method = existingNote ? "PUT" : "POST";
       const url = existingNote
-        ? `http://192.168.100.7:5002/api/notes/${existingNote._id}`
-        : `http://192.168.100.7:5002/api/notes`;
+        ? `http://172.20.10.7:5001/api/notes/${existingNote._id}`
+        : `http://172.20.10.7:5001/api/notes`;
 
       const res = await fetch(url, {
         method,
@@ -36,7 +36,7 @@ const NoteEditorScreen = ({ route, navigation }) => {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await fetch(
-        `http://192.168.100.7:5002/api/notes/${existingNote._id}`,
+        `http://172.20.10.7:5001/api/notes/${existingNote._id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

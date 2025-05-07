@@ -16,32 +16,35 @@ export default function QuizResultScreen({ route }) {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Quiz Results</Text>
 
-      {quiz.map((q, idx) => (
-        <View key={idx} style={styles.block}>
-          <Text style={styles.question}>
-            {idx + 1}. {q.question}
-          </Text>
+      {quiz.map((q, idx) => {
+        const correctLetter = q.answer.split(".")[0].trim();
+        return (
+          <View key={idx} style={styles.block}>
+            <Text style={styles.question}>
+              {idx + 1}. {q.question}
+            </Text>
 
-          {q.options.map((opt, i) => {
-            const letter = opt.split(".")[0].trim();
-            const isCorrect = letter === q.answer;
-            const isUserWrong = q.userAnswer === letter && !isCorrect;
+            {q.options.map((opt, i) => {
+              const letter = opt.split(".")[0].trim();
+              const isCorrect = letter === correctLetter;
+              const isUserWrong = q.userAnswer === letter && !isCorrect;
 
-            return (
-              <Text
-                key={i}
-                style={[
-                  styles.option,
-                  isCorrect && styles.correct,
-                  isUserWrong && styles.wrong,
-                ]}
-              >
-                {opt}
-              </Text>
-            );
-          })}
-        </View>
-      ))}
+              return (
+                <Text
+                  key={i}
+                  style={[
+                    styles.option,
+                    isCorrect && styles.correct,
+                    isUserWrong && styles.wrong,
+                  ]}
+                >
+                  {opt}
+                </Text>
+              );
+            })}
+          </View>
+        );
+      })}
 
       <View style={styles.footer}>
         <Text style={styles.scoreText}>
@@ -98,12 +101,12 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   correct: {
-    backgroundColor: "#C8E6C9", // ✅ Green
+    backgroundColor: "#C8E6C9",
     color: "#2E7D32",
     fontWeight: "bold",
   },
   wrong: {
-    backgroundColor: "#FFCDD2", // ❌ Red
+    backgroundColor: "#FFCDD2",
     color: "#C62828",
     fontWeight: "bold",
   },

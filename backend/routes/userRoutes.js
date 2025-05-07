@@ -1,27 +1,25 @@
-const express = require("express");
+// routes/userRoutes.js
 const {
   createUser,
   getUsers,
   updateUser,
   deleteUser,
   getProfile,
-  updateProfile
+  updateProfile,
+  updateStreak,
+  getStreak
 } = require("../controllers/UserController");
+
 const { protect } = require("../middleware/authMiddleware");
+const router = require("express").Router();
 
-const router = express.Router();
-
-// ✅ Create a new user
 router.post("/", createUser);
-
-// ✅ Get all users
 router.get("/", getUsers);
-
-// ✅ Update a user
+router.get("/profile", protect, getProfile);
 router.put("/:id", updateUser);
-
-// ✅ Delete a user
 router.delete("/:id", deleteUser);
-
+router.put("/profile", protect, updateProfile);
+router.patch("/update-streak", protect, updateStreak);
+router.get("/get-streak", protect, getStreak);
 
 module.exports = router;

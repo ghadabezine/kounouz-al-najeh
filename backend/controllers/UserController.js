@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const moment = require("moment");
 
 // ✅ Create User
 const createUser = async (req, res) => {
@@ -41,6 +42,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// ✅ Get Profile
 const getProfile = async (req, res) => {
   try {
     if (!req.user) {
@@ -52,8 +54,6 @@ const getProfile = async (req, res) => {
   }
 };
 
-
-
 // ✅ Update Profile
 const updateProfile = async (req, res) => {
   try {
@@ -62,7 +62,6 @@ const updateProfile = async (req, res) => {
 
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    // Update user fields
     user.firstName = firstName || user.firstName;
     user.lastName = lastName || user.lastName;
     user.email = email || user.email;
@@ -74,4 +73,60 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getUsers, updateUser, deleteUser, getProfile, updateProfile };
+// ✅ Update User's Quiz Streak
+const updateStreak = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const today = moment().startOf("day");
+    const lastAttempt = user.lastAttemptDate
+      ? moment(user.lastAttemptDate).startOf("day")
+      : null;
+
+    if (!lastAttempt || !lastAttempt.isSame(today)) {
+      user.streak =
+        lastAttempt && lastAttempt.isSame(today.clone().subtract(1, "day"))
+          ? user.streak + 1
+          : 1;
+
+      user.lastAttemptDate = new Date();
+      await user.save();
+    }
+
+    res.json({ streak: user.streak });
+  } catch (err) {
+    console.error("Error updating streak:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ✅ Get User's Current Streak
+const getStreak = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("streak lastAttemptDate");
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.json({
+      streak: user.streak,
+      lastAttemptDate: user.lastAttemptDate,
+    });
+  } catch (err) {
+    console.error("Error getting streak:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// ✅ Export everything correctly
+module.exports = {
+  createUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+  getProfile,
+  updateProfile,
+  updateStreak,
+  getStreak,
+};

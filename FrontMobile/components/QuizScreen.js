@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function GenerateQuizScreen({ route, navigation }) {
   const { chapterId, quiz: passedQuiz } = route.params;
@@ -27,7 +28,7 @@ export default function GenerateQuizScreen({ route, navigation }) {
       }
 
       try {
-        const response = await fetch("http://192.168.100.7:5001/generate-quiz", {
+        const response = await fetch("http://172.20.10.7:5002/generate-quiz", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ chapterId }),
@@ -41,13 +42,22 @@ export default function GenerateQuizScreen({ route, navigation }) {
         }
 
         setQuiz(data.quiz);
-        await fetch("http://192.168.100.7:5001/api/users/update-streak", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+
+        // ⬇️ Attempt streak update
+        try {
+          const token = await AsyncStorage.getItem("token");
+          if (!token) throw new Error("User not authenticated");
+
+          await fetch("http://172.20.10.7:5001/api/users/update-streak", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+        } catch (streakError) {
+          console.error("❌ Failed to update streak:", streakError.message);
+        }
 
       } catch (error) {
         console.error("❌ Error fetching quiz:", error);
@@ -160,15 +170,15 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
   },
   selectedOption: {
-    backgroundColor: "#D1C4E9", // 🟣 Purple
+    backgroundColor: "#D1C4E9",
     borderColor: "#673AB7",
   },
   correctAnswer: {
-    backgroundColor: "#C8E6C9", // ✅ Green
+    backgroundColor: "#C8E6C9",
     borderColor: "#4CAF50",
   },
   wrongAnswer: {
-    backgroundColor: "#FFCDD2", // ❌ Red
+    backgroundColor: "#FFCDD2",
     borderColor: "#F44336",
   },
   optionText: {

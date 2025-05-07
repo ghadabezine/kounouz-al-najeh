@@ -72,7 +72,7 @@ function QuizForm({ chapter, goBack }) {
         correctAnswer: q.options[q.correctAnswerIndex]
       }));
 
-      const response = await axios.post('http://localhost:5002/api/quizzes', {
+      const response = await axios.post('http://localhost:5001/api/quizzes', {
         title,
         chapter: chapter._id, // <-- use chapter here
         questions: formattedQuestions,

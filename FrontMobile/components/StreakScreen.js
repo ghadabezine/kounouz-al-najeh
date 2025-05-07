@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,21 +7,44 @@ import {
   SafeAreaView,
   Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STREAK_DAYS = [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
 
 const StreakScreen = () => {
   const navigation = useNavigation();
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    const fetchStreak = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await fetch("http://172.20.10.7:5001/api/users/get-streak", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch streak");
+
+        const data = await res.json();
+        setStreak(data.streak || 0);
+      } catch (err) {
+        console.error("❌ Streak fetch error:", err);
+        Alert.alert("Error", "Failed to load streak.");
+      }
+    };
+
+    fetchStreak();
+  }, []);
 
   return (
-    <LinearGradient
-      colors={["#F78C1F", "#F45D01", "#2C2C2C"]}
-      style={styles.safeArea}
-    >
+    <LinearGradient colors={["#F78C1F", "#F45D01", "#2C2C2C"]} style={styles.safeArea}>
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
           {/* Top Bar */}
@@ -43,12 +66,9 @@ const StreakScreen = () => {
             <Text style={styles.label}>STREAK SOCIETY</Text>
 
             <View style={styles.streakDisplay}>
-              <Image
-                source={require("../assets/flameBox.png")}
-                style={styles.streakFlameLarge}
-              />
+              <Image source={require("../assets/flameBox.png")} style={styles.streakFlameLarge} />
               <View style={styles.streakNumberBox}>
-                <Text style={styles.streakCount}>54</Text>
+                <Text style={styles.streakCount}>{streak}</Text>
                 <Text style={styles.streakText}>day streak!</Text>
               </View>
             </View>
@@ -69,7 +89,7 @@ const StreakScreen = () => {
           </View>
 
           <View style={styles.metrics}>
-            <Text style={styles.metric}>✅ 11 Days practiced</Text>
+            <Text style={styles.metric}>✅ {streak} Days practiced</Text>
             <Text style={styles.metric}>🎈 0 Freezes used</Text>
           </View>
 
@@ -211,21 +231,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   weekdayText: {
-    width: '14.2857%',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    color: '#fff',
+    width: "14.2857%",
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 8,
-  },  
+  },
   dayCell: {
-    width: '14.2857%',
+    width: "14.2857%",
     height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 2,
     borderRadius: 20,
   },
-  
   dayText: {
     color: "#333",
     fontWeight: "600",

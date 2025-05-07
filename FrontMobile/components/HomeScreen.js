@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,12 +24,57 @@ import {
 } from "@expo/vector-icons";
 
 // 🔥 Flame Streak Icon
-const StreakIcon = ({ streakCount }) => (
-  <View style={styles.streakContainer}>
-    <Image source={require("../assets/flameBox.png")} style={styles.streakIcon} />
-    <Text style={styles.streakText}>{streakCount}</Text>
-  </View>
-);
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const StreakIcon = () => {
+  const [streakCount, setStreakCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStreak = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+
+        if (!token) {
+          console.warn("⚠️ No token found in AsyncStorage");
+          return;
+        }
+
+        const response = await fetch("http://172.20.10.7:5001/api/users/get-streak", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const text = await response.text();
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch (parseErr) {
+          console.error("❌ Response is not valid JSON:", text);
+          return;
+        }
+
+        if (response.ok) {
+          setStreakCount(data.streak);
+        } else {
+          console.error("❌ Failed to fetch streak:", data.error || response.status);
+        }
+      } catch (err) {
+        console.error("❌ Error fetching streak:", err);
+      }
+    };
+
+    fetchStreak();
+  }, []);
+
+  return (
+    <View style={styles.streakContainer}>
+      <Image source={require("../assets/flameBox.png")} style={styles.streakIcon} />
+      <Text style={styles.streakText}>{streakCount}</Text>
+    </View>
+  );
+};
 
 // 📚 Quotes
 const quotes = [
@@ -126,7 +172,7 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://192.168.100.7:5001/chat", {
+      const response = await fetch("http://172.20.10.7:5002/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage.text }),
