@@ -8,41 +8,53 @@ import {
 } from "react-native";
 
 const quizData = [
-  {
-    question: "Which number comes next in the sequence: 2, 4, 8, 16, ?",
-    options: ["18", "24", "32", "20"],
-    answer: "32",
-  },
-  {
-    question: "What is the capital of France?",
-    options: ["Rome", "Paris", "Madrid", "Berlin"],
-    answer: "Paris",
-  },
-  {
-    question: "Which planet is known as the Red Planet?",
-    options: ["Earth", "Jupiter", "Mars", "Venus"],
-    answer: "Mars",
-  },
+    {
+      question: "What’s the strongest shape?",
+      options: ["Circle", "Triangle", "Square", "Pentagon"],
+      answer: "Triangle",
+    },
+    {
+      question: "Which of the following is NOT a type of engineering?",
+      options: ["Mechanical Engineering", "Aerospace Engineering", "Chemical Engineering", "Creative Engineering"],
+      answer: "Creative Engineering",
+    },
+
+    {
+      question: "What does the acronym 'CAD' stand for in engineering?",
+      options: ["Computer-Aided Design", "Computer-Aided Development", "Centralized Automated Design", "Computerized Algorithmic Design"],
+      answer: "Computer-Aided Design",
+    },
 ];
 
 export default function QuickBrainQuiz({ navigation }) {
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState(null);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState(1);
   const [time, setTime] = useState(10);
   const progress = useRef(new Animated.Value(0)); // For progress bar
+  const [answeredQuestions, setAnsweredQuestions] = useState([]);
+  const [quizFinished, setQuizFinished] = useState(false);
 
+  // Handle answer selection
   const handleSelect = useCallback(
     (option) => {
       setSelected(option);
-      if (option === quizData[currentQ].answer)
-        setScore((prevScore) => prevScore + 1);
+      const isCorrect = option === quizData[currentQ].answer;
+      if (isCorrect) {
+        setScore((prevScore) => prevScore + 1); // Update the score correctly
+      }
+      setAnsweredQuestions((prev) => [
+        ...prev,
+        { question: quizData[currentQ], userAnswer: option, isCorrect },
+      ]);
+
+      // Animate progress bar
       Animated.timing(progress.current, {
         toValue: (currentQ + 1) / quizData.length,
         duration: 500,
         useNativeDriver: false,
       }).start();
-      setTimeout(() => handleNext(), 500);
+      setTimeout(() => handleNext(), 1000);
     },
     [currentQ]
   );
@@ -53,18 +65,20 @@ export default function QuickBrainQuiz({ navigation }) {
       setSelected(null);
       setTime(10);
     } else {
-      navigation.navigate("QuizResult", { score });
+      setQuizFinished(true);
+      // Pass the correct score and other data to the result screen
+      navigation.navigate("QuizResult", { score, quizData, answeredQuestions });
     }
-  }, [currentQ, score, navigation]);
+  }, [currentQ, score, navigation, answeredQuestions]);
 
   // Timer effect
   useEffect(() => {
     const timer = setInterval(() => {
-      if (time > 0) setTime((prevTime) => prevTime - 1);
-      else handleNext();
+      if (time > 0 && !quizFinished) setTime((prevTime) => prevTime - 1);
+      else if (!quizFinished) handleNext();
     }, 1000);
     return () => clearInterval(timer);
-  }, [time, handleNext]);
+  }, [time, handleNext, quizFinished]);
 
   return (
     <View style={styles.container}>
@@ -93,11 +107,13 @@ export default function QuickBrainQuiz({ navigation }) {
           key={option}
           style={[
             styles.option,
-            selected === option && { backgroundColor: "#4CAF50" }, // Correct answer
-            selected && selected !== option && { backgroundColor: "#F44336" }, // Incorrect answer
+            selected === option && {
+              backgroundColor:
+                option === quizData[currentQ].answer ? "#4CAF50" : "#F44336",
+            }, // Green for correct, Red for wrong
           ]}
           onPress={() => handleSelect(option)}
-          disabled={!!selected}
+          disabled={!!selected} // Disable after selection
         >
           <Text style={styles.optionText}>{option}</Text>
         </TouchableOpacity>
@@ -109,7 +125,7 @@ export default function QuickBrainQuiz({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#D5E8D4",
+    backgroundColor: "#FFEB3B", // Bright background for fun
     padding: 20,
     justifyContent: "center",
   },
@@ -130,6 +146,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 30,
     color: "#2E4053",
+    textAlign: "center",
   },
   option: {
     backgroundColor: "#5D6D7E",
@@ -138,6 +155,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     justifyContent: "center",
     alignItems: "center",
+    transition: "background-color 0.3s ease",
   },
-  optionText: { color: "#fff", fontSize: 18, textAlign: "center" },
+  optionText: {
+    color: "#fff",
+    fontSize: 18,
+    textAlign: "center",
+  },
 });

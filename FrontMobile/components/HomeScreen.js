@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,7 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
-  Modal,
+  Pressable,
   TextInput,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,17 +15,11 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import {
-  Ionicons,
-  MaterialCommunityIcons,
-  Feather,
-  MaterialIcons,
-} from "@expo/vector-icons";
-
-// 🔥 Flame Streak Icon
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const StreakIcon = () => {
+// 🔥 Flame Streak Icon with navigation
+const StreakIcon = ({ navigation }) => {
   const [streakCount, setStreakCount] = useState(0);
 
   useEffect(() => {
@@ -39,11 +32,14 @@ const StreakIcon = () => {
           return;
         }
 
-        const response = await fetch("http://172.20.10.7:5001/api/users/get-streak", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          "http://192.168.1.56:5005/api/users/get-streak",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const text = await response.text();
         let data;
@@ -58,7 +54,10 @@ const StreakIcon = () => {
         if (response.ok) {
           setStreakCount(data.streak);
         } else {
-          console.error("❌ Failed to fetch streak:", data.error || response.status);
+          console.error(
+            "❌ Failed to fetch streak:",
+            data.error || response.status
+          );
         }
       } catch (err) {
         console.error("❌ Error fetching streak:", err);
@@ -69,10 +68,16 @@ const StreakIcon = () => {
   }, []);
 
   return (
-    <View style={styles.streakContainer}>
-      <Image source={require("../assets/flameBox.png")} style={styles.streakIcon} />
+    <TouchableOpacity
+      style={styles.streakContainer}
+      onPress={() => navigation.navigate("Streak")}
+    >
+      <Image
+        source={require("../assets/flameBox.png")}
+        style={styles.streakIcon}
+      />
       <Text style={styles.streakText}>{streakCount}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -92,6 +97,33 @@ const quotes = [
 const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
 const HomeScreen = ({ navigation }) => {
+  const [userName, setUserName] = useState("Student");
+  const [isChatVisible, setIsChatVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) return;
+
+        const res = await fetch("http://192.168.1.56:5005/api/auth/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.firstName) {
+          const fullName = `${data.firstName} ${data.lastName || ""}`.trim();
+          setUserName(fullName);
+        }
+      } catch (err) {
+        console.warn("Could not load user name:", err.message);
+      }
+    };
+
+    fetchUserName();
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -100,69 +132,96 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.openDrawer()}>
             <Ionicons name="menu" size={28} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Streak")}>
-            <StreakIcon streakCount={54} />
-          </TouchableOpacity>
+          <StreakIcon navigation={navigation} />
         </View>
 
-        <Text style={styles.header}>🎓 Welcome back, Student!</Text>
+        {/* Personalized Welcome */}
+        <Text style={styles.header}>🎓 Welcome back, {userName}!</Text>
 
-        <Card icon="lightbulb-on-outline" title="Quote of the Day" color="#355C7D">
-          <Text style={styles.cardText}>{randomQuote}</Text>
-        </Card>
+        {/* Quote of the Day */}
+        <View style={styles.quoteContainer}>
+          <Text style={styles.quoteText}>"{randomQuote}"</Text>
+        </View>
 
-        <Card icon="trending-up" title="Your Progress Tracker" color="#6C5B7B">
-          <Text style={styles.cardText}>You're 65% through your current term courses.</Text>
-        </Card>
-
-        <Card icon="calendar-check" title="Attendance Overview" color="#355C7D">
-          <Text style={styles.cardText}>Average attendance: 88%. Keep it up!</Text>
-        </Card>
-
-        <Card icon="timeline-clock" title="Term Timeline" color="#F67280">
-          <Text style={styles.cardText}>Week 11 of 12 • Midterms Done • 1 Week to Finals</Text>
-        </Card>
-
-        <Card icon="gamepad-variant" title="Daily Challenge" color="#F8B195">
-          <Text style={styles.cardText}>🧠 Solve 3 case-based MCQs before 10PM!</Text>
-          <TouchableOpacity
-            style={styles.challengeBtn}
+        {/* Section Grid */}
+        <Text style={styles.subHeader}>Choose a Section</Text>
+        <View style={styles.zigzagGrid}>
+          <Section
+            icon="book-open-page-variant"
+            title="All Courses"
+            subtitle="Browse materials"
+            onPress={() => navigation.navigate("All Courses")}
+            color="#84b6f4"
+            alignRight={false}
+          />
+          <Section
+            icon="note-text"
+            title="Notes"
+            subtitle="Your saved notes"
+            onPress={() => navigation.navigate("Note")}
+            color="#81c784"
+            alignRight={true}
+          />
+          <Section
+            icon="calculator-variant"
+            title="GPA Calculator"
+            subtitle="Track grades"
+            onPress={() => navigation.navigate("GPACalculator")}
+            color="#ffd54f"
+            alignRight={false}
+          />
+          <Section
+            icon="gamepad-variant"
+            title="Daily Game"
+            subtitle="Train your brain"
             onPress={() => navigation.navigate("QuickBrainQuiz")}
-          >
-            <Text style={{ color: "#fff" }}>Start Challenge</Text>
-          </TouchableOpacity>
-        </Card>
-
-        <Card icon="calculator-variant" title="GPA Calculator" color="#6C5B7B">
-          <TouchableOpacity onPress={() => navigation.navigate("GPACalculator")}>
-            <Text style={styles.link}>Tap to calculate your GPA →</Text>
-          </TouchableOpacity>
-        </Card>
+            color="#e57373"
+            alignRight={true}
+          />
+        </View>
       </ScrollView>
 
-      <ChatBot />
+      {/* Chatbot Button */}
+      <TouchableOpacity
+        style={styles.chatBotIcon}
+        onPress={() => setIsChatVisible(!isChatVisible)} // toggle chatbot visibility
+      >
+        <MaterialCommunityIcons name="message" size={30} color="#fff" />
+      </TouchableOpacity>
+
+      {isChatVisible && <ChatBot setIsChatVisible={setIsChatVisible} />}
     </SafeAreaView>
   );
 };
 
-const Card = ({ icon, title, children, color }) => (
-  <View style={[styles.card, { borderLeftColor: color }]}>
-    <View style={styles.cardHeader}>
-      <MaterialCommunityIcons name={icon} size={24} color={color} />
-      <Text style={styles.cardTitle}>{title}</Text>
-    </View>
-    <View>{children}</View>
-  </View>
-);
+// ✅ Section Component (no animation)
+const Section = ({ icon, title, subtitle, onPress, color, alignRight }) => {
+  return (
+    <Pressable onPress={onPress}>
+      <View
+        style={[
+          styles.zigzagCard,
+          { backgroundColor: color },
+          alignRight ? styles.alignRight : styles.alignLeft,
+        ]}
+      >
+        <MaterialCommunityIcons name={icon} size={40} color="#fff" />
+        <View style={styles.cardTextContainer}>
+          <Text style={styles.sectionTitle}>{title}</Text>
+          {subtitle && <Text style={styles.sectionSubtitle}>{subtitle}</Text>}
+        </View>
+      </View>
+    </Pressable>
+  );
+};
 
-const ChatBot = () => {
-  const [visible, setVisible] = useState(false);
+// ChatBot Component
+const ChatBot = ({ setIsChatVisible }) => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     { role: "assistant", text: "👋 Hi! I'm your assistant. Ask me anything." },
   ]);
   const [loading, setLoading] = useState(false);
-  const [showTip, setShowTip] = useState(true);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -172,7 +231,7 @@ const ChatBot = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://172.20.10.7:5002/chat", {
+      const response = await fetch("http://192.168.1.56:5002/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage.text }),
@@ -191,66 +250,49 @@ const ChatBot = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => { setShowTip(false); Keyboard.dismiss(); }}>
-      <>
-        {showTip && (
-          <View style={styles.chatTip}>
-            <MaterialIcons name="smart-toy" size={24} color="#6C5B7B" />
-            <Text style={styles.chatTipText}>Need help?</Text>
-            <TouchableOpacity onPress={() => setShowTip(false)}>
-              <Text style={styles.chatTipClose}>✖</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <TouchableOpacity style={styles.chatIcon} onPress={() => setVisible(true)}>
-          <Feather name="message-circle" size={24} color="#fff" />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.chatBotContainer}
+    >
+      <View style={styles.chatBotHeader}>
+        <Text style={styles.chatBotHeaderText}>Chatbot</Text>
+        <TouchableOpacity onPress={() => setIsChatVisible(false)}>
+          <Ionicons name="close-circle" size={30} color="#333" />
         </TouchableOpacity>
+      </View>
 
-        <Modal visible={visible} transparent animationType="slide">
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.chatModal}
+      <ScrollView contentContainerStyle={styles.messagesContainer}>
+        {messages.map((msg, index) => (
+          <View
+            key={index}
+            style={[
+              styles.message,
+              msg.role === "user"
+                ? styles.userMessage
+                : styles.assistantMessage,
+            ]}
           >
-            <View style={styles.chatBox}>
-              <ScrollView style={{ flex: 1 }}>
-                {messages.map((msg, i) => (
-                  <Text
-                    key={i}
-                    style={{
-                      padding: 8,
-                      marginVertical: 4,
-                      backgroundColor: msg.role === "user" ? "#DCF8C6" : "#EEE",
-                      alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                      borderRadius: 8,
-                      maxWidth: "80%",
-                    }}
-                  >
-                    {msg.text}
-                  </Text>
-                ))}
-                {loading && <ActivityIndicator size="small" color="#6C5B7B" />}
-              </ScrollView>
+            <Text>{msg.text}</Text>
+          </View>
+        ))}
+      </ScrollView>
 
-              <View style={styles.chatInputRow}>
-                <TextInput
-                  value={input}
-                  onChangeText={setInput}
-                  placeholder="Ask me anything..."
-                  style={styles.chatInput}
-                />
-                <TouchableOpacity onPress={sendMessage}>
-                  <Feather name="send" size={20} color="#6C5B7B" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setVisible(false)}>
-                  <Text style={{ color: "red", marginLeft: 10 }}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
-      </>
-    </TouchableWithoutFeedback>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Ask me something..."
+          value={input}
+          onChangeText={setInput}
+        />
+        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Ionicons name="send" size={24} color="#fff" />
+          )}
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -275,45 +317,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     color: "#333",
   },
-  card: {
-    backgroundColor: "#fff",
-    marginBottom: 16,
-    padding: 16,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginLeft: 8,
-    color: "#333",
-  },
-  cardText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  link: {
-    color: "#007bff",
-    fontSize: 16,
-    textDecorationLine: "underline",
-  },
-  challengeBtn: {
-    marginTop: 10,
-    backgroundColor: "#F67280",
-    padding: 10,
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   streakContainer: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 4,
   },
   streakIcon: {
     width: 24,
@@ -325,67 +332,145 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#F67280",
   },
-  chatIcon: {
+  quoteContainer: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#ffab91", // Light orange color (unchanged)
+    borderRadius: 15,
+    width: "85%",
+    alignItems: "center",
+    alignSelf: "center",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
+    background:
+      "linear-gradient(to right, rgba(255, 126, 95, 0.2), rgba(254, 180, 123, 0.2))", // Applying opacity for fade effect
+  },
+  quoteText: {
+    fontSize: 20,
+    color: "#fff",
+    fontStyle: "italic",
+    textAlign: "center",
+    fontWeight: "600",
+    letterSpacing: 1.2, // Adding spacing for style
+  },
+
+  subHeader: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 20,
+    color: "#333",
+    textAlign: "center",
+  },
+  zigzagGrid: {
+    gap: 16,
+    marginTop: 10,
+  },
+  zigzagCard: {
+    width: "85%",
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderRadius: 18,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  alignLeft: {
+    alignSelf: "flex-start",
+  },
+  alignRight: {
+    alignSelf: "flex-end",
+    flexDirection: "row-reverse",
+  },
+  cardTextContainer: {
+    flex: 1,
+    marginHorizontal: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: "#fff",
+    opacity: 0.85,
+  },
+  // Chatbot icon at bottom
+  chatBotIcon: {
     position: "absolute",
-    bottom: 30,
+    bottom: 20,
     right: 20,
     backgroundColor: "#6C5B7B",
-    padding: 14,
     borderRadius: 30,
-    elevation: 5,
-    zIndex: 999,
+    padding: 15,
+    elevation: 10,
   },
-  chatTip: {
+  chatBotContainer: {
     position: "absolute",
-    bottom: 85,
+    bottom: 80,
+    left: 20,
     right: 20,
     backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    elevation: 5,
+    maxHeight: 350,
+    minHeight: 150,
+  },
+  chatBotHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  chatBotHeaderText: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  messagesContainer: {
+    flexGrow: 1,
+    marginBottom: 10,
+  },
+  message: {
+    marginBottom: 10,
+    padding: 8,
+    borderRadius: 12,
+    maxWidth: "80%",
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#84b6f4",
+  },
+  assistantMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#f5f5f5",
+  },
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    zIndex: 999,
-    elevation: 3,
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+    paddingTop: 10,
   },
-  chatTipText: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "500",
-    marginLeft: 5,
-  },
-  chatTipClose: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: "#999",
-    fontWeight: "bold",
-  },
-  chatModal: {
+  textInput: {
     flex: 1,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(0,0,0,0.2)",
-  },
-  chatBox: {
-    backgroundColor: "#fff",
-    height: "60%",
     padding: 10,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 12,
+    marginRight: 10,
   },
-  chatInputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-    gap: 10,
-  },
-  chatInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 8,
+  sendButton: {
+    backgroundColor: "#6C5B7B",
+    borderRadius: 50,
+    padding: 12,
   },
 });
 

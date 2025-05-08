@@ -16,7 +16,6 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-
 export default function ProfileScreen({ navigation }) {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -86,7 +85,7 @@ export default function ProfileScreen({ navigation }) {
       const token = await AsyncStorage.getItem("token");
       if (!token) return navigation.replace("Login");
 
-      const res = await fetch("http://172.20.10.7:5001/api/auth/profile", {
+      const res = await fetch("http://192.168.1.56:5005/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       });
 

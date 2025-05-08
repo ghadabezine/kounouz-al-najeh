@@ -24,11 +24,14 @@ const StreakScreen = () => {
     const fetchStreak = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        const res = await fetch("http://172.20.10.7:5001/api/users/get-streak", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          "http://192.168.1.56:5005/api/users/get-streak",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch streak");
 
@@ -44,7 +47,10 @@ const StreakScreen = () => {
   }, []);
 
   return (
-    <LinearGradient colors={["#F78C1F", "#F45D01", "#2C2C2C"]} style={styles.safeArea}>
+    <LinearGradient
+      colors={["#F78C1F", "#F45D01", "#2C2C2C"]}
+      style={styles.safeArea}
+    >
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
           {/* Top Bar */}
@@ -66,7 +72,10 @@ const StreakScreen = () => {
             <Text style={styles.label}>STREAK SOCIETY</Text>
 
             <View style={styles.streakDisplay}>
-              <Image source={require("../assets/flameBox.png")} style={styles.streakFlameLarge} />
+              <Image
+                source={require("../assets/flameBox.png")}
+                style={styles.streakFlameLarge}
+              />
               <View style={styles.streakNumberBox}>
                 <Text style={styles.streakCount}>{streak}</Text>
                 <Text style={styles.streakText}>day streak!</Text>

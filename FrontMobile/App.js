@@ -25,6 +25,7 @@ import GPACalculatorScreen from "./components/GPACalculator";
 import NotesListScreen from "./components/NotesListScreen";
 import NoteEditorScreen from "./components/NoteEditorScreen";
 import StreakScreen from "./components/StreakScreen";
+
 // Navigators
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();

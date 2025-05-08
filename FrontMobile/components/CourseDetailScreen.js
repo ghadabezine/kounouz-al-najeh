@@ -25,7 +25,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchChapters = async () => {
     try {
       const response = await axios.get(
-        `http://172.20.10.7:5001/api/chapters/subject/${course._id}`
+        `http://192.168.1.56:5005/api/chapters/subject/${course._id}`
       );
       setChapters(response.data);
     } catch (error) {
@@ -36,7 +36,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchMaterials = async (chapterId) => {
     try {
       const response = await axios.get(
-        `http://172.20.10.7:5001/api/files/${chapterId}/files`
+        `http://192.168.1.56:5005/api/files/${chapterId}/files`
       );
       setMaterials((prev) => ({ ...prev, [chapterId]: response.data }));
     } catch (error) {
@@ -47,7 +47,7 @@ export default function CourseDetailScreen({ route, navigation }) {
   const fetchQuizzes = async (chapterId) => {
     try {
       const response = await axios.get(
-        `http://172.20.10.7:5002/api/quizzes/${chapterId}/quizzes`
+        `http://192.168.1.56:5002/api/quizzes/${chapterId}/quizzes`
       );
       setQuizzes((prev) => ({ ...prev, [chapterId]: response.data }));
     } catch (error) {
@@ -65,9 +65,11 @@ export default function CourseDetailScreen({ route, navigation }) {
   };
 
   const handleLikeQuestion = (id) => {
-    setQna(qna.map((item) =>
-      item.id === id ? { ...item, likes: item.likes + 1 } : item
-    ));
+    setQna(
+      qna.map((item) =>
+        item.id === id ? { ...item, likes: item.likes + 1 } : item
+      )
+    );
   };
 
   const handleDeleteQuestion = (id) => {
@@ -99,7 +101,6 @@ export default function CourseDetailScreen({ route, navigation }) {
                   style={styles.cardButton}
                   onPress={() =>
                     navigation.navigate("QuizScreen", { chapterId: item._id })
-
                   }
                 >
                   <Text style={styles.cardButtonText}>Generate Quiz</Text>
@@ -121,7 +122,7 @@ export default function CourseDetailScreen({ route, navigation }) {
                       key={file._id}
                       onPress={() =>
                         Linking.openURL(
-                          `http://172.20.10.7:5001/api/files/view/${file._id}`
+                          `http://192.168.1.56:5005/api/files/view/${file._id}`
                         )
                       }
                     >
