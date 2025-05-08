@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/UserModal.css";
 
-const UserModal = ({ editingUser, closeModal, fetchUsers, setEditingUser, isDarkMode }) => {
+const UserModal = ({
+  editingUser,
+  closeModal,
+  fetchUsers,
+  setEditingUser,
+  isDarkMode,
+}) => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -58,14 +64,14 @@ const UserModal = ({ editingUser, closeModal, fetchUsers, setEditingUser, isDark
 
       if (editingUser) {
         await axios.put(
-          `http://localhost:5001/api/users/${editingUser._id}`,
+          `http://localhost:5005/api/users/${editingUser._id}`,
           userData,
           {
             headers: { "Content-Type": "application/json" },
           }
         );
       } else {
-        await axios.post("http://localhost:5001/api/users", userData, {
+        await axios.post("http://localhost:5005/api/users", userData, {
           headers: { "Content-Type": "application/json" },
         });
       }
@@ -85,7 +91,9 @@ const UserModal = ({ editingUser, closeModal, fetchUsers, setEditingUser, isDark
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2 style={{ color: "black" }}>{editingUser ? "Edit User" : "Add User"}</h2>
+        <h2 style={{ color: "black" }}>
+          {editingUser ? "Edit User" : "Add User"}
+        </h2>
         <form onSubmit={handleSubmit}>
           <input
             type="text"

@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import '../styles/QuizForm.css';
+import React, { useState } from "react";
+import axios from "axios";
+import "../styles/QuizForm.css";
 
 function QuizForm({ chapter, goBack }) {
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([
-    { questionText: '', options: ['', '', '', ''], correctAnswerIndex: null }
+    { questionText: "", options: ["", "", "", ""], correctAnswerIndex: null },
   ]);
 
-  if (!chapter) return <p>⚠️ No chapter selected. Please select a chapter first.</p>;
+  if (!chapter)
+    return <p>⚠️ No chapter selected. Please select a chapter first.</p>;
 
   const addQuestion = () => {
-    setQuestions(prev => [
+    setQuestions((prev) => [
       ...prev,
-      { questionText: '', options: ['', '', '', ''], correctAnswerIndex: null }
+      { questionText: "", options: ["", "", "", ""], correctAnswerIndex: null },
     ]);
   };
 
@@ -25,7 +26,7 @@ function QuizForm({ chapter, goBack }) {
 
   const addOption = (qIndex) => {
     const updated = [...questions];
-    updated[qIndex].options.push('');
+    updated[qIndex].options.push("");
     setQuestions(updated);
   };
 
@@ -51,7 +52,7 @@ function QuizForm({ chapter, goBack }) {
         alert(`⚠️ Question ${i + 1} is missing text`);
         return;
       }
-      if (q.options.length < 2 || q.options.some(opt => !opt.trim())) {
+      if (q.options.length < 2 || q.options.some((opt) => !opt.trim())) {
         alert(`⚠️ Question ${i + 1} has invalid options`);
         return;
       }
@@ -65,27 +66,29 @@ function QuizForm({ chapter, goBack }) {
       }
     }
 
-  
     try {
-      const formattedQuestions = questions.map(q => ({
+      const formattedQuestions = questions.map((q) => ({
         questionText: q.questionText,
         options: q.options,
-        correctAnswer: q.options[q.correctAnswerIndex]
+        correctAnswer: q.options[q.correctAnswerIndex],
       }));
-  
+
       // FIX: Use the proper URL structure matching your backend routes
-      const response = await axios.post(`http://localhost:5001/api/quizzes/${chapter._id}/quizzes`, {
-        title,
-        questions: formattedQuestions,
-        // Chapter ID is now in the URL, not needed in body
-      });
-  
+      const response = await axios.post(
+        `http://localhost:5005/api/quizzes/${chapter._id}/quizzes`,
+        {
+          title,
+          questions: formattedQuestions,
+          // Chapter ID is now in the URL, not needed in body
+        }
+      );
+
       alert(`✅ Quiz Created: ${response.data._id}`);
       goBack();
     } catch (err) {
       console.error("❌ Error creating quiz:", err);
       console.error("📋 Full error response:", err?.response?.data);
-      alert('❌ Error creating quiz. Check console for details.');
+      alert("❌ Error creating quiz. Check console for details.");
     }
   };
 
@@ -141,7 +144,10 @@ function QuizForm({ chapter, goBack }) {
                     setQuestions(updated);
                   }}
                 />
-                <label className="checkbox-label" htmlFor={`correct-${qIndex}-${optIndex}`}></label>
+                <label
+                  className="checkbox-label"
+                  htmlFor={`correct-${qIndex}-${optIndex}`}
+                ></label>
               </div>
               <button
                 onClick={() => deleteOption(qIndex, optIndex)}
@@ -152,16 +158,27 @@ function QuizForm({ chapter, goBack }) {
             </div>
           ))}
 
-          <button className="add-option-btn" onClick={() => addOption(qIndex)}>➕ Add Option</button>
-          <button className="delete-question-btn" onClick={() => deleteQuestion(qIndex)}>
+          <button className="add-option-btn" onClick={() => addOption(qIndex)}>
+            ➕ Add Option
+          </button>
+          <button
+            className="delete-question-btn"
+            onClick={() => deleteQuestion(qIndex)}
+          >
             ❌ Delete Question
           </button>
         </div>
       ))}
 
-      <button className="add-btn" onClick={addQuestion}>➕ Add Question</button>
-      <button className="save-btn" onClick={handleSubmit}>💾 Save Quiz</button>
-      <button className="back-btn" onClick={goBack}>🔙 Back</button>
+      <button className="add-btn" onClick={addQuestion}>
+        ➕ Add Question
+      </button>
+      <button className="save-btn" onClick={handleSubmit}>
+        💾 Save Quiz
+      </button>
+      <button className="back-btn" onClick={goBack}>
+        🔙 Back
+      </button>
     </div>
   );
 }

@@ -12,7 +12,7 @@ CORS(app)
 openai.api_key = "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"
 
 # 🔗 Node.js backend URL (MongoDB + Express)
-NODE_BACKEND_URL = "http://172.20.10.7:5001"
+NODE_BACKEND_URL = "http://192.168.1.56:5005"
 
 
 # 📚 Fetch and combine all file contents for a chapter

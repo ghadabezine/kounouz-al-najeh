@@ -3,7 +3,7 @@ const axios = require("axios");
 async function generate_quiz(inputText) {
   try {
     console.log("📤 Sending content to API...");
-    const response = await axios.post("http://127.0.0.1:5001/generate-quiz", {
+    const response = await axios.post("http://127.0.0.1:5005/generate-quiz", {
       content: inputText,
     });
 
