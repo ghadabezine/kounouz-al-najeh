@@ -21,7 +21,11 @@ const Login = ({ setIsAuthenticated }) => {
 
     try {
       const { data } = await axios.post(
+<<<<<<< HEAD
         "http://localhost:5005/api/auth/login",
+=======
+        "http://localhost:5002/api/auth/login",
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );

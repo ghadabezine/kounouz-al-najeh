@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+<<<<<<< HEAD
 import { motion, AnimatePresence } from "framer-motion";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -7,11 +8,23 @@ import QuizForm from "./components/QuizForm";
 import UserList from "./components/UserList";
 import UserForm from "./components/UserForm";
 import FileDashboard from "./components/FileDashboard";
+=======
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import UserForm from "./components/UserForm";
+import UserList from "./components/UserList";
+import FileDashboard from "./components/FileDashboard";
+import QuizForm from "./components/QuizForm";
+import TakeQuiz from "./components/TakeQuiz";
+import Dashboard from "./components/SubjectsDashboard";
+import FileUpload from "./components/FileDashboard";
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 import ViewQuizzes from "./components/ViewQuizzes";
 import Dashboard from "./components/SubjectsDashboard";
 import ChapterList from "./components/ChapterList";
 import Login from "./components/Login";
 import UserModal from "./components/UserModal";
+<<<<<<< HEAD
 import Statistics from "./components/Statistics";
 import "./styles/App.css";
 
@@ -26,11 +39,18 @@ const PageTransition = ({ children }) => (
     {children}
   </motion.div>
 );
+=======
+import "./styles/App.css";
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 
 const App = () => {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [activePage, setActivePage] = useState("login");
+<<<<<<< HEAD
+=======
+  const [quizId, setQuizId] = useState("");
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   const [subjects, setSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
@@ -72,7 +92,11 @@ const App = () => {
   // Fetch users from the backend
   const fetchUsers = async () => {
     try {
+<<<<<<< HEAD
       const response = await axios.get("http://localhost:5005/api/users");
+=======
+      const response = await axios.get("http://localhost:5002/api/users");
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -82,7 +106,11 @@ const App = () => {
   // Handle deleting a user
   const handleDelete = async (id) => {
     try {
+<<<<<<< HEAD
       await axios.delete(`http://localhost:5005/api/users/${id}`);
+=======
+      await axios.delete(`http://localhost:5002/api/users/${id}`);
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -129,7 +157,11 @@ const App = () => {
 
   const fetchSubjects = async () => {
     try {
+<<<<<<< HEAD
       const response = await axios.get("http://localhost:5005/api/subjects");
+=======
+      const response = await axios.get("http://localhost:5002/api/subjects");
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       setSubjects(response.data);
     } catch (err) {
       console.error("❌ Error fetching subjects:", err);
@@ -137,10 +169,18 @@ const App = () => {
   };
   const handleAddSubject = async (name) => {
     try {
+<<<<<<< HEAD
       const response = await axios.post("http://localhost:5005/api/subjects", {
         name,
       });
       setSubjects((prev) => [...prev, response.data]);
+=======
+      const response = await axios.post("http://localhost:5002/api/subjects", {
+        name,
+      });
+      fetchSubjects(); // Refetch subjects to update the UI
+      return response.data;
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     } catch (err) {
       console.error("❌ Error adding subject:", err);
     }
@@ -148,8 +188,13 @@ const App = () => {
 
   const handleDeleteSubject = async (id) => {
     try {
+<<<<<<< HEAD
       await axios.delete(`http://localhost:5005/api/subjects/${id}`);
       setSubjects((prev) => prev.filter((subject) => subject._id !== id));
+=======
+      await axios.delete(`http://localhost:5002/api/subjects/${id}`);
+      fetchSubjects(); // Refetch subjects to update the UI
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     } catch (err) {
       console.error("❌ Error deleting subject:", err);
     }
@@ -158,12 +203,20 @@ const App = () => {
   const handleEditSubject = async (id, name) => {
     try {
       const response = await axios.put(
+<<<<<<< HEAD
         `http://localhost:5005/api/subjects/${id}`,
         { name }
       );
       setSubjects((prev) =>
         prev.map((subject) => (subject._id === id ? response.data : subject))
       );
+=======
+        `http://localhost:5002/api/subjects/${id}`,
+        { name }
+      );
+      fetchSubjects(); // Refetch subjects to update the UI
+      return response.data;
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     } catch (err) {
       console.error("❌ Error editing subject:", err);
     }
@@ -186,6 +239,7 @@ const App = () => {
   return (
     <div className={`container ${isDarkMode ? "dark-mode" : ""}`}>
       {!isAuthenticated ? (
+<<<<<<< HEAD
         <PageTransition>
           <Login
             setIsAuthenticated={(status) => {
@@ -234,6 +288,110 @@ const App = () => {
                   />
                 </PageTransition>
               )}
+=======
+        <Login
+          setIsAuthenticated={(status) => {
+            setIsAuthenticated(status);
+            if (status) setActivePage("home"); // Navigate to home on successful login
+          }}
+        />
+      ) : (
+        <>
+          {/* Show header only after authentication */}
+          <Header
+            setActivePage={setActivePage}
+            setSelectedSubject={setSelectedSubject}
+          />
+
+          <main>
+            {activePage === "home" && <div className="home"></div>}
+
+            {activePage === "files" && <FileDashboard />}
+
+            {activePage === "users" && (
+              <div>
+                <h1 className="user-management">User Management</h1>
+                <button onClick={openModal}>Add User</button>
+                <UserList
+                  users={users}
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                />
+              </div>
+            )}
+
+            {activePage === "subjects" &&
+              (!selectedSubject ? (
+                <Dashboard
+                  subjects={subjects}
+                  onFileUpload={(subject) => {
+                    setSelectedSubject(subject);
+                    setActivePage("fileUpload");
+                  }}
+                  onCreateQuiz={(subject) => {
+                    setSelectedSubject(subject);
+                    setActivePage("createQuiz");
+                  }}
+                  onViewQuizzes={(subject) => {
+                    setSelectedSubject(subject);
+                    setActivePage("viewQuizzes");
+                  }}
+                  onDeleteSubject={handleDeleteSubject}
+                  onAddSubject={handleAddSubject}
+                  onEditSubject={handleEditSubject}
+                />
+              ) : (
+                <FileUpload
+                  subject={selectedSubject}
+                  goBack={() => setSelectedSubject(null)}
+                />
+              ))}
+
+            {activePage === "createQuiz" && selectedSubject && (
+              <QuizForm
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage("subjects");
+                }}
+              />
+            )}
+
+            {activePage === "fileUpload" && selectedSubject && (
+              <FileUpload
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage("subjects");
+                }}
+              />
+            )}
+
+            {activePage === "takeQuiz" && (
+              <div>
+                <h1>Take a Quiz</h1>
+                <input
+                  type="text"
+                  value={quizId}
+                  onChange={(e) => setQuizId(e.target.value)}
+                  placeholder="Enter Quiz ID"
+                  className="quiz-id-input"
+                />
+                {quizId && <TakeQuiz quizId={quizId} />}
+              </div>
+            )}
+
+            {activePage === "viewQuizzes" && selectedSubject && (
+              <ViewQuizzes
+                subject={selectedSubject}
+                goBack={() => {
+                  setSelectedSubject(null);
+                  setActivePage("subjects");
+                }}
+              />
+            )}
+          </main>
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 
               {activePage === "chapters" &&
                 selectedSubject &&
@@ -349,6 +507,7 @@ const App = () => {
             </AnimatePresence>
           </main>
           {isModalOpen && (
+<<<<<<< HEAD
             <UserModal
               editingUser={editingUser}
               closeModal={closeModal}
@@ -356,6 +515,16 @@ const App = () => {
               setEditingUser={setEditingUser}
               isDarkMode={isDarkMode}
             />
+=======
+            <UserModal closeModal={closeModal}>
+              <UserForm
+                fetchUsers={fetchUsers}
+                editingUser={editingUser}
+                setEditingUser={setEditingUser}
+                closeModal={closeModal}
+              />
+            </UserModal>
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
           )}
 
           <Footer isDarkMode={isDarkMode} />

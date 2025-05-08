@@ -27,7 +27,11 @@ export default function EditProfileScreen({ navigation, route }) {
       const token = await AsyncStorage.getItem("token");
 
       const res = await fetch(
+<<<<<<< HEAD
         "http://192.168.1.56:5005/api/auth/updateProfile",
+=======
+        "http://192.168.1.56:5002/api/auth/updateProfile",
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
         {
           method: "PATCH",
           headers: {

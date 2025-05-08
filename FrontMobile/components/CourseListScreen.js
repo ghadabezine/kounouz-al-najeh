@@ -24,7 +24,11 @@ export default function CourseListScreen() {
   /** ✅ Fetch courses from the database */
   const fetchCourses = async () => {
     try {
+<<<<<<< HEAD
       const response = await fetch("http://192.168.1.56:5005/api/subjects");
+=======
+      const response = await fetch("http://192.168.1.56:5002/api/subjects");
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       if (!response.ok) throw new Error("Failed to fetch courses");
 
       const data = await response.json();

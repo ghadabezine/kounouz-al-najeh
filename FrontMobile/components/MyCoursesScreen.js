@@ -6,11 +6,14 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  Modal,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MyCoursesScreen({ navigation }) {
   const [myCourses, setMyCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
   /** ✅ Load saved courses */
   const loadCourses = async () => {
@@ -26,9 +29,29 @@ export default function MyCoursesScreen({ navigation }) {
     loadCourses();
   }, []);
 
+<<<<<<< HEAD
   /** ✅ Navigate to Course Details */
   const handleCoursePress = (course) => {
     navigation.navigate("CourseDetailScreen", { course });
+=======
+  /** ✅ Open modal with selected course */
+  const openModal = (course) => {
+    setSelectedCourse(course);
+    setModalVisible(true);
+  };
+
+  /** ✅ Close modal */
+  const closeModal = () => {
+    setSelectedCourse(null);
+    setModalVisible(false);
+  };
+
+  /** ✅ Edit course details */
+  const editCourse = () => {
+    // Navigate to EditCourseScreen with the selected course
+    closeModal();
+    navigation.navigate("EditCourseScreen", { course: selectedCourse });
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   };
 
   return (
@@ -44,12 +67,72 @@ export default function MyCoursesScreen({ navigation }) {
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.card}
+<<<<<<< HEAD
               onPress={() => handleCoursePress(item)}
+=======
+              onPress={() => openModal(item)}
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
             >
               <Text style={styles.cardTitle}>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
+      )}
+
+      {/* ✅ Modal for Course Options */}
+      {modalVisible && selectedCourse && (
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={modalVisible}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>{selectedCourse.name}</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("CourseDetailScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Show Full Course</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("QuizScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Generate Quiz</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  closeModal();
+                  navigation.navigate("ExamScreen", {
+                    course: selectedCourse,
+                  });
+                }}
+              >
+                <Text style={styles.modalButtonText}>Generate Exam</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       )}
     </SafeAreaView>
   );
@@ -88,5 +171,65 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#999",
     fontStyle: "italic",
+<<<<<<< HEAD
+=======
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 24,
+    width: "88%",
+    maxWidth: 420,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#6C5B7B",
+    marginBottom: 18,
+    textAlign: "center",
+  },
+  modalButton: {
+    width: "100%",
+    backgroundColor: "#c7efff",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginVertical: 6,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  modalButtonText: {
+    fontSize: 17,
+    fontWeight: "600",
+    color: "#1E3E62",
+  },
+  closeButton: {
+    width: "100%",
+    backgroundColor: "#E0E0E0",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#555",
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   },
 });

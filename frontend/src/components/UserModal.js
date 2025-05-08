@@ -64,14 +64,22 @@ const UserModal = ({
 
       if (editingUser) {
         await axios.put(
+<<<<<<< HEAD
           `http://localhost:5005/api/users/${editingUser._id}`,
+=======
+          `http://localhost:5002/api/users/${editingUser._id}`,
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
           userData,
           {
             headers: { "Content-Type": "application/json" },
           }
         );
       } else {
+<<<<<<< HEAD
         await axios.post("http://localhost:5005/api/users", userData, {
+=======
+        await axios.post("http://localhost:5002/api/users", userData, {
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
           headers: { "Content-Type": "application/json" },
         });
       }

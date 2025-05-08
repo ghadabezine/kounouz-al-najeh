@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
+=======
+import React from "react";
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 import {
   View,
   Text,
@@ -6,6 +10,7 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+<<<<<<< HEAD
   Image,
   Pressable,
   TextInput,
@@ -82,6 +87,12 @@ const StreakIcon = ({ navigation }) => {
 };
 
 // 📚 Quotes
+=======
+} from "react-native";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+
+// Array of quotes
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 const quotes = [
   `"Success is the sum of small efforts, repeated day in and day out." – R. Collier`,
   `"The only way to do great work is to love what you do." – Steve Jobs`,
@@ -97,6 +108,7 @@ const quotes = [
 const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
 const HomeScreen = ({ navigation }) => {
+<<<<<<< HEAD
   const [userName, setUserName] = useState("Student");
   const [isChatVisible, setIsChatVisible] = useState(false);
 
@@ -179,6 +191,67 @@ const HomeScreen = ({ navigation }) => {
             alignRight={true}
           />
         </View>
+=======
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color="#000" />
+        </TouchableOpacity>
+
+        <Text style={styles.header}>🎓 Welcome back, Student!</Text>
+        {/* Quote Wall */}
+        <Card
+          icon="lightbulb-on-outline"
+          title="Quote of the Day"
+          color="#355C7D"
+        >
+          <Text style={styles.cardText}>{randomQuote}</Text>
+        </Card>
+
+        {/* Progress Tracker */}
+        <Card icon="trending-up" title="Your Progress Tracker" color="#6C5B7B">
+          <Text style={styles.cardText}>
+            You're 65% through your current term courses.
+          </Text>
+        </Card>
+
+        {/* Attendance Overview */}
+        <Card icon="calendar-check" title="Attendance Overview" color="#355C7D">
+          <Text style={styles.cardText}>
+            Average attendance: 88%. Keep it up!
+          </Text>
+        </Card>
+
+        {/* Term Timeline */}
+        <Card icon="timeline-clock" title="Term Timeline" color="#F67280">
+          <Text style={styles.cardText}>
+            Week 11 of 12 • Midterms Done • 1 Weeks to Finals
+          </Text>
+        </Card>
+
+        {/* Daily Challenge */}
+        <Card icon="gamepad-variant" title="Daily Challenge" color="#F8B195">
+          <Text style={styles.cardText}>
+            🧠 Solve 3 case-based MCQs before 10PM!
+          </Text>
+          <TouchableOpacity
+            style={styles.challengeBtn}
+            onPress={() => navigation.navigate("QuickBrainQuiz")}
+          >
+            <Text style={{ color: "#fff" }}>Start Challenge</Text>
+          </TouchableOpacity>
+        </Card>
+
+        {/* GPA Calculator */}
+        <Card icon="calculator-variant" title="GPA Calculator" color="#6C5B7B">
+          <TouchableOpacity
+            onPress={() => navigation.navigate("GPACalculator")}
+          >
+            <Text style={styles.link}>Tap to calculate your GPA →</Text>
+          </TouchableOpacity>
+        </Card>
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       </ScrollView>
 
       {/* Chatbot Button */}
@@ -194,6 +267,7 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+<<<<<<< HEAD
 // ✅ Section Component (no animation)
 const Section = ({ icon, title, subtitle, onPress, color, alignRight }) => {
   return (
@@ -295,16 +369,32 @@ const ChatBot = ({ setIsChatVisible }) => {
     </KeyboardAvoidingView>
   );
 };
+=======
+const Card = ({ icon, title, children, color }) => (
+  <View style={[styles.card, { borderLeftColor: color }]}>
+    <View style={styles.cardHeader}>
+      <MaterialCommunityIcons name={icon} size={24} color={color} />
+      <Text style={styles.cardTitle}>{title}</Text>
+    </View>
+    <View>{children}</View>
+  </View>
+);
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+<<<<<<< HEAD
     backgroundColor: "#F0EBF8",
+=======
+    backgroundColor: "#F0EBF8", // Match your app's background
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   },
   scrollContainer: {
     padding: 20,
     paddingBottom: 40,
   },
+<<<<<<< HEAD
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -455,6 +545,53 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
+=======
+  container: {
+    padding: 16,
+    backgroundColor: "#f4f4f8",
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 16,
+    color: "#333",
+  },
+  card: {
+    backgroundColor: "#fff",
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F67280",
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginLeft: 8,
+    color: "#333",
+  },
+  cardText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  link: {
+    color: "#007bff",
+    fontSize: 16,
+    textDecorationLine: "underline",
+  },
+  challengeBtn: {
+    marginTop: 10,
+    backgroundColor: "#F67280",
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: "center",
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     alignItems: "center",
     borderTopWidth: 1,
     borderTopColor: "#ccc",

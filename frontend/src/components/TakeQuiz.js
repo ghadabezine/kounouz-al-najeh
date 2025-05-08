@@ -11,7 +11,11 @@ function TakeQuiz() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
+<<<<<<< HEAD
         const response = await axios.get("http://localhost:5005/quizzes"); // Ensure the endpoint is /quizzes
+=======
+        const response = await axios.get("http://localhost:5002/quizzes"); // Ensure the endpoint is /quizzes
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
         if (response.data && Array.isArray(response.data)) {
           setQuizzes(response.data);
         } else {
@@ -28,7 +32,11 @@ function TakeQuiz() {
   const handleQuizSelect = async (e) => {
     const quizId = e.target.value;
     try {
+<<<<<<< HEAD
       const response = await axios.get(`http://localhost:5005/quiz/${quizId}`); // Fetch the selected quiz details
+=======
+      const response = await axios.get(`http://localhost:5002/quiz/${quizId}`); // Fetch the selected quiz details
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       setSelectedQuiz(response.data);
       setAnswers({}); // Reset answers when a new quiz is selected
     } catch (error) {

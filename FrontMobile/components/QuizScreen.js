@@ -69,6 +69,7 @@ export default function GenerateQuizScreen({ route, navigation }) {
     fetchQuiz();
   }, [chapterId]);
 
+<<<<<<< HEAD
   const handleOptionSelect = (option) => {
     if (selectedOption) return;
 
@@ -113,15 +114,90 @@ export default function GenerateQuizScreen({ route, navigation }) {
     return styles.option;
   };
 
+=======
+export default function GenerateQuizScreen({ route }) {
+  const { subjectId } = route.params;
+
+  const [quiz, setQuiz] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const response = await fetch(
+          "http://192.168.1.56:5002/api/quizzes/generate-quiz",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subjectId }),
+          }
+        );
+
+        if (!response.ok) throw new Error("Failed to generate quiz.");
+        const data = await response.json();
+        if (!data.quiz || !Array.isArray(data.quiz) || data.quiz.length === 0) {
+          throw new Error("No questions received.");
+        }
+        setQuiz(data.quiz);
+      } catch (error) {
+        console.error("❌ Error fetching quiz:", error);
+        Alert.alert("Error", error.message || "Failed to load quiz");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [subjectId]);
+
+  const handleNext = () => {
+    if (currentIndex < quiz.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+      setSelectedOption(null);
+    } else {
+      Alert.alert("🎉 Quiz Complete", "You've completed the quiz!");
+    }
+  };
+
+  const handleOptionSelect = (option) => {
+    if (!selectedOption) setSelectedOption(option);
+  };
+
+  const currentQuestion = quiz[currentIndex];
+
+  const getOptionText = (opt) => {
+    // Extracts just "mode" from "D. mode"
+    return opt.split(". ")[1]?.trim();
+  };
+
+  const getOptionStyle = (opt) => {
+    const actualText = getOptionText(opt);
+    const isCorrect = actualText === currentQuestion.answer;
+    const isSelected = opt === selectedOption;
+
+    if (!selectedOption) return styles.option;
+    if (isCorrect) return [styles.option, styles.correctAnswer];
+    if (isSelected && !isCorrect) return [styles.option, styles.wrongAnswer];
+
+    return styles.option;
+  };
+
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="#6C5B7B" />
       ) : currentQuestion ? (
         <>
+<<<<<<< HEAD
           <Text style={styles.question}>
             {currentIndex + 1}. {currentQuestion.question}
           </Text>
+=======
+          <Text style={styles.question}>{currentQuestion.question}</Text>
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
 
           {currentQuestion.options.map((opt, index) => (
             <TouchableOpacity
@@ -135,9 +211,13 @@ export default function GenerateQuizScreen({ route, navigation }) {
           ))}
 
           <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+<<<<<<< HEAD
             <Text style={styles.nextButtonText}>
               {currentIndex === quiz.length - 1 ? "Finish" : "Next"}
             </Text>
+=======
+            <Text style={styles.nextButtonText}>Next</Text>
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
           </TouchableOpacity>
         </>
       ) : (
@@ -168,6 +248,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
+<<<<<<< HEAD
   selectedOption: {
     backgroundColor: "#D1C4E9",
     borderColor: "#673AB7",
@@ -178,6 +259,14 @@ const styles = StyleSheet.create({
   },
   wrongAnswer: {
     backgroundColor: "#FFCDD2",
+=======
+  correctAnswer: {
+    backgroundColor: "#C8E6C9", // light green
+    borderColor: "#4CAF50",
+  },
+  wrongAnswer: {
+    backgroundColor: "#FFCDD2", // light red
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     borderColor: "#F44336",
   },
   optionText: {
@@ -202,3 +291,4 @@ const styles = StyleSheet.create({
     color: "red",
   },
 });
+``;

@@ -3,11 +3,16 @@ import axios from "axios";
 import logo from "../assets/logo.jpg";
 import "../styles/viewQuizzes.css";
 
+<<<<<<< HEAD
 const ViewQuizzes = ({ chapter, goBack }) => {
+=======
+const ViewQuizzes = ({ subject, goBack }) => {
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
   const [quizzes, setQuizzes] = useState([]);
   const [expandedQuiz, setExpandedQuiz] = useState(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [editingQuiz, setEditingQuiz] = useState(null);
+<<<<<<< HEAD
   // Change from subject-based to chapter-based fetching
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -151,6 +156,150 @@ const ViewQuizzes = ({ chapter, goBack }) => {
       {/* Page title */}
       <h1 className="title">Quizzes for {chapter.name}</h1>
 
+=======
+
+  // Fetch quizzes for the selected subject
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5002/api/quizzes?subject=${subject._id}`
+        );
+        setQuizzes(response.data);
+      } catch (error) {
+        console.error("Error fetching quizzes:", error);
+      }
+    };
+    fetchQuizzes();
+  }, [subject]);
+
+  // Toggle quiz expansion
+  const toggleQuiz = (quizId) => {
+    setExpandedQuiz(expandedQuiz === quizId ? null : quizId);
+  };
+
+  // Delete a quiz
+  const deleteQuiz = async (quizId) => {
+    try {
+      await axios.delete(`http://localhost:5002/api/quizzes/${quizId}`);
+      setQuizzes(quizzes.filter((quiz) => quiz._id !== quizId));
+    } catch (error) {
+      console.error("Error deleting quiz:", error);
+    }
+  };
+
+  // Delete a question from a quiz
+  const deleteQuestion = async (quizId, questionIndex) => {
+    try {
+      await axios.delete(
+        `http://localhost:5002/api/quizzes/${quizId}/questions/${questionIndex}`
+      );
+
+      // Update the quizzes state to reflect the deletion
+      const updatedQuizzes = quizzes.map((quiz) => {
+        if (quiz._id === quizId) {
+          return {
+            ...quiz,
+            questions: quiz.questions.filter(
+              (_, index) => index !== questionIndex
+            ),
+          };
+        }
+        return quiz;
+      });
+
+      setQuizzes(updatedQuizzes);
+    } catch (error) {
+      console.error("Error deleting question:", error);
+    }
+  };
+
+  // Open the edit question popup
+  const handleEditQuestion = (quizId, questionIndex, question) => {
+    setEditingQuestion({ quizId, questionIndex, question });
+  };
+
+  // Save the edited question
+  const handleSaveQuestion = async (updatedQuestion) => {
+    try {
+      await axios.put(
+        `http://localhost:5002/api/quizzes/${editingQuestion.quizId}/questions/${editingQuestion.questionIndex}`,
+        updatedQuestion
+      );
+
+      // Update the quizzes state to reflect the edited question
+      const updatedQuizzes = quizzes.map((quiz) => {
+        if (quiz._id === editingQuestion.quizId) {
+          return {
+            ...quiz,
+            questions: quiz.questions.map((q, index) =>
+              index === editingQuestion.questionIndex ? updatedQuestion : q
+            ),
+          };
+        }
+        return quiz;
+      });
+
+      setQuizzes(updatedQuizzes);
+      setEditingQuestion(null); // Close the edit popup
+    } catch (error) {
+      console.error("Error editing question:", error);
+    }
+  };
+
+  // Open the edit quiz popup
+  const handleEditQuiz = (quiz) => {
+    setEditingQuiz(quiz);
+  };
+
+  // Save the edited quiz
+  const handleSaveQuiz = async (updatedQuiz) => {
+    try {
+      await axios.put(
+        `http://localhost:5002/api/quizzes/${updatedQuiz._id}`,
+        updatedQuiz
+      );
+
+      // Update the quizzes state to reflect the changes
+      const updatedQuizzes = quizzes.map((quiz) =>
+        quiz._id === updatedQuiz._id ? updatedQuiz : quiz
+      );
+
+      setQuizzes(updatedQuizzes);
+      setEditingQuiz(null); // Close the edit popup
+    } catch (error) {
+      console.error("Error updating quiz:", error);
+    }
+  };
+
+  return (
+    <div className="view-quizzes-container">
+      {/* Header with logo and back button */}
+      <div className="header">
+        <button onClick={goBack} className="back-button">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="back-icon"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Subjects
+        </button>
+        <img src={logo} alt="Logo" className="logo" />
+      </div>
+
+      {/* Page title */}
+      <h1 className="title">Quizzes for {subject.name}</h1>
+
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
       {/* Quizzes list */}
       <div className="quiz-list">
         {quizzes.length > 0 ? (
@@ -387,7 +536,11 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
           name="title"
           value={editedQuiz.title}
           onChange={handleChange}
+<<<<<<< HEAD
           placeholder="Enter Quiz Title"
+=======
+          placeholder="Quiz Title"
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
         />
         <div>
           {editedQuiz.questions.map((question, qIndex) => (
@@ -400,7 +553,11 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
                   newQuestions[qIndex].questionText = e.target.value;
                   setEditedQuiz({ ...editedQuiz, questions: newQuestions });
                 }}
+<<<<<<< HEAD
                 placeholder="Enter your question here"
+=======
+                placeholder="Question Text"
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
               />
               <div>
                 {question.options.map((option, optIndex) => (
@@ -413,7 +570,11 @@ const EditQuizPopup = ({ quiz, onSave, onClose }) => {
                       newQuestions[qIndex].options[optIndex] = e.target.value;
                       setEditedQuiz({ ...editedQuiz, questions: newQuestions });
                     }}
+<<<<<<< HEAD
                     placeholder={`Enter option ${optIndex + 1}`}
+=======
+                    placeholder={`Option ${optIndex + 1}`}
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
                   />
                 ))}
               </div>

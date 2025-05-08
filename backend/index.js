@@ -36,9 +36,8 @@ app.use("/api/notes", noteRoutes);
 // Routes
 app.use("/api/auth", authRoutes); // Auth endpoints
 app.use("/api/users", userRoutes); // User endpoints
-app.use("/api/files", fileRoutes);
+app.use("/api/files", fileRoutes); // File endpoints
 app.use("/api/subjects", subjectRoutes);
 app.use("/api/quizzes", quizRoutes);
-app.use("/api/chapters", chapterRoutes);
-const PORT = process.env.PORT || 5005;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

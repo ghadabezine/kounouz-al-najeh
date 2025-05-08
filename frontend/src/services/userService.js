@@ -13,12 +13,20 @@ const App = () => {
   }, []);
 
   const fetchUsers = async () => {
+<<<<<<< HEAD
     const response = await axios.get("http://localhost:5005/api/users");
+=======
+    const response = await axios.get("http://localhost:5002/api/users");
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     setUsers(response.data);
   };
 
   const handleDelete = async (id) => {
+<<<<<<< HEAD
     await axios.delete(`http://localhost:5005/api/users/${id}`);
+=======
+    await axios.delete(`http://localhost:5002/api/users/${id}`);
+>>>>>>> f603a2515574303b1ebbf32af460cfd4a61be625
     fetchUsers();
   };
 

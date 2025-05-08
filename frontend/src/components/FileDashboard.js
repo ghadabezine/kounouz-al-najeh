@@ -93,6 +93,12 @@ const FileDashboard = ({ chapter, goBack }) => {
           <button type="button" onClick={goBack} className="button-secondary">
             Back
           </button>
+          <button type="submit" className="button">
+            Upload
+          </button>
+          <button type="button" onClick={goBack} className="button-secondary">
+            Back
+          </button>
         </div>
       </form>
       {message && <p className="message">{message}</p>}
@@ -109,6 +115,15 @@ const FileDashboard = ({ chapter, goBack }) => {
                     onChange={(e) => setNewFilename(e.target.value)}
                   />
                   <div className="button-container">
+                    <button className="save-btn" onClick={handleUpdateFilename}>
+                      Save
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={() => setEditingFile(null)}
+                    >
+                      Cancel
+                    </button>
                     <button className="save-btn" onClick={handleUpdateFilename}>
                       Save
                     </button>
